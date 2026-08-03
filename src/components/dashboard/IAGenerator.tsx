@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSupabaseInventory, type Mueble } from "@/lib/api/inventory.functions";
-import { generateProductCreative } from "@/lib/api/ai.functions";
+import { generateProductCreative, updateAIContent, deleteAIContent } from "@/lib/api/ai.functions";
 import { 
   Sparkles, 
   Search, 
@@ -14,7 +14,12 @@ import {
   CheckCircle2,
   Clock,
   ChevronRight,
-  Plus
+  Plus,
+  Trash2,
+  Edit2,
+  Save,
+  X,
+  Copy
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
