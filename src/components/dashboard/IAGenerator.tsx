@@ -43,6 +43,8 @@ export function IAGenerator() {
   const [selectedType, setSelectedType] = useState<typeof CREATIVE_TYPES[number]["id"] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const { data: records, refetch } = useSuspenseQuery({
@@ -105,6 +107,45 @@ export function IAGenerator() {
 
   const hasContentFor = (mueble: Mueble, type: string) => {
     return mueble.detalles?.ai_content?.some((c: any) => c.type === type);
+  };
+
+  const handleUpdate = async (index: number) => {
+    if (!selectedProduct) return;
+    try {
+      await updateAIContent({
+        data: {
+          muebleId: selectedProduct.id,
+          index,
+          content: editText
+        }
+      });
+      toast.success("Contenido actualizado");
+      setEditingIndex(null);
+      refetch();
+    } catch (error) {
+      toast.error("Error al actualizar");
+    }
+  };
+
+  const handleDelete = async (index: number) => {
+    if (!selectedProduct || !confirm("¿Estás seguro de eliminar este contenido?")) return;
+    try {
+      await deleteAIContent({
+        data: {
+          muebleId: selectedProduct.id,
+          index
+        }
+      });
+      toast.success("Contenido eliminado");
+      refetch();
+    } catch (error) {
+      toast.error("Error al eliminar");
+    }
+  };
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copiado al portapapeles");
   };
 
   return (
@@ -292,16 +333,53 @@ export function IAGenerator() {
                               {new Date(item.created_at).toLocaleDateString()}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-600 line-clamp-3 italic">
-                            "{item.content.substring(0, 150)}..."
-                          </p>
-                          <Button 
-                            variant="link" 
-                            className="p-0 h-auto text-[10px] text-indigo-600 font-bold mt-2"
-                            onClick={() => setGeneratedContent(item.content)}
-                          >
-                            Ver completo →
-                          </Button>
+                          
+                          {editingIndex === idx ? (
+                            <div className="space-y-2">
+                              <textarea
+                                className="w-full text-xs p-2 border rounded-lg bg-slate-50 min-h-[100px] font-sans"
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                              />
+                              <div className="flex gap-2">
+                                <Button size="sm" className="h-7 text-[10px]" onClick={() => handleUpdate(idx)}>
+                                  <Save className="h-3 w-3 mr-1" /> Guardar
+                                </Button>
+                                <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setEditingIndex(null)}>
+                                  <X className="h-3 w-3 mr-1" /> Cancelar
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <p className="text-xs text-slate-600 line-clamp-3 italic">
+                                "{item.content.substring(0, 150)}..."
+                              </p>
+                              <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-50">
+                                <Button 
+                                  variant="link" 
+                                  className="p-0 h-auto text-[10px] text-indigo-600 font-bold"
+                                  onClick={() => setGeneratedContent(item.content)}
+                                >
+                                  Ver completo →
+                                </Button>
+                                <div className="ml-auto flex items-center gap-1">
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-indigo-600" onClick={() => handleCopy(item.content)}>
+                                    <Copy className="h-3 w-3" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-indigo-600" onClick={() => {
+                                    setEditingIndex(idx);
+                                    setEditText(item.content);
+                                  }}>
+                                    <Edit2 className="h-3 w-3" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-600" onClick={() => handleDelete(idx)}>
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       )).reverse()}
                     </div>
