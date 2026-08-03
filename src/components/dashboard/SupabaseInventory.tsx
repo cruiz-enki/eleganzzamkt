@@ -61,6 +61,7 @@ export function SupabaseInventory() {
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
   const [lightboxIndex, setLightboxIndex] = useState(-1);
