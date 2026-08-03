@@ -5,7 +5,7 @@ import { generateProductCreative } from "@/lib/api/ai.functions";
 import { 
   Sparkles, 
   Search, 
-  Instagram, 
+  Camera, 
   FileText, 
   Layout, 
   MessageSquare, 
