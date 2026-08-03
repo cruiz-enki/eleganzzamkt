@@ -112,11 +112,20 @@ export function SupabaseInventory() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submit triggered. isAdding:", isAdding, "isEditing:", isEditing);
+    
     if (!formData.nombre) {
       toast.error("El nombre del producto es obligatorio");
       return;
     }
-    upsertMutation.mutate(formData);
+
+    try {
+      console.log("Mutating with data:", formData);
+      upsertMutation.mutate(formData);
+    } catch (err) {
+      console.error("Mutation call failed:", err);
+      toast.error("Error al iniciar el guardado");
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
