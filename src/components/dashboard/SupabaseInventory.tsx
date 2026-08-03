@@ -214,7 +214,7 @@ export function SupabaseInventory() {
     }
 
     return result;
-  }, [records, searchTerm, categoryFilter, sortConfig]);
+  }, [records, searchTerm, categoryFilter, statusFilter, sortConfig]);
 
   const lightboxSlides = useMemo(() => {
     return processedRecords.map(record => {
