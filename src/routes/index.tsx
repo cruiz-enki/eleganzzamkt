@@ -191,18 +191,18 @@ function Index() {
                 icon={<LayoutDashboard className="h-4 w-4 text-slate-400" />}
               >
                 <div className="mt-4">
-                  <h2 className="text-2xl font-semibold text-slate-800">Elegannza Muebles</h2>
-                  <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  <h2 className="text-2xl font-semibold text-slate-800 dark:text-white">Elegannza Muebles</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                     Gestión centralizada de campañas, activos digitales y base de datos estratégica.
                   </p>
                   <div className="mt-8 grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                      <p className="text-xs text-slate-400 uppercase font-bold">Activos</p>
-                      <p className="text-xl font-semibold text-slate-700">1,240</p>
+                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Activos</p>
+                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">1,240</p>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                      <p className="text-xs text-slate-400 uppercase font-bold">Leads</p>
-                      <p className="text-xl font-semibold text-slate-700">856</p>
+                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Leads</p>
+                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">856</p>
                     </div>
                   </div>
                 </div>
@@ -215,12 +215,12 @@ function Index() {
                 icon={<Cloud className="h-4 w-4 text-slate-400" />}
               >
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="h-10 w-10 rounded bg-blue-50 flex items-center justify-center">
-                    <ImageIcon className="h-5 w-5 text-blue-500" />
+                  <div className="h-10 w-10 rounded bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                    <ImageIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Unidad Compartida</p>
-                    <p className="text-xs text-slate-400 italic">Conexión establecida</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Unidad Compartida</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 italic">Conexión establecida</p>
                   </div>
                 </div>
               </BentoItem>
