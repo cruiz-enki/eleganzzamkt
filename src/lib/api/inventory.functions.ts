@@ -156,22 +156,29 @@ export const upsertMueble = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return result as Mueble;
     } else {
-      // Crear carpeta en Google Drive para el nuevo producto
+      // 1. Crear la carpeta en Google Drive para el nuevo producto
       const folderId = await createDriveFolder(data.nombre);
       
+      // 2. Preparar los datos del mueble con el ID de la carpeta
+      const muebleData = {
+        ...updateData,
+        detalles: { 
+          ...(typeof updateData.detalles === 'object' ? updateData.detalles : {}),
+          google_drive_folder_id: folderId || null 
+        }
+      };
+
+      // 3. Insertar en Supabase
       const { data: result, error } = await supabase
         .from('muebles')
-        .insert([{
-          ...updateData,
-          detalles: { 
-            ...(typeof updateData.detalles === 'object' ? updateData.detalles : {}),
-            google_drive_folder_id: folderId 
-          }
-        }])
+        .insert([muebleData])
         .select()
         .single();
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw new Error(error.message);
+      }
       return result as Mueble;
     }
   });
