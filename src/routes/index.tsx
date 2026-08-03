@@ -14,7 +14,8 @@ import {
   Settings,
   Menu,
   X,
-  Sparkles as SparklesIcon
+  Sparkles as SparklesIcon,
+  Loader2
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";

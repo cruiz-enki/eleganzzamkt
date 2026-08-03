@@ -77,10 +77,16 @@ export function CampaignsManager() {
     try {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        if (!file) continue;
+
         const reader = new FileReader();
         
-        const base64Promise = new Promise<string>((resolve) => {
-          reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1]);
+          };
+          reader.onerror = reject;
           reader.readAsDataURL(file);
         });
 
