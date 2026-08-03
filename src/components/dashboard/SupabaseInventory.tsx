@@ -59,6 +59,7 @@ export function SupabaseInventory() {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
+  const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
