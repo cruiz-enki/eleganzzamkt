@@ -48,8 +48,6 @@ export function CSVImporter() {
 
     const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
     
-    // Mapeo de columnas basado en el CSV del usuario
-    // Nombre,Categoría,Imagen Original,Descripción,Foto Editada,Precio,Etiquetas...
     const nameIdx = headers.findIndex(h => h.toLowerCase().includes('nombre'));
     const catIdx = headers.findIndex(h => h.toLowerCase().includes('categoría') || h.toLowerCase().includes('categoria'));
     const descIdx = headers.findIndex(h => h.toLowerCase().includes('descripción') || h.toLowerCase().includes('descripcion'));
@@ -66,22 +64,22 @@ export function CSVImporter() {
 
       const clean = (val: string | undefined) => val?.trim().replace(/^"|"$/g, '') || "";
       
-      const nombre = nameIdx !== -1 ? clean(row[nameIdx]) : "";
+      const nombre = nameIdx !== -1 && row[nameIdx] !== undefined ? clean(row[nameIdx]) : "";
       if (!nombre) continue;
 
-      let fotoUrl = imgIdx !== -1 ? clean(row[imgIdx]) : "";
+      let fotoUrl = imgIdx !== -1 && row[imgIdx] !== undefined ? clean(row[imgIdx]) : "";
       const urlMatch = fotoUrl.match(/\((https?:\/\/[^\)]+)\)/);
       if (urlMatch) {
         fotoUrl = urlMatch[1];
       }
 
-      const precioStr = priceIdx !== -1 ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
+      const precioStr = priceIdx !== -1 && row[priceIdx] !== undefined ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
       const precio = precioStr ? parseFloat(precioStr) : 0;
 
       results.push({
         nombre,
-        categoria: catIdx !== -1 ? clean(row[catIdx]) : "",
-        descripcion: descIdx !== -1 ? clean(row[descIdx]) : "",
+        categoria: catIdx !== -1 && row[catIdx] !== undefined ? clean(row[catIdx]) : "",
+        descripcion: descIdx !== -1 && row[descIdx] !== undefined ? clean(row[descIdx]) : "",
         precio,
         fotos: fotoUrl ? [{ url: fotoUrl }] : [],
         detalles: { source: 'csv_import' }
