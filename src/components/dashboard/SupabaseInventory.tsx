@@ -235,6 +235,7 @@ export function SupabaseInventory() {
       precio_3: 0,
       descripcion: "",
       fotos: [],
+      galeria: [],
       detalles: {},
     });
     setIsAdding(true);
