@@ -94,15 +94,26 @@ export function CatalogosManager() {
     }
   };
 
+  const [extractingId, setExtractingId] = useState<string | null>(null);
+
   const handleExtract = async (id: string, url: string) => {
-    toast.info("Iniciando extracción de productos con IA...");
+    setExtractingId(id);
+    toast.info("Analizando el catálogo con IA. Esto puede tardar un momento...");
     try {
-      await extractProductsFromPDF({ data: { catalogoId: id, pdfUrl: url } });
-      toast.success("El proceso ha iniciado. Puedes revisar y publicar el contenido creado en la sección de Productos.");
-    } catch (error) {
-      toast.error("Error al iniciar la extracción");
+      const res = await extractProductsFromPDF({ data: { catalogoId: id, pdfUrl: url } });
+      if (res?.count === 0) {
+        toast.warning(res.message || "No se encontraron muebles en el catálogo.");
+      } else {
+        toast.success(res?.message || "Productos extraídos como borrador. Revísalos en Productos.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.message || "Error al extraer los productos del catálogo");
+    } finally {
+      setExtractingId(null);
     }
   };
+
 
   return (
     <div className="space-y-8">
