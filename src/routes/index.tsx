@@ -14,13 +14,15 @@ import {
   Settings,
   Menu,
   X,
-  Sparkles as SparklesIcon
+  Sparkles as SparklesIcon,
+  Loader2
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
+import { CampaignsManager } from "@/components/dashboard/CampaignsManager";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -313,14 +315,22 @@ function Index() {
             </div>
           )}
 
-          {(view === "campañas" || view === "marca") && (
+          {view === "campañas" && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
+                <CampaignsManager />
+              </Suspense>
+            </div>
+          )}
+
+          {view === "marca" && (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                <Settings className="h-8 w-8 text-slate-300 animate-spin-slow" />
+                <Palette className="h-8 w-8 text-slate-300" />
               </div>
               <h3 className="text-lg font-medium text-slate-800">Sección en desarrollo</h3>
               <p className="text-slate-500 mt-1 text-sm text-center max-w-xs">
-                Estamos conectando los módulos de {view} para Eleganzza Marketing.
+                Estamos preparando el módulo de Identidad de Marca para Eleganzza.
               </p>
             </div>
           )}
