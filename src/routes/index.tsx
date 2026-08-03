@@ -17,7 +17,9 @@ import {
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { generateMarketingCopy } from "@/lib/api/ai.functions";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -41,6 +43,28 @@ type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuraci
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiResult, setAiResult] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerateCopy = async () => {
+    if (!aiPrompt.trim()) {
+      toast.error("Por favor ingresa un tema para el copy.");
+      return;
+    }
+    
+    setIsGenerating(true);
+    try {
+      const copy = await generateMarketingCopy({ data: { prompt: aiPrompt } });
+      setAiResult(copy);
+      toast.success("Copy generado con éxito");
+    } catch (error) {
+      console.error("AI Generation error:", error);
+      toast.error("Error al conectar con OpenAI. Verifica tus API Keys.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -193,15 +217,25 @@ function Index() {
                 icon={<Sparkles className="h-4 w-4 text-indigo-400" />}
               >
                 <div className="mt-4 space-y-4">
-                  <p className="text-sm text-slate-600">Generador de copys y análisis de sentimientos activo.</p>
-                  <div className="space-y-2">
-                    <div className="h-2 w-full bg-indigo-50 rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-400 w-[75%]" />
+                  <p className="text-sm text-slate-600">Genera copys de marketing al instante con GPT-4o.</p>
+                  <textarea 
+                    className="w-full p-2 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
+                    placeholder="Ej: Sofá de terciopelo azul para sala moderna..."
+                    rows={2}
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                  />
+                  {aiResult && (
+                    <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-[10px] text-slate-700 max-h-32 overflow-y-auto">
+                      {aiResult}
                     </div>
-                    <p className="text-[10px] text-slate-400 text-right uppercase font-bold tracking-tighter">API Quota: 75%</p>
-                  </div>
-                  <button className="w-full py-2 bg-indigo-500 text-white text-xs font-bold rounded hover:bg-indigo-600 transition-colors">
-                    NUEVO COPY
+                  )}
+                  <button 
+                    onClick={handleGenerateCopy}
+                    disabled={isGenerating}
+                    className="w-full py-2 bg-indigo-500 text-white text-xs font-bold rounded hover:bg-indigo-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isGenerating ? "GENERANDO..." : "GENERAR COPY"}
                   </button>
                 </div>
               </BentoItem>
