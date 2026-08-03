@@ -66,7 +66,7 @@ export async function uploadToDrive(file: File, folderId: string) {
       body: JSON.stringify({
         metadata: {
           name: file.name,
-          parents: [folderId]
+          parents: [targetFolderId]
         },
         content: base64Content
       })
