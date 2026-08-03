@@ -414,6 +414,31 @@ export function SupabaseInventory() {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Status Filter (Drafts/Published) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("h-9 border-slate-200", statusFilter !== "all" && "bg-indigo-50 border-indigo-200 text-indigo-700")}>
+                <Clock className="h-4 w-4 mr-2" />
+                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : "Publicados"}
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px]">
+              <DropdownMenuLabel>Filtrar por estado</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+                Todos los productos
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("draft")} className="flex items-center justify-between text-amber-600">
+                Solo Borradores
+                <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-700 border-amber-200 text-[9px] uppercase font-bold">Revisión</Badge>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("published")} className="text-emerald-600">
+                Solo Publicados
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Columns Visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
