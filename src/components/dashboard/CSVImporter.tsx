@@ -43,6 +43,7 @@ export function CSVImporter() {
   };
 
   const parseCSV = (text: string) => {
+    // Intentar normalizar saltos de línea y manejar campos complejos
     const lines = text.split(/\r?\n/);
     if (lines.length < 2) return [];
 
@@ -59,13 +60,41 @@ export function CSVImporter() {
 
     const results = [];
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i]?.trim();
-      if (!line) continue;
+      let line = lines[i] || "";
+      if (!line.trim()) continue;
       
-      const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-      if (!row || row.length === 0) continue;
+      const row: string[] = [];
+      let currentField = "";
+      let inQuotes = false;
+      
+      // Función para procesar caracteres de una línea y manejar comillas
+      const processLineChars = (str: string) => {
+        for (let j = 0; j < str.length; j++) {
+          const char = str[j];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            row.push(currentField.trim());
+            currentField = "";
+          } else {
+            currentField += char;
+          }
+        }
+      };
 
-      const clean = (val: string | undefined) => val?.trim().replace(/^"|"$/g, '') || "";
+      processLineChars(line);
+
+      // Si terminamos la línea pero seguimos dentro de comillas, es un campo multi-línea
+      while (inQuotes && i + 1 < lines.length) {
+        i++;
+        currentField += "\n";
+        line = lines[i] || "";
+        processLineChars(line);
+      }
+      
+      row.push(currentField.trim());
+
+      const clean = (val: string | undefined) => val?.replace(/^"|"$/g, '').trim() || "";
       
       const nombre = nameIdx !== -1 && row[nameIdx] !== undefined ? clean(row[nameIdx]) : "";
       if (!nombre) continue;
@@ -77,7 +106,7 @@ export function CSVImporter() {
       }
 
       const precioStr = priceIdx !== -1 && row[priceIdx] !== undefined ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
-      let precio: number | null = precioStr ? parseFloat(precioStr) : 0;
+      let precio = precioStr ? parseFloat(precioStr) : 0;
       if (isNaN(precio)) precio = 0;
 
       results.push({
