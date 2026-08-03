@@ -12,7 +12,14 @@ export const getDashboardStats = createServerFn({ method: "GET" })
 
     const categoriesCount: Record<string, number> = {};
     muebles?.forEach(m => {
-      const cat = m.categoria || 'Sin Categoría';
+      let cat = m.categoria || 'Sin Categoría';
+      // Normalización para el conteo en dashboard
+      const normalized = cat.trim().toLowerCase();
+      if (normalized === "sala" || normalized === "salas") cat = "Salas";
+      else if (normalized === "comedor" || normalized === "comedores") cat = "Comedores";
+      else if (normalized === "cubrecama" || normalized === "set de cubrecama") cat = "Cubrecamas";
+      else cat = cat.trim().charAt(0).toUpperCase() + cat.trim().slice(1);
+      
       categoriesCount[cat] = (categoriesCount[cat] || 0) + 1;
     });
 
