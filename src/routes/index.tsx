@@ -289,6 +289,23 @@ function Index() {
             </div>
           )}
 
+          {view === "ia-generator" && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                    <SparklesIcon className="h-5 w-5 text-indigo-400" />
+                    IA Generator Creative Lab
+                  </h2>
+                  <p className="text-sm text-slate-500">Crea contenido publicitario vinculado a tus productos de Eleganzza.</p>
+                </div>
+              </div>
+              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-40 w-full"/><Skeleton className="h-60 w-full"/></div>}>
+                <IAGenerator />
+              </Suspense>
+            </div>
+          )}
+
           {(view === "campañas" || view === "marca" || view === "configuracion") && (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
