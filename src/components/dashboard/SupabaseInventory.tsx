@@ -647,7 +647,12 @@ export function SupabaseInventory() {
                         <img 
                           src={photos[0].url} 
                           alt={record.nombre} 
-                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const slideIndex = lightboxSlides.findIndex(s => s.title === record.nombre);
+                            if (slideIndex !== -1) setLightboxIndex(slideIndex);
+                          }}
                         />
                       ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-2">
