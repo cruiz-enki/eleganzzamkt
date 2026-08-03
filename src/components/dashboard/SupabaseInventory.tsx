@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   getSupabaseInventory, 
@@ -23,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
@@ -117,8 +118,11 @@ export function SupabaseInventory() {
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        const url = await uploadImage(files[i]);
-        newUrls.push(url);
+        const file = files[i];
+        if (file) {
+          const url = await uploadImage(file);
+          newUrls.push(url);
+        }
       }
 
       const existingFotos = formData.fotos || [];
