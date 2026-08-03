@@ -333,6 +333,28 @@ export function SupabaseInventory() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* View Mode Switcher */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <Button 
+              variant={viewMode === "table" ? "secondary" : "ghost"} 
+              size="sm" 
+              className={cn("h-7 px-2 text-[10px] font-bold uppercase", viewMode === "table" ? "bg-white shadow-sm" : "text-slate-500")}
+              onClick={() => setViewMode("table")}
+            >
+              <List className="h-3.5 w-3.5 mr-1" />
+              Lista
+            </Button>
+            <Button 
+              variant={viewMode === "gallery" ? "secondary" : "ghost"} 
+              size="sm" 
+              className={cn("h-7 px-2 text-[10px] font-bold uppercase", viewMode === "gallery" ? "bg-white shadow-sm" : "text-slate-500")}
+              onClick={() => setViewMode("gallery")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5 mr-1" />
+              Galería
+            </Button>
+          </div>
+
           {/* Category Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
