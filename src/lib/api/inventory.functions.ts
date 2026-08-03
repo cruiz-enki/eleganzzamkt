@@ -34,9 +34,6 @@ async function createDriveFolder(name: string) {
   } catch (error) {
     console.error("Error creating Drive folder:", error);
     return null;
-  } catch (error) {
-    console.error("Error creating Drive folder:", error);
-    return null;
   }
 }
 
