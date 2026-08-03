@@ -188,6 +188,9 @@ export const upsertMueble = createServerFn({ method: "POST" })
 
     if (error) {
       console.error("Supabase insert error:", error);
+      if (error.code === "42501") {
+        throw new Error("La base de datos no permite crear productos. Ejecuta el permiso INSERT para el rol anon en la tabla muebles.");
+      }
       throw new Error(error.message);
     }
     return result as Mueble;

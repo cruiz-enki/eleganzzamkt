@@ -34,6 +34,7 @@ export function SupabaseInventory() {
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -52,8 +53,43 @@ export function SupabaseInventory() {
 
   const upsertMutation = useMutation({
     mutationFn: async (data: Partial<Mueble>) => {
-      console.log("Calling upsertMueble with:", data);
-      return await upsertMueble({ data });
+      const savedProduct = await upsertMueble({ data });
+      if (pendingFiles.length === 0) return savedProduct;
+
+      const folderId = savedProduct.detalles?.google_drive_folder_id;
+      if (!folderId) {
+        throw new Error("El producto se guardó, pero Drive no devolvió la carpeta para sus fotos");
+      }
+
+      setUploading(true);
+      const uploadedPhotos: Array<{ id: string; url: string }> = [];
+      try {
+        for (const file of pendingFiles) {
+          const base64 = await fileToBase64(file);
+          const uploaded = await uploadToDrive({
+            data: {
+              fileName: file.name,
+              mimeType: file.type || "application/octet-stream",
+              base64,
+              folderId,
+            },
+          });
+          uploadedPhotos.push(uploaded);
+        }
+
+        return await upsertMueble({
+          data: {
+            ...savedProduct,
+            fotos: [...(savedProduct.fotos || []), ...uploadedPhotos],
+          },
+        });
+      } catch (error) {
+        await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
+        const message = error instanceof Error ? error.message : "Error desconocido";
+        throw new Error(`El producto se guardó, pero no todas las fotos pudieron subirse: ${message}`);
+      } finally {
+        setUploading(false);
+      }
     },
     onSuccess: (data) => {
       console.log("Upsert success:", data);
@@ -87,6 +123,7 @@ export function SupabaseInventory() {
 
   const handleEdit = (record: Mueble) => {
     setFormData(record);
+    setPendingFiles([]);
     setIsEditing(true);
     setSelectedRecord(null); // Close detail view if open
   };
@@ -103,11 +140,13 @@ export function SupabaseInventory() {
       detalles: {},
     });
     setIsAdding(true);
+    setPendingFiles([]);
   };
 
   const closeForm = () => {
     setIsEditing(false);
     setIsAdding(false);
+    setPendingFiles([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,8 +159,7 @@ export function SupabaseInventory() {
     }
 
     try {
-      console.log("Mutating with data:", formData);
-      upsertMutation.mutate(formData);
+      await upsertMutation.mutateAsync(formData);
     } catch (err) {
       console.error("Mutation call failed:", err);
       toast.error("Error al iniciar el guardado");
@@ -142,39 +180,13 @@ export function SupabaseInventory() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    setPendingFiles((current) => [...current, ...Array.from(files)]);
+    toast.info(`${files.length} foto(s) lista(s); se subirán al guardar el producto`);
+    e.target.value = "";
+  };
 
-    const folderId = formData.detalles?.google_drive_folder_id ?? null;
-
-    setUploading(true);
-    try {
-      const newUrls: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (!file) continue;
-        const base64 = await fileToBase64(file);
-        const uploaded = await uploadToDrive({
-          data: {
-            fileName: file.name,
-            mimeType: file.type || 'application/octet-stream',
-            base64,
-            folderId,
-          },
-        });
-        newUrls.push(uploaded.url);
-      }
-
-      setFormData(prev => ({
-        ...prev,
-        fotos: [...(prev.fotos || []), ...newUrls.map(url => ({ url }))],
-      }));
-      toast.success(`${newUrls.length} foto(s) subida(s) a Google Drive`);
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error("Error al subir a Drive: " + (error?.message ?? "desconocido"));
-    } finally {
-      setUploading(false);
-      e.target.value = '';
-    }
+  const removePendingFile = (index: number) => {
+    setPendingFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
   };
 
   const removePhoto = (index: number) => {
@@ -496,6 +508,22 @@ export function SupabaseInventory() {
                         >
                           <X className="w-3 h-3" />
                         </button>
+                      </div>
+                    ))}
+                    {pendingFiles.map((file, idx) => (
+                      <div key={`${file.name}-${idx}`} className="relative aspect-square rounded-lg border border-slate-200 bg-slate-50 p-2 flex flex-col items-center justify-center text-center">
+                        <ImageIcon className="h-6 w-6 text-slate-400 mb-1" />
+                        <span className="text-[10px] text-slate-600 line-clamp-2 break-all">{file.name}</span>
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="destructive"
+                          className="absolute right-1 top-1 h-6 w-6"
+                          onClick={() => removePendingFile(idx)}
+                          aria-label={`Quitar ${file.name}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
                       </div>
                     ))}
                     <label className={cn(
