@@ -96,18 +96,24 @@ export function AirtableInventory() {
               >
                 <TableCell className="py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                      {getPhotos(record)[0]?.url ? (
-                        <img src={getPhotos(record)[0].url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <Package className="w-5 h-5 text-slate-400" />
-                      )}
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                      {(() => {
+                        const photos = getPhotos(record);
+                        const firstPhoto = photos[0];
+                        const url = firstPhoto?.url || firstPhoto?.thumbnails?.small?.url || firstPhoto?.thumbnails?.large?.url;
+                        
+                        if (url) {
+                          return <img src={url} alt="" className="w-full h-full object-cover" />;
+                        }
+                        return <Package className="w-5 h-5 text-slate-400" />;
+                      })()}
                     </div>
                     <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
                       {record.fields["Nombre"]}
                     </span>
                   </div>
                 </TableCell>
+
                 <TableCell className="py-4">
                   <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
                     {record.fields["Categoría"] || "Sin categoría"}
