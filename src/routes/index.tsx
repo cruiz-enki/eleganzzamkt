@@ -32,6 +32,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BookOpen } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardStats } from "@/lib/api/stats.functions";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -186,123 +189,9 @@ function Index() {
           </header>
 
           {view === "dashboard" && (
-            <BentoGrid>
-              {/* Sección Principal - Status */}
-              <BentoItem 
-                title="Resumen de Marca" 
-                className="md:col-span-2 md:row-span-2 flex flex-col justify-between"
-                icon={<LayoutDashboard className="h-4 w-4 text-slate-400" />}
-              >
-                <div className="mt-4">
-                  <h2 className="text-2xl font-semibold text-slate-800 dark:text-white">Elegannza Muebles</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                    Gestión centralizada de campañas, activos digitales y base de datos estratégica.
-                  </p>
-                  <div className="mt-8 grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
-                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Activos</p>
-                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">1,240</p>
-                    </div>
-                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
-                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Leads</p>
-                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">856</p>
-                    </div>
-                  </div>
-                </div>
-              </BentoItem>
-
-              {/* Conectividad Google Drive */}
-              <BentoItem 
-                title="Google Drive" 
-                className="md:col-span-2"
-                icon={<Cloud className="h-4 w-4 text-slate-400" />}
-              >
-                <div className="flex items-center gap-3 mt-2">
-                  <div className="h-10 w-10 rounded bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                    <ImageIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Unidad Compartida</p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500 italic">Conexión establecida</p>
-                  </div>
-                </div>
-              </BentoItem>
-
-              {/* Airtable Preview (Vista rápida) */}
-              <BentoItem 
-                title="Inventario (Vista Rápida)" 
-                className="md:col-span-2"
-                icon={<TableIcon className="h-4 w-4 text-slate-400" />}
-              >
-                <div className="mt-2">
-                  <p className="text-2xl font-semibold text-slate-700 dark:text-slate-200">Catálogo</p>
-                  <button 
-                    onClick={() => setView("productos")}
-                    className="text-xs text-blue-500 font-bold uppercase mt-2 hover:underline"
-                  >
-                    Ver todo el contenido →
-                  </button>
-                </div>
-              </BentoItem>
-
-              {/* OpenAI Assist */}
-              <BentoItem 
-                title="AI Creative Lab" 
-                className="md:col-span-2 md:row-span-2"
-                icon={<Sparkles className="h-4 w-4 text-indigo-400" />}
-              >
-                <div className="mt-4 space-y-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Genera copys de marketing al instante con GPT-4o.</p>
-                  <textarea 
-                    className="w-full p-2 text-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
-                    placeholder="Ej: Sofá de terciopelo azul para sala moderna..."
-                    rows={2}
-                    value={aiPrompt}
-                    onChange={(e) => setAiPrompt(e.target.value)}
-                  />
-                  {aiResult && (
-                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg text-[10px] text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto">
-                      {aiResult}
-                    </div>
-                  )}
-                  <button 
-                    onClick={handleGenerateCopy}
-                    disabled={isGenerating}
-                    className="w-full py-2 bg-indigo-500 text-white text-xs font-bold rounded hover:bg-indigo-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isGenerating ? "GENERANDO..." : "GENERAR COPY"}
-                  </button>
-                </div>
-              </BentoItem>
-
-              {/* Métricas rápidas */}
-              <BentoItem 
-                title="Rendimiento" 
-                className="md:col-span-2"
-                icon={<TrendingUp className="h-4 w-4 text-emerald-400" />}
-              >
-                <div className="mt-2">
-                  <p className="text-3xl font-serif text-slate-800 dark:text-white">+12.4%</p>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">vs mes anterior</p>
-                </div>
-              </BentoItem>
-
-              {/* Supabase Status */}
-              <BentoItem 
-                title="Backend" 
-                className="md:col-span-2"
-                icon={<Database className="h-4 w-4 text-slate-400" />}
-              >
-                <div className="mt-2 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Supabase Propio</p>
-                    <p className="text-xs text-emerald-500 dark:text-emerald-400 font-bold uppercase tracking-tighter">Online</p>
-                  </div>
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-              </BentoItem>
-            </BentoGrid>
+            <DashboardView setView={setView} />
           )}
+
 
           {view === "productos" && (
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
