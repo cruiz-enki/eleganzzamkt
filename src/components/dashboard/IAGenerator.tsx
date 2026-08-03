@@ -157,8 +157,8 @@ export function IAGenerator() {
           isSidebarOpen ? "w-80" : "w-0 opacity-0 -translate-x-full"
         )}
       >
-        <Card className="flex-1 flex flex-col overflow-hidden border-slate-200">
-          <CardHeader className="pb-3">
+        <Card className="flex-1 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 dark:bg-slate-900">
+          <CardHeader className="pb-3 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-serif">1. Elige un Producto</CardTitle>
               <Button 
@@ -196,8 +196,8 @@ export function IAGenerator() {
                     className={cn(
                       "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group border",
                       selectedProduct?.id === product.id
-                        ? "bg-slate-900 border-slate-900 text-white"
-                        : "bg-white border-slate-100 hover:border-slate-300 text-slate-600"
+                        ? "bg-slate-900 border-slate-900 dark:bg-white dark:border-white text-white dark:text-slate-900"
+                        : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-500 text-slate-600 dark:text-slate-300"
                     )}
                   >
                     <div className="h-10 w-10 rounded-lg bg-slate-100 overflow-hidden shrink-0 border border-slate-200">

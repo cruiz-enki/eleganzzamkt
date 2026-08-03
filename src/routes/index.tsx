@@ -302,7 +302,7 @@ function Index() {
           )}
 
           {view === "productos" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -319,7 +319,7 @@ function Index() {
           )}
 
           {view === "ia-generator" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -336,13 +336,13 @@ function Index() {
           )}
 
           {view === "configuracion" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
               <PromptSettings />
             </div>
           )}
 
           {view === "campañas" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
                 <CampaignsManager />
               </Suspense>

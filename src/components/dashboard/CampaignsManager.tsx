@@ -190,7 +190,7 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {campaigns.map((campaign) => (
-            <Card key={campaign.id} className="overflow-hidden border-slate-200 group hover:border-slate-300 transition-all">
+            <Card key={campaign.id} className="overflow-hidden border-slate-200 dark:border-slate-800 dark:bg-slate-900 group hover:border-slate-300 dark:hover:border-slate-700 transition-all">
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">
                   <div className="p-2 bg-indigo-50 rounded-lg">
