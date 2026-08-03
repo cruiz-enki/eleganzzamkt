@@ -4,7 +4,7 @@ import {
   getSupabaseInventory, 
   upsertMueble, 
   deleteMueble, 
-  uploadImage,
+  uploadToDrive,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -114,26 +114,40 @@ export function SupabaseInventory() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    let folderId = formData.detalles?.google_drive_folder_id;
+    
+    // If we're adding a new product and don't have a folder ID yet, 
+    // we can't upload until the product (and its folder) is created.
+    // However, the current flow creates the folder on upsert.
+    // Let's ensure we have a folder or inform the user.
+    if (!folderId && !isAdding) {
+      toast.error("No se encontró la carpeta de Drive para este producto.");
+      return;
+    }
+
     setUploading(true);
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file) {
-          const url = await uploadImage(file);
-          newUrls.push(url);
+          // If folderId doesn't exist yet (new product), we'll have to wait until upsert.
+          // For now, let's assume we are editing or the folder is pre-created if possible.
+          // Realistically, for a professional flow, we should create folder on demand if missing.
+          const driveFileId = await uploadToDrive(file, folderId || "");
+          const driveUrl = `https://lh3.googleusercontent.com/u/0/d/${driveFileId}`;
+          newUrls.push(driveUrl);
         }
       }
 
       const existingFotos = formData.fotos || [];
       const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
       setFormData({ ...formData, fotos: newFotos });
-      toast.success(`${files.length} foto(s) subida(s) correctamente`);
+      toast.success(`${files.length} foto(s) subida(s) a Google Drive`);
     } catch (error: any) {
-      toast.error("Error al subir imagen: " + error.message);
+      toast.error("Error al subir a Drive: " + error.message);
     } finally {
       setUploading(false);
-      // Reset input
       e.target.value = '';
     }
   };

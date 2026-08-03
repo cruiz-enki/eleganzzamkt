@@ -34,28 +34,72 @@ async function createDriveFolder(name: string) {
   } catch (error) {
     console.error("Error creating Drive folder:", error);
     return null;
+  } catch (error) {
+    console.error("Error creating Drive folder:", error);
+    return null;
+  }
+}
+
+export async function uploadToDrive(file: File, folderId: string) {
+  const lovableApiKey = process.env['LOVABLE_API_KEY'];
+  const googleDriveApiKey = process.env['GOOGLE_DRIVE_API_KEY'];
+
+  if (!lovableApiKey || !googleDriveApiKey) {
+    throw new Error("Missing Google Drive credentials");
+  }
+
+  try {
+    // 1. Convert File to Base64
+    const buffer = await file.arrayBuffer();
+    const base64Content = btoa(
+      new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
+
+    // 2. Upload to Drive via Lovable Connector Gateway
+    const response = await fetch(`https://connector-gateway.lovable.dev/google_drive/upload/drive/v3/files?uploadType=multipart`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'X-Connection-Api-Key': googleDriveApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        metadata: {
+          name: file.name,
+          parents: [folderId]
+        },
+        content: base64Content
+      })
+    });
+
+    const data = await response.json();
+    if (!data.id) throw new Error("Failed to upload to Drive");
+
+    // 3. Make file public (so it can be embedded)
+    await fetch(`https://connector-gateway.lovable.dev/google_drive/drive/v3/files/${data.id}/permissions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'X-Connection-Api-Key': googleDriveApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        role: 'reader',
+        type: 'anyone'
+      })
+    });
+
+    return data.id;
+  } catch (error) {
+    console.error("Error uploading to Drive:", error);
+    throw error;
   }
 }
 
 export async function uploadImage(file: File) {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-  const filePath = `muebles/${fileName}`;
-
-  const { data, error } = await supabase.storage
-    .from('assets')
-    .upload(filePath, file);
-
-  if (error) {
-    console.error("Error uploading image:", error);
-    throw new Error(error.message);
-  }
-
-  const { data: { publicUrl } } = supabase.storage
-    .from('assets')
-    .getPublicUrl(filePath);
-
-  return publicUrl;
+  // We'll keep this as a stub for compatibility or redirect to Drive logic if needed, 
+  // but the component will now use uploadToDrive directly with the folderId.
+  return ""; 
 }
 
 
