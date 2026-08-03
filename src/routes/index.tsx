@@ -20,6 +20,7 @@ import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
+import { PromptSettings } from "@/components/dashboard/PromptSettings";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -306,7 +307,13 @@ function Index() {
             </div>
           )}
 
-          {(view === "campañas" || view === "marca" || view === "configuracion") && (
+          {view === "configuracion" && (
+            <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+              <PromptSettings />
+            </div>
+          )}
+
+          {(view === "campañas" || view === "marca") && (
             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl border border-dashed border-slate-300">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                 <Settings className="h-8 w-8 text-slate-300 animate-spin-slow" />

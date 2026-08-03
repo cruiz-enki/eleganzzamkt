@@ -111,6 +111,8 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     muebleId: z.string(),
     type: z.enum(["story", "carousel", "post", "copy", "prompt"]),
     context: z.string().optional(),
+    customSystem: z.string().optional(),
+    customPrompt: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
     const headers = aiHeaders();
@@ -154,8 +156,8 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     };
 
     const config = DEFAULT_PROMPTS[data.type];
-    let systemMsg = config.system;
-    let userPrompt = config.user
+    let systemMsg = data.customSystem || config.system;
+    let userPrompt = (data.customPrompt || config.user)
       .replace(/{nombre}/g, mueble.nombre)
       .replace(/{categoria}/g, mueble.categoria || "Muebles");
 
