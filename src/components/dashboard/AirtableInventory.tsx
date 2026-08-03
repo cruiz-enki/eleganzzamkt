@@ -11,7 +11,7 @@ export function AirtableInventory() {
   
   const { data: records, isLoading } = useSuspenseQuery({
     queryKey: ['airtable-inventory'],
-    queryFn: () => getAirtableData({ baseId: 'appExample', table: 'Muebles' }),
+    queryFn: () => getAirtableData({ data: { baseId: 'appExample', table: 'Muebles' } }),
   });
 
   const filteredRecords = records?.filter((r: any) => 
