@@ -415,9 +415,9 @@ export function SupabaseInventory() {
 
       {/* Edit/Add Dialog */}
       <Dialog open={isEditing || isAdding} onOpenChange={(open) => !open && closeForm()}>
-        <DialogContent className="max-w-2xl bg-white border-none shadow-2xl p-0 overflow-hidden">
-          <form onSubmit={handleSubmit}>
-            <div className="p-8">
+        <DialogContent className="max-w-2xl bg-white border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
+          <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
+            <div className="p-8 overflow-y-auto flex-1">
               <DialogHeader className="mb-8">
                 <DialogTitle className="text-2xl font-bold text-slate-900">
                   {isAdding ? "Nuevo Producto" : "Editar Producto"}
