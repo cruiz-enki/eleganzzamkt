@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   getSupabaseInventory, 
@@ -10,7 +10,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -26,7 +26,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
+
+type SortConfig = {
+  key: keyof Mueble | "";
+  direction: "asc" | "desc";
+};
 
 export function SupabaseInventory() {
   const queryClient = useQueryClient();
@@ -37,6 +52,11 @@ export function SupabaseInventory() {
   const [isAdding, setIsAdding] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  
+  // New States for Filter, Sort and Column Visibility
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -118,11 +138,64 @@ export function SupabaseInventory() {
     }
   });
 
-  const filteredRecords = (records || []).filter((r) =>
-    Object.values(r).some(val =>
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  );
+  const categories = useMemo(() => {
+    const cats = new Set((records || []).map(r => r.categoria).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [records]);
+
+  const processedRecords = useMemo(() => {
+    let result = [...(records || [])];
+
+    // Search filter
+    if (searchTerm) {
+      result = result.filter((r) =>
+        Object.values(r).some(val =>
+          String(val).toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+
+    // Category filter
+    if (categoryFilter !== "all") {
+      result = result.filter(r => r.categoria === categoryFilter);
+    }
+
+    // Sort
+    if (sortConfig.key) {
+      result.sort((a, b) => {
+        const aValue = a[sortConfig.key as keyof Mueble];
+        const bValue = b[sortConfig.key as keyof Mueble];
+
+        if (aValue === bValue) return 0;
+        if (aValue === null || aValue === undefined) return 1;
+        if (bValue === null || bValue === undefined) return -1;
+
+        const comparison = String(aValue).localeCompare(String(bValue), undefined, { numeric: true });
+        return sortConfig.direction === "asc" ? comparison : -comparison;
+      });
+    }
+
+    return result;
+  }, [records, searchTerm, categoryFilter, sortConfig]);
+
+  const handleSort = (key: keyof Mueble) => {
+    setSortConfig(current => ({
+      key,
+      direction: current.key === key && current.direction === "asc" ? "desc" : "asc"
+    }));
+  };
+
+  const toggleColumn = (columnId: string) => {
+    setVisibleColumns(prev => {
+      const next = new Set(prev);
+      if (next.has(columnId)) {
+        if (next.size > 1) next.delete(columnId); // Don't hide all columns
+      } else {
+        next.add(columnId);
+      }
+      return next;
+    });
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
@@ -134,10 +207,10 @@ export function SupabaseInventory() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredRecords.length) {
+    if (selectedIds.size === processedRecords.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredRecords.map(r => r.id)));
+      setSelectedIds(new Set(processedRecords.map(r => r.id)));
     }
   };
 
@@ -217,8 +290,8 @@ export function SupabaseInventory() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-[300px] flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar en inventario de Supabase..."
@@ -227,39 +300,96 @@ export function SupabaseInventory() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {selectedIds.size > 0 && (
+
+        <div className="flex items-center gap-2">
+          {/* Category Filter */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 border-slate-200">
+                <Filter className="h-4 w-4 mr-2" />
+                {categoryFilter === "all" ? "Categorías" : categoryFilter}
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[200px]">
+              <DropdownMenuItem onClick={() => setCategoryFilter("all")}>
+                Todas las categorías
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {categories.map(cat => (
+                <DropdownMenuItem key={cat} onClick={() => setCategoryFilter(cat!)}>
+                  {cat}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Columns Visibility */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 border-slate-200">
+                <Eye className="h-4 w-4 mr-2" />
+                Columnas
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px]">
+              <DropdownMenuLabel>Mostrar columnas</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem checked={visibleColumns.has("nombre")} onCheckedChange={() => toggleColumn("nombre")}>
+                Nombre
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={visibleColumns.has("categoria")} onCheckedChange={() => toggleColumn("categoria")}>
+                Categoría
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={visibleColumns.has("precio")} onCheckedChange={() => toggleColumn("precio")}>
+                Precio 1
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={visibleColumns.has("precio_2")} onCheckedChange={() => toggleColumn("precio_2")}>
+                Precio 2
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={visibleColumns.has("precio_3")} onCheckedChange={() => toggleColumn("precio_3")}>
+                Precio 3
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {selectedIds.size > 0 && (
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              className="h-9"
+              onClick={() => {
+                if (confirm(`¿Estás seguro de eliminar ${selectedIds.size} productos?`)) {
+                  deleteMutation.mutate(Array.from(selectedIds));
+                }
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Eliminar ({selectedIds.size})
+            </Button>
+          )}
+          
           <Button 
             size="sm" 
-            variant="destructive" 
-            className="h-9"
-            onClick={() => {
-              if (confirm(`¿Estás seguro de eliminar ${selectedIds.size} productos?`)) {
-                deleteMutation.mutate(Array.from(selectedIds));
-              }
-            }}
+            variant="outline" 
+            className="h-9 border-slate-200 text-slate-600"
+            onClick={() => refetch()}
           >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Eliminar ({selectedIds.size})
+            <RefreshCcw className="h-4 w-4 mr-2" />
+            Actualizar
           </Button>
-        )}
-        <Button 
-          size="sm" 
-          variant="outline" 
-          className="h-9 border-slate-200 text-slate-600"
-          onClick={() => refetch()}
-        >
-          <RefreshCcw className="h-4 w-4 mr-2" />
-          Actualizar
-        </Button>
-        <CSVImporter />
-        <Button 
-          size="sm" 
-          className="h-9 bg-black text-white hover:bg-black/90"
-          onClick={handleAdd}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nuevo Producto
-        </Button>
+          
+          <CSVImporter />
+          
+          <Button 
+            size="sm" 
+            className="h-9 bg-black text-white hover:bg-black/90"
+            onClick={handleAdd}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Producto
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-xl border border-slate-100 bg-white shadow-sm overflow-hidden">
@@ -270,24 +400,63 @@ export function SupabaseInventory() {
                 <input 
                   type="checkbox" 
                   className="rounded border-slate-300" 
-                  checked={filteredRecords.length > 0 && selectedIds.size === filteredRecords.length}
+                  checked={processedRecords.length > 0 && selectedIds.size === processedRecords.length}
                   onChange={toggleSelectAll}
                 />
               </TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Producto</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Categoría</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Precio</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Acciones</TableHead>
+              {visibleColumns.has("nombre") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("nombre")}>
+                  <div className="flex items-center gap-1">
+                    Producto
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.has("categoria") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("categoria")}>
+                  <div className="flex items-center gap-1">
+                    Categoría
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.has("precio") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio")}>
+                  <div className="flex items-center justify-end gap-1">
+                    Precio 1
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.has("precio_2") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_2")}>
+                  <div className="flex items-center justify-end gap-1">
+                    Precio 2
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.has("precio_3") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_3")}>
+                  <div className="flex items-center justify-end gap-1">
+                    Precio 3
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+              )}
+              {visibleColumns.has("acciones") && (
+                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Acciones</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredRecords.length === 0 ? (
+            {processedRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-12 text-sm text-slate-400">
+                <TableCell colSpan={visibleColumns.size + 1} className="text-center py-12 text-sm text-slate-400">
                   No se encontraron muebles en Supabase.
                 </TableCell>
               </TableRow>
-            ) : filteredRecords.map((record) => (
+            ) : processedRecords.map((record) => (
               <TableRow 
                 key={record.id} 
                 className={cn(
@@ -303,57 +472,79 @@ export function SupabaseInventory() {
                     onChange={() => toggleSelect(record.id)}
                   />
                 </TableCell>
-                <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                      {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
-                        <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <Package className="w-5 h-5 text-slate-400" />
-                      )}
+                {visibleColumns.has("nombre") && (
+                  <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                        {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
+                          <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <Package className="w-5 h-5 text-slate-400" />
+                        )}
+                      </div>
+                      <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
+                        {record.nombre}
+                      </span>
                     </div>
-                    <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
-                      {record.nombre}
-                    </span>
-                  </div>
-                </TableCell>
+                  </TableCell>
+                )}
 
-                <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
-                    {record.categoria || "Sin categoría"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
-                  {record.precio ? currency.format(record.precio) : "—"}
-                </TableCell>
-                <TableCell className="text-right py-4">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 text-slate-400 hover:text-slate-900"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(record);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 text-slate-400 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm("¿Estás seguro de eliminar este producto?")) {
-                          deleteMutation.mutate([record.id]);
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+                {visibleColumns.has("categoria") && (
+                  <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
+                    <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
+                      {record.categoria || "Sin categoría"}
+                    </Badge>
+                  </TableCell>
+                )}
+                
+                {visibleColumns.has("precio") && (
+                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                    {record.precio ? currency.format(record.precio) : "—"}
+                  </TableCell>
+                )}
+
+                {visibleColumns.has("precio_2") && (
+                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                    {record.precio_2 ? currency.format(record.precio_2) : "—"}
+                  </TableCell>
+                )}
+
+                {visibleColumns.has("precio_3") && (
+                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                    {record.precio_3 ? currency.format(record.precio_3) : "—"}
+                  </TableCell>
+                )}
+
+                {visibleColumns.has("acciones") && (
+                  <TableCell className="text-right py-4">
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-slate-400 hover:text-slate-900"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(record);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-slate-400 hover:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm("¿Estás seguro de eliminar este producto?")) {
+                            deleteMutation.mutate([record.id]);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
