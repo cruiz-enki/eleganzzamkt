@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 
 const OPENAI_GATEWAY = "https://ai-gateway.lovable.dev/v1/chat/completions";
