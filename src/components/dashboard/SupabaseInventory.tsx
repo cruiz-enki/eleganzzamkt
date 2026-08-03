@@ -850,7 +850,11 @@ export function SupabaseInventory() {
                         <img src={f.url} alt="" className="w-full h-full object-cover" />
                         <button 
                           type="button"
-                          onClick={() => removePhoto(idx)}
+                          onClick={() => {
+                            const newGaleria = [...(formData.galeria || [])];
+                            newGaleria.splice(idx, 1);
+                            setFormData({ ...formData, galeria: newGaleria });
+                          }}
                           className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-3 h-3" />
@@ -898,10 +902,10 @@ export function SupabaseInventory() {
                   <Label className="text-xs text-slate-400 font-normal">O pega URLs (separadas por comas)</Label>
                   <Textarea 
                     placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
-                    value={(formData.fotos || []).map((f: any) => f.url).join(', ')}
+                    value={(formData.galeria || []).map((f: any) => f.url).join(', ')}
                     onChange={(e) => {
                       const urls = e.target.value.split(',').map(u => u.trim()).filter(u => u !== '');
-                      setFormData({...formData, fotos: urls.map(url => ({ url }))});
+                      setFormData({...formData, galeria: urls.map(url => ({ url }))});
                     }}
                     rows={2}
                   />
