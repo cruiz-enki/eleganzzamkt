@@ -2,22 +2,22 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 
-const OPENAI_GATEWAY = "https://ai-gateway.lovable.dev/v1/chat/completions";
+const OPENAI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 function aiHeaders() {
   const lovableApiKey = process.env['LOVABLE_API_KEY'];
-  const openaiApiKey = process.env['OPENAI_API_KEY'];
-  
-  if (!lovableApiKey || !openaiApiKey) {
-    throw new Error("Faltan credenciales: asegúrate de haber configurado LOVABLE_API_KEY y OPENAI_API_KEY en los secretos.");
+
+  if (!lovableApiKey) {
+    throw new Error("Falta LOVABLE_API_KEY en los secretos.");
   }
-  
+
   return {
-    Authorization: `Bearer ${lovableApiKey}`,
-    'X-Connection-Api-Key': openaiApiKey,
+    'Lovable-API-Key': lovableApiKey,
     'Content-Type': 'application/json',
   };
 }
+
+const AI_MODEL = "google/gemini-3.6-flash";
 
 const chatSchema = z.object({
   prompt: z.string().min(1),
@@ -30,7 +30,7 @@ export const generateMarketingCopy = createServerFn({ method: "POST" })
     const headers = aiHeaders();
 
     const body = {
-      model: "gpt-4o",
+      model: AI_MODEL,
       messages: [
         {
           role: "system",
@@ -79,7 +79,7 @@ export const cleanProductImage = createServerFn({ method: "POST" })
     // el endpoint v1/images/edits o herramientas específicas de remoción de fondo.
     
     const body = {
-      model: "gpt-4o",
+      model: AI_MODEL,
       messages: [
         {
           role: "user",
@@ -142,7 +142,7 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     if (data.context) prompt += `\nContexto adicional: ${data.context}`;
 
     const body = {
-      model: "gpt-4o",
+      model: AI_MODEL,
       messages: [
         { role: "system", content: systemMsg },
         { role: "user", content: prompt }
@@ -154,6 +154,14 @@ export const generateProductCreative = createServerFn({ method: "POST" })
       headers,
       body: JSON.stringify(body),
     });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`AI Gateway error [${res.status}]: ${errorText}`);
+      if (res.status === 429) throw new Error("Límite de solicitudes alcanzado. Intenta de nuevo en un momento.");
+      if (res.status === 402) throw new Error("Créditos de IA agotados. Agrega créditos en Settings → Workspace → Usage.");
+      throw new Error(`Error de IA: ${errorText}`);
+    }
 
     const result = await res.json();
     const content = result.choices[0]?.message?.content;
