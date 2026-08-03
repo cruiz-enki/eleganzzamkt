@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 const CREATIVE_TYPES = [
   { id: "copy", label: "Marketing Copy", icon: FileText, description: "Textos para redes y web" },
-  { id: "story", label: "Stories", icon: Instagram, description: "Estructura para historias" },
+  { id: "story", label: "Stories", icon: Camera, description: "Estructura para historias" },
   { id: "post", label: "Post Feed", icon: Layout, description: "Diseño de post cuadrado" },
   { id: "carousel", label: "Carrusel", icon: History, description: "Secuencia de diapositivas" },
   { id: "prompt", label: "AI Prompt", icon: Wand2, description: "Prompt para Midjourney/DALL-E" },
