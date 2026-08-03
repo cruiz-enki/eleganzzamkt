@@ -22,6 +22,7 @@ export const importCSVInventory = createServerFn({ method: "POST" })
 
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
+      if (!item) continue;
       try {
         // 1. Crear el producto y su carpeta en Drive usando upsertMueble
         const savedProduct = await upsertMueble({ data: item });
