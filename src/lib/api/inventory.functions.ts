@@ -43,6 +43,8 @@ export type Mueble = {
   nombre: string;
   categoria: string | null;
   precio: number | null;
+  precio_2: number | null;
+  precio_3: number | null;
   fotos: any[] | null;
   descripcion: string | null;
   detalles: any | null;
@@ -69,6 +71,8 @@ const muebleSchema = z.object({
   nombre: z.string(),
   categoria: z.string().optional().nullable(),
   precio: z.number().optional().nullable(),
+  precio_2: z.number().optional().nullable(),
+  precio_3: z.number().optional().nullable(),
   fotos: z.array(z.any()).optional().nullable(),
   descripcion: z.string().optional().nullable(),
   detalles: z.any().optional().nullable(),

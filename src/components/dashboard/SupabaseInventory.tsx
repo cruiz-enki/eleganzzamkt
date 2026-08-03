@@ -37,6 +37,8 @@ export function SupabaseInventory() {
     nombre: "",
     categoria: "",
     precio: 0,
+    precio_2: 0,
+    precio_3: 0,
     descripcion: "",
   });
 
@@ -86,6 +88,8 @@ export function SupabaseInventory() {
       nombre: "",
       categoria: "",
       precio: 0,
+      precio_2: 0,
+      precio_3: 0,
       descripcion: "",
       fotos: [],
       detalles: {},
@@ -263,12 +267,34 @@ export function SupabaseInventory() {
                   </DialogHeader>
 
                   <div className="grid gap-8">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Precio</span>
-                      <div className="h-px flex-1 bg-slate-100"></div>
-                      <span className="text-2xl font-bold text-slate-900">
-                        {selectedRecord.precio ? currency.format(selectedRecord.precio) : "No disponible"}
-                      </span>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Precio 1</span>
+                        <div className="h-px flex-1 bg-slate-100"></div>
+                        <span className="text-xl font-bold text-slate-900">
+                          {selectedRecord.precio ? currency.format(selectedRecord.precio) : "—"}
+                        </span>
+                      </div>
+                      
+                      {selectedRecord.precio_2 !== undefined && selectedRecord.precio_2 !== null && (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Precio 2</span>
+                          <div className="h-px flex-1 bg-slate-100"></div>
+                          <span className="text-xl font-bold text-slate-900">
+                            {currency.format(selectedRecord.precio_2)}
+                          </span>
+                        </div>
+                      )}
+
+                      {selectedRecord.precio_3 !== undefined && selectedRecord.precio_3 !== null && (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Precio 3</span>
+                          <div className="h-px flex-1 bg-slate-100"></div>
+                          <span className="text-xl font-bold text-slate-900">
+                            {currency.format(selectedRecord.precio_3)}
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-4">
@@ -341,18 +367,9 @@ export function SupabaseInventory() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="categoria">Categoría</Label>
-                    <Input 
-                      id="categoria" 
-                      value={formData.categoria || ""} 
-                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-                      placeholder="Ej: Sala"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="precio">Precio (MXN)</Label>
+                    <Label htmlFor="precio">Precio 1 (MXN)</Label>
                     <Input 
                       id="precio" 
                       type="number"
@@ -360,6 +377,48 @@ export function SupabaseInventory() {
                       onChange={(e) => setFormData({...formData, precio: parseFloat(e.target.value)})}
                     />
                   </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="precio_2">Precio 2 (MXN)</Label>
+                    <Input 
+                      id="precio_2" 
+                      type="number"
+                      value={formData.precio_2 || 0} 
+                      onChange={(e) => setFormData({...formData, precio_2: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="precio_3">Precio 3 (MXN)</Label>
+                    <Input 
+                      id="precio_3" 
+                      type="number"
+                      value={formData.precio_3 || 0} 
+                      onChange={(e) => setFormData({...formData, precio_3: parseFloat(e.target.value)})}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="categoria">Categoría</Label>
+                  <Input 
+                    id="categoria" 
+                    value={formData.categoria || ""} 
+                    onChange={(e) => setFormData({...formData, categoria: e.target.value})}
+                    placeholder="Ej: Sala"
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label>Fotos (URLs separadas por comas)</Label>
+                  <Textarea 
+                    placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
+                    value={(formData.fotos || []).map((f: any) => f.url).join(', ')}
+                    onChange={(e) => {
+                      const urls = e.target.value.split(',').map(u => u.trim()).filter(u => u !== '');
+                      setFormData({...formData, fotos: urls.map(url => ({ url }))});
+                    }}
+                    rows={2}
+                  />
+                  <p className="text-[10px] text-slate-400">Pega las URLs de las fotos separadas por una coma.</p>
                 </div>
 
                 <div className="grid gap-2">
