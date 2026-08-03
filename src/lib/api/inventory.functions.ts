@@ -161,6 +161,35 @@ const normalizeCategory = (cat: string | null | undefined): string | null => {
   return cat.trim().charAt(0).toUpperCase() + cat.trim().slice(1);
 };
 
+export const bulkDiscontinueMuebles = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ nombres: z.array(z.string()) }).parse(data))
+  .handler(async ({ data }) => {
+    let updatedCount = 0;
+    
+    // Buscamos los muebles por nombre (insensible a mayúsculas/minúsculas y trim)
+    const { data: records, error: fetchError } = await supabase
+      .from('muebles')
+      .select('id, nombre, detalles');
+
+    if (fetchError) throw new Error(fetchError.message);
+
+    const nombresNormalizados = data.nombres.map(n => n.trim().toLowerCase());
+
+    for (const record of (records || [])) {
+      if (nombresNormalizados.includes(record.nombre.trim().toLowerCase())) {
+        const detalles = { ...(record.detalles || {}), status: 'discontinued' };
+        const { error: updateError } = await supabase
+          .from('muebles')
+          .update({ detalles })
+          .eq('id', record.id);
+        
+        if (!updateError) updatedCount++;
+      }
+    }
+    
+    return { success: true, updatedCount };
+  });
+
 export const updateMuebleStatus = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string(), status: z.string() }).parse(data))
   .handler(async ({ data }) => {
