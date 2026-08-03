@@ -195,6 +195,17 @@ export function SupabaseInventory() {
     return result;
   }, [records, searchTerm, categoryFilter, sortConfig]);
 
+  const lightboxSlides = useMemo(() => {
+    return processedRecords.map(record => {
+      const photos = [...(record.galeria || []), ...(record.fotos || [])];
+      return {
+        src: photos.length > 0 ? photos[0].url : "",
+        title: record.nombre,
+        description: `${record.categoria} - ${record.precio ? currency.format(record.precio) : ""}`,
+      };
+    }).filter(slide => slide.src);
+  }, [processedRecords]);
+
   const handleSort = (key: keyof Mueble) => {
     setSortConfig(current => ({
       key,
