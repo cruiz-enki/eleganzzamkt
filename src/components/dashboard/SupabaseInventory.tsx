@@ -32,6 +32,7 @@ export function SupabaseInventory() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -105,11 +106,12 @@ export function SupabaseInventory() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteMueble({ data: { id } }),
+    mutationFn: (ids: string[]) => Promise.all(ids.map(id => deleteMueble({ data: { id } }))),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['supabase-inventory'] });
-      toast.success("Producto eliminado");
+      toast.success(selectedIds.size > 1 ? `${selectedIds.size} productos eliminados` : "Producto eliminado");
       setSelectedRecord(null);
+      setSelectedIds(new Set());
     },
     onError: (error) => {
       toast.error("Error al eliminar: " + error.message);
@@ -121,6 +123,23 @@ export function SupabaseInventory() {
       String(val).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredRecords.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredRecords.map(r => r.id)));
+    }
+  };
 
   const handleEdit = (record: Mueble) => {
     setFormData(record);
@@ -208,6 +227,21 @@ export function SupabaseInventory() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        {selectedIds.size > 0 && (
+          <Button 
+            size="sm" 
+            variant="destructive" 
+            className="h-9"
+            onClick={() => {
+              if (confirm(`¿Estás seguro de eliminar ${selectedIds.size} productos?`)) {
+                deleteMutation.mutate(Array.from(selectedIds));
+              }
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Eliminar ({selectedIds.size})
+          </Button>
+        )}
         <Button 
           size="sm" 
           variant="outline" 
@@ -232,6 +266,14 @@ export function SupabaseInventory() {
         <Table>
           <TableHeader className="bg-slate-50/50 border-b border-slate-100">
             <TableRow className="hover:bg-transparent">
+              <TableHead className="w-10 py-4">
+                <input 
+                  type="checkbox" 
+                  className="rounded border-slate-300" 
+                  checked={filteredRecords.length > 0 && selectedIds.size === filteredRecords.length}
+                  onChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Producto</TableHead>
               <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Categoría</TableHead>
               <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Precio</TableHead>
@@ -241,15 +283,26 @@ export function SupabaseInventory() {
           <TableBody>
             {filteredRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-12 text-sm text-slate-400">
+                <TableCell colSpan={5} className="text-center py-12 text-sm text-slate-400">
                   No se encontraron muebles en Supabase.
                 </TableCell>
               </TableRow>
             ) : filteredRecords.map((record) => (
               <TableRow 
                 key={record.id} 
-                className="hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0"
+                className={cn(
+                  "hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0",
+                  selectedIds.has(record.id) && "bg-blue-50/30"
+                )}
               >
+                <TableCell className="py-4" onClick={(e) => e.stopPropagation()}>
+                  <input 
+                    type="checkbox" 
+                    className="rounded border-slate-300" 
+                    checked={selectedIds.has(record.id)}
+                    onChange={() => toggleSelect(record.id)}
+                  />
+                </TableCell>
                 <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
@@ -293,7 +346,7 @@ export function SupabaseInventory() {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (confirm("¿Estás seguro de eliminar este producto?")) {
-                          deleteMutation.mutate(record.id);
+                          deleteMutation.mutate([record.id]);
                         }
                       }}
                     >
