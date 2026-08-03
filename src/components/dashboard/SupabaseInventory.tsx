@@ -12,7 +12,7 @@ import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2 } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2, Clock } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -61,6 +61,7 @@ export function SupabaseInventory() {
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
   const [lightboxIndex, setLightboxIndex] = useState(-1);
@@ -188,6 +189,14 @@ export function SupabaseInventory() {
     if (categoryFilter !== "all") {
       result = result.filter(r => r.categoria === categoryFilter);
     }
+    
+    // Status filter (draft/published)
+    if (statusFilter !== "all") {
+      result = result.filter(r => {
+        const status = r.detalles?.status || "published";
+        return status === statusFilter;
+      });
+    }
 
     // Sort
     if (sortConfig.key) {
@@ -205,7 +214,7 @@ export function SupabaseInventory() {
     }
 
     return result;
-  }, [records, searchTerm, categoryFilter, sortConfig]);
+  }, [records, searchTerm, categoryFilter, statusFilter, sortConfig]);
 
   const lightboxSlides = useMemo(() => {
     return processedRecords.map(record => {
@@ -402,6 +411,31 @@ export function SupabaseInventory() {
                   {cat}
                 </DropdownMenuItem>
               ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Status Filter (Drafts/Published) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("h-9 border-slate-200", statusFilter !== "all" && "bg-indigo-50 border-indigo-200 text-indigo-700")}>
+                <Clock className="h-4 w-4 mr-2" />
+                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : "Publicados"}
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px]">
+              <DropdownMenuLabel>Filtrar por estado</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setStatusFilter("all")}>
+                Todos los productos
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("draft")} className="flex items-center justify-between text-amber-600">
+                Solo Borradores
+                <Badge variant="outline" className="ml-2 bg-amber-50 text-amber-700 border-amber-200 text-[9px] uppercase font-bold">Revisión</Badge>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("published")} className="text-emerald-600">
+                Solo Publicados
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
