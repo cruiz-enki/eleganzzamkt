@@ -71,7 +71,8 @@ export function IAGenerator() {
       refetch(); // Para actualizar los detalles vinculados
     } catch (error) {
       console.error(error);
-      toast.error("Error al generar contenido. Verifica tu conexión.");
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      toast.error(msg.slice(0, 200));
     } finally {
       setIsGenerating(false);
     }
