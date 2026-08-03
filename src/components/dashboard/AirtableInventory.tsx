@@ -33,10 +33,26 @@ export function AirtableInventory() {
   );
 
   const getPhotos = (record: AirtableRecord) => {
-    const photos = record.fields["Fotos"] || record.fields["Foto"] || record.fields["Imagen"];
-    if (Array.isArray(photos)) return photos;
+    // Try different common names for attachment fields in Airtable
+    const photoField = record.fields["Fotos"] || 
+                       record.fields["Foto"] || 
+                       record.fields["Imagen"] || 
+                       record.fields["Attachments"] ||
+                       record.fields["Imágenes"];
+    
+    if (Array.isArray(photoField)) return photoField;
+    
+    // Sometimes it might not be an array if it's a single attachment or a different format
+    if (photoField && typeof photoField === 'object' && 'url' in photoField) {
+      return [photoField];
+    }
+    
     return [];
   };
+
+  // Debug helper to see field names if needed
+  // console.log("Field names:", Object.keys(records[0]?.fields || {}));
+
 
   return (
     <div className="space-y-4">
