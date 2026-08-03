@@ -38,6 +38,7 @@ export function IAGenerator() {
   const [selectedType, setSelectedType] = useState<typeof CREATIVE_TYPES[number]["id"] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const { data: records, refetch } = useSuspenseQuery({
     queryKey: ['supabase-inventory'],
