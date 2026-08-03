@@ -62,7 +62,7 @@ function Index() {
       toast.success("Copy generado con éxito");
     } catch (error) {
       console.error("AI Generation error:", error);
-      toast.error("Error al conectar con OpenAI. Verifica tus API Keys.");
+      toast.error("Error al generar contenido. Verifica tu conexión.");
     } finally {
       setIsGenerating(false);
     }
