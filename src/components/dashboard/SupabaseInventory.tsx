@@ -104,7 +104,7 @@ export function SupabaseInventory() {
         return await upsertMueble({
           data: {
             ...savedProduct,
-            fotos: [...(savedProduct.fotos || []), ...uploadedPhotos],
+            galeria: [...(savedProduct.galeria || []), ...uploadedPhotos],
           },
         });
       } catch (error) {
