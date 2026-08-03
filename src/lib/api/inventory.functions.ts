@@ -37,6 +37,27 @@ async function createDriveFolder(name: string) {
   }
 }
 
+export async function uploadImage(file: File) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+  const filePath = `muebles/${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('assets')
+    .upload(filePath, file);
+
+  if (error) {
+    console.error("Error uploading image:", error);
+    throw new Error(error.message);
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('assets')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+}
+
 
 export type Mueble = {
   id: string;

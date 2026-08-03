@@ -4,12 +4,13 @@ import {
   getSupabaseInventory, 
   upsertMueble, 
   deleteMueble, 
+  uploadImage,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +32,7 @@ export function SupabaseInventory() {
   const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -105,6 +107,37 @@ export function SupabaseInventory() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     upsertMutation.mutate(formData);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const newUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadImage(files[i]);
+        newUrls.push(url);
+      }
+
+      const existingFotos = formData.fotos || [];
+      const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
+      setFormData({ ...formData, fotos: newFotos });
+      toast.success(`${files.length} foto(s) subida(s) correctamente`);
+    } catch (error: any) {
+      toast.error("Error al subir imagen: " + error.message);
+    } finally {
+      setUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    const newFotos = [...(formData.fotos || [])];
+    newFotos.splice(index, 1);
+    setFormData({ ...formData, fotos: newFotos });
   };
 
   return (
