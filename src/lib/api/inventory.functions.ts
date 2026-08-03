@@ -26,3 +26,40 @@ export const getSupabaseInventory = createServerFn({ method: "GET" })
 
     return data as Mueble[];
   });
+
+export const upsertMueble = createServerFn({ method: "POST" })
+  .handler(async ({ data }: { data: Partial<Mueble> }) => {
+    const { id, ...updateData } = data;
+    
+    if (id) {
+      const { data: result, error } = await supabase
+        .from('muebles')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return result as Mueble;
+    } else {
+      const { data: result, error } = await supabase
+        .from('muebles')
+        .insert([updateData])
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return result as Mueble;
+    }
+  });
+
+export const deleteMueble = createServerFn({ method: "POST" })
+  .handler(async ({ data }: { data: { id: string } }) => {
+    const { error } = await supabase
+      .from('muebles')
+      .delete()
+      .eq('id', data.id);
+
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
