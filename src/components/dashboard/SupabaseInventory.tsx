@@ -128,36 +128,49 @@ export function SupabaseInventory() {
     }
   };
 
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result);
+        resolve(result.split(',')[1] ?? "");
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    let folderId = formData.detalles?.google_drive_folder_id;
-    
-    // If we're adding a new product, we'll use a temporary "root" or wait
-    // Actually, to make it work, let's use the ELEGANZZA_FOLDER_ID if no folderId exists
-    // (This is defined in inventory.functions.ts but not exported, let's just use the fallback there)
-    
+    const folderId = formData.detalles?.google_drive_folder_id ?? null;
+
     setUploading(true);
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        if (file) {
-          // Pass empty string if folderId is missing; the server function should handle the fallback
-          const driveFileId = await uploadToDrive(file, folderId || "");
-          const driveUrl = `https://lh3.googleusercontent.com/u/0/d/${driveFileId}`;
-          newUrls.push(driveUrl);
-        }
+        if (!file) continue;
+        const base64 = await fileToBase64(file);
+        const uploaded = await uploadToDrive({
+          data: {
+            fileName: file.name,
+            mimeType: file.type || 'application/octet-stream',
+            base64,
+            folderId,
+          },
+        });
+        newUrls.push(uploaded.url);
       }
 
-      const existingFotos = formData.fotos || [];
-      const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
-      setFormData(prev => ({ ...prev, fotos: newFotos }));
-      toast.success(`${files.length} foto(s) subida(s) a Google Drive`);
+      setFormData(prev => ({
+        ...prev,
+        fotos: [...(prev.fotos || []), ...newUrls.map(url => ({ url }))],
+      }));
+      toast.success(`${newUrls.length} foto(s) subida(s) a Google Drive`);
     } catch (error: any) {
       console.error("Upload error:", error);
-      toast.error("Error al subir a Drive: " + error.message);
+      toast.error("Error al subir a Drive: " + (error?.message ?? "desconocido"));
     } finally {
       setUploading(false);
       e.target.value = '';
