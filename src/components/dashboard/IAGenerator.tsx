@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSupabaseInventory, type Mueble } from "@/lib/api/inventory.functions";
-import { generateProductCreative, updateAIContent, deleteAIContent } from "@/lib/api/ai.functions";
+import { generateProductCreative, updateAIContent, deleteAIContent, approveAIContent } from "@/lib/api/ai.functions";
 import { 
   Sparkles, 
   Search, 
