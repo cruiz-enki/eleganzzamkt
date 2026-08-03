@@ -111,6 +111,8 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     muebleId: z.string(),
     type: z.enum(["story", "carousel", "post", "copy", "prompt"]),
     context: z.string().optional(),
+    customSystem: z.string().optional(),
+    customPrompt: z.string().optional(),
   }).parse(data))
   .handler(async ({ data }) => {
     const headers = aiHeaders();
@@ -124,28 +126,48 @@ export const generateProductCreative = createServerFn({ method: "POST" })
       
     if (error || !mueble) throw new Error("No se encontró el producto.");
 
-    // 2. Construir prompt según tipo
-    let systemMsg = "Eres un director creativo de marketing para Eleganzza Muebles. ";
-    let prompt = `Genera contenido para el producto: ${mueble.nombre}. Categoría: ${mueble.categoria}. `;
+    // 2. Construir prompt según tipo, usando configuración guardada si existe (esto se manejaría mejor pasando los prompts como input)
+    // Pero como estamos en un entorno serverless, leemos el prompt configurado que el cliente debería enviar o usamos defaults.
+    // Para simplificar y que funcione con lo que el usuario configuró en el cliente, 
+    // asumimos que el cliente enviará los prompts personalizados en el futuro, o los recuperamos si estuvieran en BD.
     
-    if (data.type === "copy") {
-      systemMsg += "Crea textos persuasivos para redes sociales.";
-      prompt += "Crea 3 opciones de copys (Instagram, Facebook y WhatsApp) que resalten la elegancia y confort.";
-    } else if (data.type === "prompt") {
-      systemMsg += "Crea prompts técnicos para generadores de imágenes (Midjourney/DALL-E).";
-      prompt += "Genera un prompt detallado para crear una escena de estilo de vida de lujo donde este mueble sea el protagonista.";
-    } else {
-      systemMsg += `Diseña una estructura de ${data.type} visualmente impactante.`;
-      prompt += `Describe detalladamente los elementos visuales, colores y composición para un ${data.type} de este producto.`;
-    }
+    // Por ahora, usaremos los defaults pero con la estructura flexible.
+    const DEFAULT_PROMPTS = {
+      copy: {
+        system: "Eres un experto en marketing para una marca de muebles de lujo llamada Eleganzza Muebles. Crea textos persuasivos para redes sociales.",
+        user: "Crea 3 opciones de copys (Instagram, Facebook y WhatsApp) para el producto: {nombre}. Categoría: {categoria}. Resalta la elegancia y confort."
+      },
+      story: {
+        system: "Eres un director creativo de marketing para Eleganzza Muebles. Diseña una estructura de stories visualmente impactante.",
+        user: "Diseña una secuencia de 3 historias para el producto: {nombre}. Describe los elementos visuales, el texto en pantalla y el llamado a la acción."
+      },
+      post: {
+        system: "Eres un director creativo de marketing para Eleganzza Muebles. Diseña un post de feed estratégico.",
+        user: "Describe detalladamente la composición visual, los colores y el copy principal para un post cuadrado de Instagram del producto: {nombre}."
+      },
+      carousel: {
+        system: "Eres un director creativo de marketing para Eleganzza Muebles. Diseña un carrusel educativo o de venta.",
+        user: "Crea una estructura de 5 diapositivas para un carrusel sobre el producto: {nombre}. Indica qué va en cada slide (título, cuerpo, imagen sugerida)."
+      },
+      prompt: {
+        system: "Eres un experto en ingeniería de prompts para IA generativa de imágenes (Midjourney/DALL-E).",
+        user: "Genera un prompt técnico y detallado para crear una escena de estilo de vida de lujo (Luxury Lifestyle) donde el mueble {nombre} sea el protagonista. Incluye iluminación, materiales y ambiente."
+      }
+    };
 
-    if (data.context) prompt += `\nContexto adicional: ${data.context}`;
+    const config = DEFAULT_PROMPTS[data.type];
+    let systemMsg = data.customSystem || config.system;
+    let userPrompt = (data.customPrompt || config.user)
+      .replace(/{nombre}/g, mueble.nombre)
+      .replace(/{categoria}/g, mueble.categoria || "Muebles");
+
+    if (data.context) userPrompt += `\nContexto adicional: ${data.context}`;
 
     const body = {
       model: AI_MODEL,
       messages: [
         { role: "system", content: systemMsg },
-        { role: "user", content: prompt }
+        { role: "user", content: userPrompt }
       ],
     };
 
@@ -166,8 +188,7 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     const result = await res.json();
     const content = result.choices[0]?.message?.content;
 
-    // 3. Vincular con el producto guardando en una tabla de 'contenido_ia' o similar
-    // Si no existe la tabla, podemos guardarlo en el campo 'detalles' del mueble por ahora
+    // 3. Vincular con el producto
     const { data: updatedMueble } = await supabase
       .from('muebles')
       .select('detalles')

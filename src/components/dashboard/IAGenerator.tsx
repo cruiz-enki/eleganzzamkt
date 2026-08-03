@@ -60,10 +60,29 @@ export function IAGenerator() {
 
     setIsGenerating(true);
     try {
+      // Intentar obtener prompts personalizados de localStorage
+      const savedPrompts = localStorage.getItem('eleganzza_ai_prompts');
+      let customPrompt = undefined;
+      let customSystem = undefined;
+      
+      if (savedPrompts) {
+        try {
+          const config = JSON.parse(savedPrompts);
+          if (config[selectedType]) {
+            customSystem = config[selectedType].system;
+            customPrompt = config[selectedType].user;
+          }
+        } catch (e) {
+          console.error("Error parsing saved prompts", e);
+        }
+      }
+
       const content = await generateProductCreative({
         data: {
           muebleId: selectedProduct.id,
-          type: selectedType
+          type: selectedType,
+          customSystem,
+          customPrompt
         }
       });
       setGeneratedContent(content);
