@@ -38,6 +38,7 @@ export function IAGenerator() {
   const [selectedType, setSelectedType] = useState<typeof CREATIVE_TYPES[number]["id"] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const { data: records, refetch } = useSuspenseQuery({
     queryKey: ['supabase-inventory'],
@@ -102,12 +103,27 @@ export function IAGenerator() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-200px)]">
-      {/* Selector de Producto */}
-      <div className="lg:col-span-4 flex flex-col gap-4">
+    <div className="flex gap-6 h-[calc(100vh-200px)] relative overflow-hidden">
+      {/* Selector de Producto (Slide Sidebar) */}
+      <div 
+        className={cn(
+          "flex flex-col gap-4 transition-all duration-300 ease-in-out shrink-0",
+          isSidebarOpen ? "w-80" : "w-0 opacity-0 -translate-x-full"
+        )}
+      >
         <Card className="flex-1 flex flex-col overflow-hidden border-slate-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg font-serif">1. Elige un Producto</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg font-serif">1. Elige un Producto</CardTitle>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 lg:hidden" 
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <ChevronRight className="h-4 w-4 rotate-180" />
+              </Button>
+            </div>
             <CardDescription>Selecciona el mueble para el contenido</CardDescription>
             <div className="relative mt-2">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-slate-400" />
@@ -128,6 +144,8 @@ export function IAGenerator() {
                     onClick={() => {
                         setSelectedProduct(product);
                         setGeneratedContent(null);
+                        // Opcionalmente cerrar en móvil tras elegir
+                        if (window.innerWidth < 1024) setIsSidebarOpen(false);
                     }}
                     className={cn(
                       "w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left group border",
@@ -156,7 +174,6 @@ export function IAGenerator() {
                         )}
                       </div>
                     </div>
-                    <ChevronRight className={cn("h-4 w-4 opacity-0 group-hover:opacity-100", selectedProduct?.id === product.id && "opacity-100")} />
                   </button>
                 ))}
               </div>
@@ -165,9 +182,22 @@ export function IAGenerator() {
         </Card>
       </div>
 
+      {/* Botón para reabrir el slide si está cerrado */}
+      {!isSidebarOpen && (
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute left-0 top-4 z-10 rounded-l-none border border-l-0 shadow-sm animate-in slide-in-from-left-2"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      )}
+
       {/* Selector de Tipo y Generador */}
-      <div className="lg:col-span-8 space-y-6 flex flex-col">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+      <div className="flex-1 space-y-6 flex flex-col min-w-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0">
+
           {/* Tipos de Contenido */}
           <Card className="border-slate-200">
             <CardHeader>
