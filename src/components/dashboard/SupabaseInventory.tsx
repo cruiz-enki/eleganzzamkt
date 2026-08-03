@@ -1066,6 +1066,13 @@ export function SupabaseInventory() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      <Lightbox
+        open={lightboxIndex >= 0}
+        index={lightboxIndex}
+        close={() => setLightboxIndex(-1)}
+        slides={lightboxSlides}
+      />
     </div>
   );
 }
