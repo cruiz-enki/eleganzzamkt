@@ -652,6 +652,9 @@ export function SupabaseInventory() {
                             {record.detalles?.status === 'draft' && (
                               <Badge variant="outline" className="text-[9px] h-4 px-1 bg-amber-50 text-amber-600 border-amber-200">Borrador</Badge>
                             )}
+                            {record.detalles?.status === 'discontinued' && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-slate-100 text-slate-500 border-slate-200">Descontinuado</Badge>
+                            )}
                           </span>
                         </div>
                       </div>
@@ -714,6 +717,27 @@ export function SupabaseInventory() {
                           }}
                         >
                           <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className={cn(
+                            "h-8 w-8 transition-colors",
+                            record.detalles?.status === 'discontinued' ? "text-amber-500 hover:text-amber-700 hover:bg-amber-50" : "text-slate-400 hover:text-slate-900"
+                          )}
+                          title={record.detalles?.status === 'discontinued' ? "Reactivar producto" : "Marcar como descontinuado"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newStatus = record.detalles?.status === 'discontinued' ? 'published' : 'discontinued';
+                            const confirmMsg = record.detalles?.status === 'discontinued' 
+                              ? "¿Reactivar este producto?" 
+                              : "¿Marcar este producto como descontinuado?";
+                            if (confirm(confirmMsg)) {
+                              updateStatusMutation.mutate({ id: record.id, status: newStatus });
+                            }
+                          }}
+                        >
+                          <Archive className="h-4 w-4" />
                         </Button>
                         <Button 
                           size="icon" 
@@ -795,6 +819,9 @@ export function SupabaseInventory() {
                               {record.nombre}
                               {record.detalles?.status === 'draft' && (
                                 <span className="bg-amber-500 text-[8px] text-white px-1 rounded">DRAFT</span>
+                              )}
+                              {record.detalles?.status === 'discontinued' && (
+                                <span className="bg-slate-500 text-[8px] text-white px-1 rounded">DISC</span>
                               )}
                             </h3>
                             <p className="text-[10px] opacity-70 uppercase tracking-wider">{record.categoria}</p>
