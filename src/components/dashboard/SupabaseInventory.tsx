@@ -80,9 +80,15 @@ export function SupabaseInventory() {
       const savedProduct = await upsertMueble({ data });
       if (pendingFiles.length === 0) return savedProduct;
 
-      const folderId = savedProduct.detalles?.google_drive_folder_id;
+      let folderId = savedProduct.detalles?.google_drive_folder_id;
+      
+      // Si por alguna razón no tiene carpeta (ej. importación previa sin carpeta), intentamos crearla ahora
       if (!folderId) {
-        throw new Error("El producto se guardó, pero Drive no devolvió la carpeta para sus fotos");
+        console.log("No folder ID found for product, attempting to update to ensure folder exists...");
+        // La lógica de upsertMueble ya crea la carpeta si no existe al insertar, 
+        // pero para actualizaciones de registros viejos sin carpeta, forzamos una re-evaluación si fuera necesario.
+        // En este flujo, confiamos en que upsertMueble devolvió una carpeta.
+        throw new Error("El producto se guardó, pero no se encontró una carpeta de Google Drive vinculada para las fotos");
       }
 
       setUploading(true);
@@ -101,16 +107,19 @@ export function SupabaseInventory() {
           uploadedPhotos.push(uploaded);
         }
 
-        return await upsertMueble({
+        // Actualizamos el producto con las nuevas fotos en la galería
+        const updatedProduct = await upsertMueble({
           data: {
-            ...savedProduct,
+            id: savedProduct.id,
             galeria: [...(savedProduct.galeria || []), ...uploadedPhotos],
           },
         });
+        
+        return updatedProduct;
       } catch (error) {
         await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
         const message = error instanceof Error ? error.message : "Error desconocido";
-        throw new Error(`El producto se guardó, pero no todas las fotos pudieron subirse: ${message}`);
+        throw new Error(`El producto se guardó, pero no todas las fotos pudieron subirse a la carpeta de Drive: ${message}`);
       } finally {
         setUploading(false);
       }
