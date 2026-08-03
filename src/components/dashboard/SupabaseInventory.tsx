@@ -112,11 +112,20 @@ export function SupabaseInventory() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submit triggered. isAdding:", isAdding, "isEditing:", isEditing);
+    
     if (!formData.nombre) {
       toast.error("El nombre del producto es obligatorio");
       return;
     }
-    upsertMutation.mutate(formData);
+
+    try {
+      console.log("Mutating with data:", formData);
+      upsertMutation.mutate(formData);
+    } catch (err) {
+      console.error("Mutation call failed:", err);
+      toast.error("Error al iniciar el guardado");
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,24 +134,17 @@ export function SupabaseInventory() {
 
     let folderId = formData.detalles?.google_drive_folder_id;
     
-    // If we're adding a new product and don't have a folder ID yet, 
-    // we can't upload until the product (and its folder) is created.
-    // However, the current flow creates the folder on upsert.
-    // Let's ensure we have a folder or inform the user.
-    if (!folderId && !isAdding) {
-      toast.error("No se encontró la carpeta de Drive para este producto.");
-      return;
-    }
-
+    // If we're adding a new product, we'll use a temporary "root" or wait
+    // Actually, to make it work, let's use the ELEGANZZA_FOLDER_ID if no folderId exists
+    // (This is defined in inventory.functions.ts but not exported, let's just use the fallback there)
+    
     setUploading(true);
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file) {
-          // If folderId doesn't exist yet (new product), we'll have to wait until upsert.
-          // For now, let's assume we are editing or the folder is pre-created if possible.
-          // Realistically, for a professional flow, we should create folder on demand if missing.
+          // Pass empty string if folderId is missing; the server function should handle the fallback
           const driveFileId = await uploadToDrive(file, folderId || "");
           const driveUrl = `https://lh3.googleusercontent.com/u/0/d/${driveFileId}`;
           newUrls.push(driveUrl);
@@ -151,9 +153,10 @@ export function SupabaseInventory() {
 
       const existingFotos = formData.fotos || [];
       const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
-      setFormData({ ...formData, fotos: newFotos });
+      setFormData(prev => ({ ...prev, fotos: newFotos }));
       toast.success(`${files.length} foto(s) subida(s) a Google Drive`);
     } catch (error: any) {
+      console.error("Upload error:", error);
       toast.error("Error al subir a Drive: " + error.message);
     } finally {
       setUploading(false);
@@ -406,9 +409,9 @@ export function SupabaseInventory() {
 
       {/* Edit/Add Dialog */}
       <Dialog open={isEditing || isAdding} onOpenChange={(open) => !open && closeForm()}>
-        <DialogContent className="max-w-2xl bg-white border-none shadow-2xl p-0 overflow-hidden">
-          <form onSubmit={handleSubmit}>
-            <div className="p-8">
+        <DialogContent className="max-w-2xl bg-white border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
+          <form onSubmit={handleSubmit} className="flex flex-col overflow-hidden">
+            <div className="p-8 overflow-y-auto flex-1">
               <DialogHeader className="mb-8">
                 <DialogTitle className="text-2xl font-bold text-slate-900">
                   {isAdding ? "Nuevo Producto" : "Editar Producto"}

@@ -41,6 +41,9 @@ export async function uploadToDrive(file: File, folderId: string) {
   const lovableApiKey = process.env['LOVABLE_API_KEY'];
   const googleDriveApiKey = process.env['GOOGLE_DRIVE_API_KEY'];
 
+  // Fallback to main folder if no specific folderId is provided (e.g., new product)
+  const targetFolderId = folderId || ELEGANZZA_FOLDER_ID;
+
   if (!lovableApiKey || !googleDriveApiKey) {
     throw new Error("Missing Google Drive credentials");
   }
@@ -63,7 +66,7 @@ export async function uploadToDrive(file: File, folderId: string) {
       body: JSON.stringify({
         metadata: {
           name: file.name,
-          parents: [folderId]
+          parents: [targetFolderId]
         },
         content: base64Content
       })
