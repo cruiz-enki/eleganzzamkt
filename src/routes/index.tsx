@@ -13,7 +13,8 @@ import {
   Palette,
   Settings,
   Menu,
-  X
+  X,
+  Sparkles as SparklesIcon
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
