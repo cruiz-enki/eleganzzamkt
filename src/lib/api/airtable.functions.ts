@@ -8,7 +8,8 @@ export const AIRTABLE_TABLE = "Total";
 
 export type AirtableRecord = {
   id: string;
-  fields: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>;
 };
 
 export const getAirtableData = createServerFn({ method: "GET" })
