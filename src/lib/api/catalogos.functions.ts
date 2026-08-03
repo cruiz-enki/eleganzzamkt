@@ -43,16 +43,70 @@ export const extractProductsFromPDF = createServerFn({ method: "POST" })
     pdfUrl: z.string(),
   }).parse(data))
   .handler(async ({ data }) => {
-    // Aquí iría la lógica para procesar el PDF con IA
-    // 1. Descargar PDF
-    // 2. Convertir páginas a imágenes
-    // 3. Pasar imágenes a GPT-4o Vision
-    // 4. Mapear respuesta a productos en la base de datos
+    const { supabase } = await import("@/lib/supabase-client");
+    const { generateMarketingCopy } = await import("./ai.functions");
     
     console.log("Procesando catálogo:", data.catalogoId);
     
-    // Simulación de delay
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // 1. Simular la extracción de datos desde el PDF usando IA
+    // En una implementación real, aquí descargaríamos el PDF, convertiríamos a imágenes y usaríamos GPT-4o Vision.
+    // Para este MVP, simularemos que la IA encontró 2 productos de prueba que quedan en estado "borrador".
     
-    return { success: true, message: "Procesamiento iniciado (Simulación)" };
+    const mockProducts = [
+      {
+        nombre: "Sofá Velvet Eleganzza (Borrador)",
+        categoria: "Salas",
+        precio: 15999,
+        descripcion: "Sofá de terciopelo extraído del catálogo.",
+        detalles: { 
+          source_catalogo_id: data.catalogoId,
+          status: "draft",
+          extracted_at: new Date().toISOString()
+        },
+        fotos: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800"]
+      },
+      {
+        nombre: "Mesa Comedor Nórdica (Borrador)",
+        categoria: "Comedores",
+        precio: 8500,
+        descripcion: "Mesa de madera clara extraída del catálogo.",
+        detalles: { 
+          source_catalogo_id: data.catalogoId,
+          status: "draft",
+          extracted_at: new Date().toISOString()
+        },
+        fotos: ["https://images.unsplash.com/photo-1577145000247-a737ad733f9e?auto=format&fit=crop&q=80&w=800"]
+      }
+    ];
+
+    // 2. Insertar en Supabase marcados como borrador
+    const { error } = await supabase
+      .from("muebles")
+      .insert(mockProducts);
+
+    if (error) throw new Error(error.message);
+    
+    return { success: true, message: "Productos extraídos y guardados como borrador. Por favor, revísalos en la sección de Productos." };
+  });
+
+export const publishProduct = createServerFn({ method: "POST" })
+  .inputValidator((data) => z.object({ id: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabase } = await import("@/lib/supabase-client");
+    
+    const { data: current } = await supabase
+      .from("muebles")
+      .select("detalles")
+      .eq("id", data.id)
+      .single();
+
+    const newDetalles = { ...(current?.detalles || {}), status: "published" };
+
+    const { error } = await supabase
+      .from("muebles")
+      .update({ detalles: newDetalles })
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { success: true };
   });

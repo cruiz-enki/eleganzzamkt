@@ -7,11 +7,12 @@ import {
   uploadToDrive,
   type Mueble 
 } from "@/lib/api/inventory.functions";
+import { publishProduct } from "@/lib/api/catalogos.functions";
 import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -152,6 +153,17 @@ export function SupabaseInventory() {
     },
     onError: (error) => {
       toast.error("Error al eliminar: " + error.message);
+    }
+  });
+
+  const publishMutation = useMutation({
+    mutationFn: (id: string) => publishProduct({ data: { id } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['supabase-inventory'] });
+      toast.success("Producto publicado correctamente");
+    },
+    onError: (error) => {
+      toast.error("Error al publicar: " + error.message);
     }
   });
 
@@ -559,9 +571,14 @@ export function SupabaseInventory() {
                             <Package className="w-5 h-5 text-slate-400" />
                           )}
                         </div>
-                        <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
-                          {record.nombre}
-                        </span>
+                        <div className="flex flex-col">
+                          <span className="font-medium text-slate-700 group-hover:text-black transition-colors flex items-center gap-2">
+                            {record.nombre}
+                            {record.detalles?.status === 'draft' && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-amber-50 text-amber-600 border-amber-200">Borrador</Badge>
+                            )}
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
                   )}
@@ -595,7 +612,24 @@ export function SupabaseInventory() {
                   {visibleColumns.has("acciones") && (
                     <TableCell className="text-right py-4">
                       <div className="flex justify-end gap-2">
+                        {record.detalles?.status === 'draft' && (
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-8 w-8 text-green-500 hover:text-green-700 hover:bg-green-50"
+                            title="Publicar producto"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm("¿Deseas publicar este producto? Dejará de ser borrador.")) {
+                                publishMutation.mutate(record.id);
+                              }
+                            }}
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button 
+
                           size="icon" 
                           variant="ghost" 
                           className="h-8 w-8 text-slate-400 hover:text-slate-900"
@@ -682,7 +716,12 @@ export function SupabaseInventory() {
                       <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="flex justify-between items-end text-white">
                           <div className="space-y-1">
-                            <h3 className="font-bold text-sm leading-tight">{record.nombre}</h3>
+                            <h3 className="font-bold text-sm leading-tight flex items-center gap-2">
+                              {record.nombre}
+                              {record.detalles?.status === 'draft' && (
+                                <span className="bg-amber-500 text-[8px] text-white px-1 rounded">DRAFT</span>
+                              )}
+                            </h3>
                             <p className="text-[10px] opacity-70 uppercase tracking-wider">{record.categoria}</p>
                           </div>
                           <div className="text-right">
@@ -890,8 +929,25 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+                  {selectedRecord.detalles?.status === 'draft' && (
+                    <Button 
+                      className="flex-1 bg-green-600 text-white hover:bg-green-700 h-12 rounded-xl transition-all font-medium border-0 gap-2"
+                      onClick={() => {
+                        if (confirm("¿Deseas publicar este producto? Dejará de ser borrador.")) {
+                          publishMutation.mutate(selectedRecord.id);
+                          setSelectedRecord(null);
+                        }
+                      }}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      Publicar Ahora
+                    </Button>
+                  )}
                   <Button 
-                    className="flex-1 bg-slate-100 text-slate-900 hover:bg-slate-200 h-12 rounded-xl transition-all font-medium border-0"
+                    className={cn(
+                      "flex-1 h-12 rounded-xl transition-all font-medium border-0",
+                      selectedRecord.detalles?.status === 'draft' ? "bg-slate-100 text-slate-900 hover:bg-slate-200" : "bg-slate-900 text-white hover:bg-slate-800"
+                    )}
                     onClick={() => handleEdit(selectedRecord)}
                   >
                     Editar Producto
