@@ -6,10 +6,12 @@ import {
   Cloud, 
   Sparkles, 
   Image as ImageIcon, 
-  Table,
   TrendingUp,
-  MessageSquare
+  Table as TableIcon
 } from "lucide-react";
+import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -69,18 +71,14 @@ function Index() {
 
         {/* Airtable Integration */}
         <BentoItem 
-          title="Airtable DB" 
-          className="md:col-span-2"
-          icon={<Table className="h-4 w-4 text-slate-400" />}
+          title="Inventario de Muebles (Airtable)" 
+          className="md:col-span-4 md:row-span-2"
+          icon={<TableIcon className="h-4 w-4 text-slate-400" />}
         >
-          <div className="flex items-center gap-3 mt-2">
-            <div className="h-10 w-10 rounded bg-amber-50 flex items-center justify-center">
-              <Database className="h-5 w-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-slate-700">Inventario Muebles</p>
-              <p className="text-xs text-slate-400">Sincronización en curso...</p>
-            </div>
+          <div className="mt-4">
+            <Suspense fallback={<div className="space-y-2"><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/></div>}>
+              <AirtableInventory />
+            </Suspense>
           </div>
         </BentoItem>
 
