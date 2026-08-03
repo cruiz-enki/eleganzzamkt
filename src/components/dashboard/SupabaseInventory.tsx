@@ -217,7 +217,10 @@ export function SupabaseInventory() {
   };
 
   const handleEdit = (record: Mueble) => {
-    setFormData(record);
+    setFormData({
+      ...record,
+      galeria: record.galeria || []
+    });
     setPendingFiles([]);
     setIsEditing(true);
     setSelectedRecord(null); // Close detail view if open
