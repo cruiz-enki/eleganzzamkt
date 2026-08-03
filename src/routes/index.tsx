@@ -7,18 +7,21 @@ import {
   Sparkles, 
   Image as ImageIcon, 
   TrendingUp,
-  Table as TableIcon
+  Table as TableIcon,
+  Package
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
+  const [view, setView] = useState<"dashboard" | "productos">("dashboard");
+
   return (
     <div className="min-h-screen bg-[#fcfbf8] p-6 lg:p-10">
       <header className="mb-10">
