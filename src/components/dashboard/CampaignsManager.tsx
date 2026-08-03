@@ -85,7 +85,12 @@ export function CampaignsManager() {
           reader.onload = () => {
             const result = reader.result;
             if (typeof result === 'string') {
-              resolve(result.split(',')[1]);
+              const parts = result.split(',');
+              if (parts.length > 1 && parts[1]) {
+                resolve(parts[1]);
+              } else {
+                reject(new Error("Formato de base64 inválido"));
+              }
             } else {
               reject(new Error("Error al leer el archivo"));
             }
