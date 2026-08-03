@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { getCatalogos, createCatalogo, extractProductsFromPDF } from "@/lib/api/catalogos.functions";
+import { uploadToDrive } from "@/lib/api/inventory.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { uploadFileToDrive } from "@/lib/api/google-drive";
 
 export function CatalogosManager() {
   const [catalogos, setCatalogos] = useState<any[]>([]);
@@ -49,13 +49,27 @@ export function CatalogosManager() {
 
     setUploading(true);
     try {
-      // 1. Subir a Google Drive (en la carpeta de Eleganzza)
+      // 1. Convertir a base64 para subir
+      const fileToBase64 = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = String(reader.result);
+            resolve(result.split(',')[1] ?? "");
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+      const base64 = await fileToBase64(selectedFile);
       const folderId = "0AKMhdlaXwPtQUk9PVA"; // ID proporcionado por el usuario
-      const driveFile = await uploadFileToDrive({ 
+      
+      const driveFile = await uploadToDrive({ 
         data: { 
-          file: selectedFile, 
+          fileName: `${nombre}.pdf`,
+          mimeType: "application/pdf",
+          base64,
           folderId,
-          fileName: `${nombre}.pdf`
         } 
       });
 
@@ -63,7 +77,7 @@ export function CatalogosManager() {
       await createCatalogo({
         data: {
           nombre,
-          pdf_url: driveFile.webContentLink || driveFile.webViewLink || "",
+          pdf_url: driveFile.url || "",
           drive_folder_id: folderId
         }
       });
