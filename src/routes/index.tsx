@@ -372,13 +372,20 @@ function Index() {
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-4">
                       <p className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Logotipo Principal</p>
-                      <div className="aspect-video bg-black rounded-xl flex items-center justify-center p-8 border border-slate-200 dark:border-slate-800 shadow-inner group relative overflow-hidden">
+                      <div className="aspect-video bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center p-8 border border-slate-200 dark:border-slate-700 shadow-inner group relative overflow-hidden">
                         <img 
                           src="https://eqshiiiekxbpsdilckuv.supabase.co/storage/v1/object/public/muebles/eleganzzacolor.png" 
                           alt="Eleganzza Logo" 
                           className="max-h-full object-contain relative z-10"
+                          onError={(e) => {
+                            // Intento de fallback si la URL de Supabase falla
+                            const target = e.target as HTMLImageElement;
+                            if (!target.src.includes('placeholder')) {
+                              target.src = "https://placehold.co/600x400/000000/FFFFFF?text=Eleganzza+Muebles";
+                            }
+                          }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
 
