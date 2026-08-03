@@ -225,7 +225,7 @@ export function IAGenerator() {
                         Ver todo el historial
                       </Button>
                     </div>
-                  ) : selectedProduct?.detalles?.ai_content?.length > 0 ? (
+                  ) : (selectedProduct && selectedProduct.detalles?.ai_content?.length > 0) ? (
                     <div className="space-y-4">
                       {selectedProduct.detalles.ai_content.map((item: any, idx: number) => (
                         <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
