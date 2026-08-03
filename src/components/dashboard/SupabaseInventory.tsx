@@ -843,9 +843,9 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Fotos del Producto</Label>
+                  <Label>Galería de Imágenes (Múltiples fotos)</Label>
                   <div className="grid grid-cols-4 gap-2 mb-2">
-                    {(formData.fotos || []).map((f: any, idx: number) => (
+                    {(formData.galeria || []).map((f: any, idx: number) => (
                       <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
                         <img src={f.url} alt="" className="w-full h-full object-cover" />
                         <button 
