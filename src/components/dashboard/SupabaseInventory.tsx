@@ -441,7 +441,43 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Fotos (URLs separadas por comas)</Label>
+                  <Label>Fotos del Producto</Label>
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    {(formData.fotos || []).map((f: any, idx: number) => (
+                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
+                        <img src={f.url} alt="" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => removePhoto(idx)}
+                          className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    <label className={cn(
+                      "aspect-square rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-slate-300 hover:bg-slate-50 transition-all",
+                      uploading && "opacity-50 cursor-not-allowed"
+                    )}>
+                      {uploading ? (
+                        <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-6 w-6 text-slate-400" />
+                          <span className="text-[10px] font-medium text-slate-500 mt-1">Subir</span>
+                        </>
+                      )}
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                  <Label className="text-xs text-slate-400 font-normal">O pega URLs (separadas por comas)</Label>
                   <Textarea 
                     placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
                     value={(formData.fotos || []).map((f: any) => f.url).join(', ')}
@@ -451,7 +487,6 @@ export function SupabaseInventory() {
                     }}
                     rows={2}
                   />
-                  <p className="text-[10px] text-slate-400">Pega las URLs de las fotos separadas por una coma.</p>
                 </div>
 
                 <div className="grid gap-2">
@@ -474,7 +509,7 @@ export function SupabaseInventory() {
               <Button 
                 type="submit" 
                 className="bg-black text-white hover:bg-black/90 px-8"
-                disabled={upsertMutation.isPending}
+                disabled={upsertMutation.isPending || uploading}
               >
                 {upsertMutation.isPending ? "Guardando..." : "Guardar Producto"}
               </Button>
