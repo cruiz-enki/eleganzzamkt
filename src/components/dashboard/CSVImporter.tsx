@@ -190,10 +190,15 @@ export function CSVImporter() {
             />
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 p-3 rounded-lg flex gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
-            <p className="text-xs text-amber-700">
-              El importador detectará automáticamente el Nombre, Categoría, Descripción, Fotos y Precios según las columnas del archivo.
+          <div className="bg-amber-50 border border-amber-100 p-3 rounded-lg flex flex-col gap-2">
+            <div className="flex gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
+              <p className="text-xs text-amber-700">
+                El importador detectará automáticamente el Nombre, Categoría, Descripción, Fotos y Precios.
+              </p>
+            </div>
+            <p className="text-[10px] text-amber-600 font-medium italic pl-8">
+              Nota: Al importar, se creará automáticamente una carpeta en Drive para cada producto y se almacenarán sus imágenes.
             </p>
           </div>
 
