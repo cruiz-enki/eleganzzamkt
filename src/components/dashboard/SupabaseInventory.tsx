@@ -10,7 +10,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2 } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -288,6 +288,23 @@ export function SupabaseInventory() {
     setFormData({ ...formData, fotos: newFotos });
   };
 
+  const currentIndex = useMemo(() => {
+    if (!selectedRecord) return -1;
+    return processedRecords.findIndex(r => r.id === selectedRecord.id);
+  }, [selectedRecord, processedRecords]);
+
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setSelectedRecord(processedRecords[currentIndex - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < processedRecords.length - 1) {
+      setSelectedRecord(processedRecords[currentIndex + 1]);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -553,9 +570,63 @@ export function SupabaseInventory() {
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedRecord} onOpenChange={(open) => !open && setSelectedRecord(null)}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-white border-none shadow-2xl">
+        <DialogContent className="max-w-4xl p-0 overflow-visible bg-white border-none shadow-2xl">
           {selectedRecord && (
-            <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px]">
+            <div className="relative">
+              {/* Lateral Navigation Buttons */}
+              <div className="absolute top-1/2 -left-16 -translate-y-1/2 hidden lg:block">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm transition-all",
+                    currentIndex <= 0 && "opacity-20 cursor-not-allowed"
+                  )}
+                  onClick={handlePrev}
+                  disabled={currentIndex <= 0}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="absolute top-1/2 -right-16 -translate-y-1/2 hidden lg:block">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm transition-all",
+                    currentIndex >= processedRecords.length - 1 && "opacity-20 cursor-not-allowed"
+                  )}
+                  onClick={handleNext}
+                  disabled={currentIndex >= processedRecords.length - 1}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
+
+              {/* Mobile Navigation */}
+              <div className="absolute top-4 right-16 z-50 flex gap-1 lg:hidden">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm"
+                  onClick={handlePrev}
+                  disabled={currentIndex <= 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm"
+                  onClick={handleNext}
+                  disabled={currentIndex >= processedRecords.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px] overflow-hidden rounded-lg">
               <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
                 {selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0 ? (
                   <ScrollArea className="h-full">
