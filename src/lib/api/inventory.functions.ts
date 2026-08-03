@@ -28,18 +28,20 @@ export const getSupabaseInventory = createServerFn({ method: "GET" })
     return data as Mueble[];
   });
 
+const muebleSchema = z.object({
+  id: z.string().optional(),
+  nombre: z.string(),
+  categoria: z.string().optional().nullable(),
+  precio: z.number().optional().nullable(),
+  fotos: z.array(z.any()).optional().nullable(),
+  descripcion: z.string().optional().nullable(),
+  detalles: z.any().optional().nullable(),
+});
+
 export const upsertMueble = createServerFn({ method: "POST" })
-  .input(z.object({
-    id: z.string().optional(),
-    nombre: z.string(),
-    categoria: z.string().optional().nullable(),
-    precio: z.number().optional().nullable(),
-    fotos: z.array(z.any()).optional().nullable(),
-    descripcion: z.string().optional().nullable(),
-    detalles: z.any().optional().nullable(),
-  }))
-  .handler(async ({ input }) => {
-    const { id, ...updateData } = input;
+  .validator((data: unknown) => muebleSchema.parse(data))
+  .handler(async ({ data }) => {
+    const { id, ...updateData } = data;
     
     if (id) {
       const { data: result, error } = await supabase
@@ -64,12 +66,12 @@ export const upsertMueble = createServerFn({ method: "POST" })
   });
 
 export const deleteMueble = createServerFn({ method: "POST" })
-  .input(z.object({ id: z.string() }))
-  .handler(async ({ input }) => {
+  .validator((data: unknown) => z.object({ id: z.string() }).parse(data))
+  .handler(async ({ data }) => {
     const { error } = await supabase
       .from('muebles')
       .delete()
-      .eq('id', input.id);
+      .eq('id', data.id);
 
     if (error) throw new Error(error.message);
     return { success: true };
