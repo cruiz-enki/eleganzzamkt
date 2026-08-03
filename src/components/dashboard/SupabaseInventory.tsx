@@ -644,11 +644,11 @@ export function SupabaseInventory() {
                               alt={`${selectedRecord.nombre} ${i + 1}`} 
                               className="w-full"
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <div className="absolute top-2 right-2 z-10">
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                className="h-8 text-[10px] gap-1 px-2 font-bold uppercase"
+                                className="h-8 text-[10px] gap-1 px-2 font-bold uppercase shadow-lg border border-slate-200"
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   try {
@@ -656,6 +656,8 @@ export function SupabaseInventory() {
                                     const result = await cleanProductImage({ data: { imageUrl: url } });
                                     toast.success("Análisis de IA completado");
                                     console.log("IA Clean Result:", result);
+                                    // Mostramos el resultado en un toast informativo para que el usuario vea que funcionó
+                                    toast.info(result, { duration: 5000 });
                                   } catch (e) {
                                     toast.error("Error al procesar con IA");
                                   }
