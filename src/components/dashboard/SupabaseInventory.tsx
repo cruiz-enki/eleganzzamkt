@@ -669,7 +669,7 @@ export function SupabaseInventory() {
                                     // Mostramos el resultado en un toast informativo para que el usuario vea que funcionó
                                     toast.info(result, { duration: 5000 });
                                   } catch (e) {
-                                    toast.error("Error al procesar con IA. Verifica tu API Key.");
+                                    toast.error("Error al procesar con IA. Verifica tu conexión.");
                                   }
                                 }}
                               >
