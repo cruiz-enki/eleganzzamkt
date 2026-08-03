@@ -15,7 +15,9 @@ import {
   Menu,
   X,
   Sparkles as SparklesIcon,
-  Loader2
+  Loader2,
+  Moon,
+  Sun
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
@@ -48,9 +50,18 @@ type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuraci
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiResult, setAiResult] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   const handleGenerateCopy = async () => {
     if (!aiPrompt.trim()) {
@@ -82,11 +93,11 @@ function Index() {
 
 
   return (
-    <div className="min-h-screen bg-[#fcfbf8] flex">
+    <div className="min-h-screen bg-[#fcfbf8] dark:bg-slate-950 flex transition-colors duration-300">
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transition-all duration-300 ease-in-out lg:static lg:block",
+          "fixed inset-y-0 left-0 z-50 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out lg:static lg:block",
           isSidebarOpen ? "w-64" : "w-20",
           !isSidebarOpen && "lg:w-20"
         )}
@@ -94,17 +105,17 @@ function Index() {
         <div className="h-full flex flex-col">
           <div className="p-6 flex items-center justify-between">
             {isSidebarOpen ? (
-              <h2 className="text-xl font-serif font-bold text-slate-900 truncate">Eleganzza</h2>
+              <h2 className="text-xl font-serif font-bold text-slate-900 dark:text-white truncate">Eleganzza</h2>
             ) : (
-              <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center mx-auto">
-                <span className="text-white font-serif font-bold">E</span>
+              <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center mx-auto">
+                <span className="text-white dark:text-slate-900 font-serif font-bold">E</span>
               </div>
             )}
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="hidden lg:flex"
+              className="hidden lg:flex dark:text-slate-400 dark:hover:text-white"
             >
               {isSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
@@ -118,27 +129,42 @@ function Index() {
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group",
                   view === item.id 
-                    ? "bg-slate-900 text-white" 
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900" 
+                    : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 <item.icon className={cn(
                   "h-5 w-5 shrink-0",
-                  view === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-900"
+                  view === item.id 
+                    ? "text-white dark:text-slate-900" 
+                    : "text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white"
                 )} />
-                {isSidebarOpen && <span className="font-medium">{item.label}</span>}
+                {isSidebarOpen && <span className="font-medium text-left">{item.label}</span>}
               </button>
             ))}
           </nav>
 
-          <div className="p-4 border-t border-slate-100">
+          <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "w-full justify-start gap-3 px-3 dark:text-slate-400 dark:hover:text-white",
+                !isSidebarOpen && "justify-center px-0"
+              )}
+              onClick={() => setIsDarkMode(!isDarkMode)}
+            >
+              {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {isSidebarOpen && <span>{isDarkMode ? "Modo Claro" : "Modo Oscuro"}</span>}
+            </Button>
+
             {isSidebarOpen ? (
-              <div className="bg-slate-50 rounded-lg p-3">
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
                 <p className="text-xs text-slate-400 uppercase font-bold">Marketing Team</p>
-                <p className="text-sm font-medium text-slate-700 mt-1">Admin Panel</p>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mt-1">Admin Panel</p>
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-slate-100 mx-auto" />
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 mx-auto" />
             )}
           </div>
         </div>
@@ -149,10 +175,10 @@ function Index() {
         <div className="p-6 lg:p-10 max-w-7xl mx-auto">
           <header className="mb-10 flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-serif font-semibold text-slate-900 tracking-tight capitalize">
+              <h1 className="text-3xl font-serif font-semibold text-slate-900 dark:text-white tracking-tight capitalize">
                 {view === "dashboard" ? "Resumen de Operaciones" : view}
               </h1>
-              <p className="text-slate-500 mt-2 font-medium">Eleganzza Marketing Hub</p>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Eleganzza Marketing Hub</p>
             </div>
           </header>
 
@@ -335,8 +361,8 @@ function Index() {
             </div>
           )}
 
-          <footer className="mt-12 pt-6 border-t border-slate-200">
-            <p className="text-xs text-slate-400 text-center lg:text-left">
+          <footer className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800">
+            <p className="text-xs text-slate-400 dark:text-slate-500 text-center lg:text-left">
               &copy; 2026 Eleganzza Muebles. Centro de Operaciones de Marketing.
             </p>
           </footer>
