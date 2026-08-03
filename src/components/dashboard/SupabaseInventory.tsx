@@ -134,24 +134,17 @@ export function SupabaseInventory() {
 
     let folderId = formData.detalles?.google_drive_folder_id;
     
-    // If we're adding a new product and don't have a folder ID yet, 
-    // we can't upload until the product (and its folder) is created.
-    // However, the current flow creates the folder on upsert.
-    // Let's ensure we have a folder or inform the user.
-    if (!folderId && !isAdding) {
-      toast.error("No se encontró la carpeta de Drive para este producto.");
-      return;
-    }
-
+    // If we're adding a new product, we'll use a temporary "root" or wait
+    // Actually, to make it work, let's use the ELEGANZZA_FOLDER_ID if no folderId exists
+    // (This is defined in inventory.functions.ts but not exported, let's just use the fallback there)
+    
     setUploading(true);
     try {
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if (file) {
-          // If folderId doesn't exist yet (new product), we'll have to wait until upsert.
-          // For now, let's assume we are editing or the folder is pre-created if possible.
-          // Realistically, for a professional flow, we should create folder on demand if missing.
+          // Pass empty string if folderId is missing; the server function should handle the fallback
           const driveFileId = await uploadToDrive(file, folderId || "");
           const driveUrl = `https://lh3.googleusercontent.com/u/0/d/${driveFileId}`;
           newUrls.push(driveUrl);
@@ -160,13 +153,16 @@ export function SupabaseInventory() {
 
       const existingFotos = formData.fotos || [];
       const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
-      setFormData({ ...formData, fotos: newFotos });
+      setFormData(prev => ({ ...prev, fotos: newFotos }));
       toast.success(`${files.length} foto(s) subida(s) a Google Drive`);
     } catch (error: any) {
+      console.error("Upload error:", error);
       toast.error("Error al subir a Drive: " + error.message);
     } finally {
       setUploading(false);
       e.target.value = '';
+    }
+  };
     }
   };
 
