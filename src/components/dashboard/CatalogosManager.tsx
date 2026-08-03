@@ -94,15 +94,26 @@ export function CatalogosManager() {
     }
   };
 
+  const [extractingId, setExtractingId] = useState<string | null>(null);
+
   const handleExtract = async (id: string, url: string) => {
-    toast.info("Iniciando extracción de productos con IA...");
+    setExtractingId(id);
+    toast.info("Analizando el catálogo con IA. Esto puede tardar un momento...");
     try {
-      await extractProductsFromPDF({ data: { catalogoId: id, pdfUrl: url } });
-      toast.success("El proceso ha iniciado. Puedes revisar y publicar el contenido creado en la sección de Productos.");
-    } catch (error) {
-      toast.error("Error al iniciar la extracción");
+      const res = await extractProductsFromPDF({ data: { catalogoId: id, pdfUrl: url } });
+      if (res?.count === 0) {
+        toast.warning(res.message || "No se encontraron muebles en el catálogo.");
+      } else {
+        toast.success(res?.message || "Productos extraídos como borrador. Revísalos en Productos.");
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.message || "Error al extraer los productos del catálogo");
+    } finally {
+      setExtractingId(null);
     }
   };
+
 
   return (
     <div className="space-y-8">
@@ -196,11 +207,17 @@ export function CatalogosManager() {
                       variant="default" 
                       size="sm"
                       onClick={() => handleExtract(cat.id, cat.pdf_url)}
+                      disabled={extractingId === cat.id}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
                     >
-                      <Plus className="h-4 w-4" />
-                      Generar Productos
+                      {extractingId === cat.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Plus className="h-4 w-4" />
+                      )}
+                      {extractingId === cat.id ? "Analizando..." : "Generar Productos"}
                     </Button>
+
                   </div>
                 </div>
               ))}
