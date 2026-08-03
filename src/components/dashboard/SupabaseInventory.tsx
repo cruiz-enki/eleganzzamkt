@@ -929,8 +929,25 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
+                  {selectedRecord.detalles?.status === 'draft' && (
+                    <Button 
+                      className="flex-1 bg-green-600 text-white hover:bg-green-700 h-12 rounded-xl transition-all font-medium border-0 gap-2"
+                      onClick={() => {
+                        if (confirm("¿Deseas publicar este producto? Dejará de ser borrador.")) {
+                          publishMutation.mutate(selectedRecord.id);
+                          setSelectedRecord(null);
+                        }
+                      }}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      Publicar Ahora
+                    </Button>
+                  )}
                   <Button 
-                    className="flex-1 bg-slate-100 text-slate-900 hover:bg-slate-200 h-12 rounded-xl transition-all font-medium border-0"
+                    className={cn(
+                      "flex-1 h-12 rounded-xl transition-all font-medium border-0",
+                      selectedRecord.detalles?.status === 'draft' ? "bg-slate-100 text-slate-900 hover:bg-slate-200" : "bg-slate-900 text-white hover:bg-slate-800"
+                    )}
                     onClick={() => handleEdit(selectedRecord)}
                   >
                     Editar Producto
