@@ -11,7 +11,7 @@ import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2 } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import Masonry from "react-layout-masonry";
 
 import {
   DropdownMenu,
@@ -58,6 +59,7 @@ export function SupabaseInventory() {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
+  const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -331,6 +333,28 @@ export function SupabaseInventory() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* View Mode Switcher */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg border border-slate-200">
+            <Button 
+              variant={viewMode === "table" ? "secondary" : "ghost"} 
+              size="sm" 
+              className={cn("h-7 px-2 text-[10px] font-bold uppercase", viewMode === "table" ? "bg-white shadow-sm" : "text-slate-500")}
+              onClick={() => setViewMode("table")}
+            >
+              <List className="h-3.5 w-3.5 mr-1" />
+              Lista
+            </Button>
+            <Button 
+              variant={viewMode === "gallery" ? "secondary" : "ghost"} 
+              size="sm" 
+              className={cn("h-7 px-2 text-[10px] font-bold uppercase", viewMode === "gallery" ? "bg-white shadow-sm" : "text-slate-500")}
+              onClick={() => setViewMode("gallery")}
+            >
+              <LayoutGrid className="h-3.5 w-3.5 mr-1" />
+              Galería
+            </Button>
+          </div>
+
           {/* Category Filter */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -421,164 +445,232 @@ export function SupabaseInventory() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-100 bg-white shadow-sm overflow-hidden">
-        <Table>
-          <TableHeader className="bg-slate-50/50 border-b border-slate-100">
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-10 py-4">
-                <input 
-                  type="checkbox" 
-                  className="rounded border-slate-300" 
-                  checked={processedRecords.length > 0 && selectedIds.size === processedRecords.length}
-                  onChange={toggleSelectAll}
-                />
-              </TableHead>
-              {visibleColumns.has("nombre") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("nombre")}>
-                  <div className="flex items-center gap-1">
-                    Producto
-                    <ArrowUpDown className="h-3 w-3" />
-                  </div>
-                </TableHead>
-              )}
-              {visibleColumns.has("categoria") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("categoria")}>
-                  <div className="flex items-center gap-1">
-                    Categoría
-                    <ArrowUpDown className="h-3 w-3" />
-                  </div>
-                </TableHead>
-              )}
-              {visibleColumns.has("precio") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio")}>
-                  <div className="flex items-center justify-end gap-1">
-                    Precio 1
-                    <ArrowUpDown className="h-3 w-3" />
-                  </div>
-                </TableHead>
-              )}
-              {visibleColumns.has("precio_2") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_2")}>
-                  <div className="flex items-center justify-end gap-1">
-                    Precio 2
-                    <ArrowUpDown className="h-3 w-3" />
-                  </div>
-                </TableHead>
-              )}
-              {visibleColumns.has("precio_3") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_3")}>
-                  <div className="flex items-center justify-end gap-1">
-                    Precio 3
-                    <ArrowUpDown className="h-3 w-3" />
-                  </div>
-                </TableHead>
-              )}
-              {visibleColumns.has("acciones") && (
-                <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Acciones</TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {processedRecords.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={visibleColumns.size + 1} className="text-center py-12 text-sm text-slate-400">
-                  No se encontraron muebles en Supabase.
-                </TableCell>
-              </TableRow>
-            ) : processedRecords.map((record) => (
-              <TableRow 
-                key={record.id} 
-                className={cn(
-                  "hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0",
-                  selectedIds.has(record.id) && "bg-blue-50/30"
-                )}
-              >
-                <TableCell className="py-4" onClick={(e) => e.stopPropagation()}>
+      {viewMode === "table" ? (
+        <div className="rounded-xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+          <Table>
+            <TableHeader className="bg-slate-50/50 border-b border-slate-100">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-10 py-4">
                   <input 
                     type="checkbox" 
                     className="rounded border-slate-300" 
-                    checked={selectedIds.has(record.id)}
-                    onChange={() => toggleSelect(record.id)}
+                    checked={processedRecords.length > 0 && selectedIds.size === processedRecords.length}
+                    onChange={toggleSelectAll}
                   />
-                </TableCell>
+                </TableHead>
                 {visibleColumns.has("nombre") && (
-                  <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                        {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
-                          <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <Package className="w-5 h-5 text-slate-400" />
-                        )}
-                      </div>
-                      <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
-                        {record.nombre}
-                      </span>
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("nombre")}>
+                    <div className="flex items-center gap-1">
+                      Producto
+                      <ArrowUpDown className="h-3 w-3" />
                     </div>
-                  </TableCell>
+                  </TableHead>
                 )}
-
                 {visibleColumns.has("categoria") && (
-                  <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
-                      {record.categoria || "Sin categoría"}
-                    </Badge>
-                  </TableCell>
-                )}
-                
-                {visibleColumns.has("precio") && (
-                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
-                    {record.precio ? currency.format(record.precio) : "—"}
-                  </TableCell>
-                )}
-
-                {visibleColumns.has("precio_2") && (
-                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
-                    {record.precio_2 ? currency.format(record.precio_2) : "—"}
-                  </TableCell>
-                )}
-
-                {visibleColumns.has("precio_3") && (
-                  <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
-                    {record.precio_3 ? currency.format(record.precio_3) : "—"}
-                  </TableCell>
-                )}
-
-                {visibleColumns.has("acciones") && (
-                  <TableCell className="text-right py-4">
-                    <div className="flex justify-end gap-2">
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-8 w-8 text-slate-400 hover:text-slate-900"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(record);
-                        }}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="h-8 w-8 text-slate-400 hover:text-red-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm("¿Estás seguro de eliminar este producto?")) {
-                            deleteMutation.mutate([record.id]);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("categoria")}>
+                    <div className="flex items-center gap-1">
+                      Categoría
+                      <ArrowUpDown className="h-3 w-3" />
                     </div>
-                  </TableCell>
+                  </TableHead>
+                )}
+                {visibleColumns.has("precio") && (
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio")}>
+                    <div className="flex items-center justify-end gap-1">
+                      Precio 1
+                      <ArrowUpDown className="h-3 w-3" />
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.has("precio_2") && (
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_2")}>
+                    <div className="flex items-center justify-end gap-1">
+                      Precio 2
+                      <ArrowUpDown className="h-3 w-3" />
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.has("precio_3") && (
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right cursor-pointer hover:text-black transition-colors" onClick={() => handleSort("precio_3")}>
+                    <div className="flex items-center justify-end gap-1">
+                      Precio 3
+                      <ArrowUpDown className="h-3 w-3" />
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.has("acciones") && (
+                  <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Acciones</TableHead>
                 )}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {processedRecords.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={visibleColumns.size + 1} className="text-center py-12 text-sm text-slate-400">
+                    No se encontraron muebles en Supabase.
+                  </TableCell>
+                </TableRow>
+              ) : processedRecords.map((record) => (
+                <TableRow 
+                  key={record.id} 
+                  className={cn(
+                    "hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0",
+                    selectedIds.has(record.id) && "bg-blue-50/30"
+                  )}
+                >
+                  <TableCell className="py-4" onClick={(e) => e.stopPropagation()}>
+                    <input 
+                      type="checkbox" 
+                      className="rounded border-slate-300" 
+                      checked={selectedIds.has(record.id)}
+                      onChange={() => toggleSelect(record.id)}
+                    />
+                  </TableCell>
+                  {visibleColumns.has("nombre") && (
+                    <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                          {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
+                            <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <Package className="w-5 h-5 text-slate-400" />
+                          )}
+                        </div>
+                        <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
+                          {record.nombre}
+                        </span>
+                      </div>
+                    </TableCell>
+                  )}
+
+                  {visibleColumns.has("categoria") && (
+                    <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
+                      <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
+                        {record.categoria || "Sin categoría"}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  
+                  {visibleColumns.has("precio") && (
+                    <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                      {record.precio ? currency.format(record.precio) : "—"}
+                    </TableCell>
+                  )}
+
+                  {visibleColumns.has("precio_2") && (
+                    <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                      {record.precio_2 ? currency.format(record.precio_2) : "—"}
+                    </TableCell>
+                  )}
+
+                  {visibleColumns.has("precio_3") && (
+                    <TableCell className="text-right py-4 font-semibold text-slate-700" onClick={() => setSelectedRecord(record)}>
+                      {record.precio_3 ? currency.format(record.precio_3) : "—"}
+                    </TableCell>
+                  )}
+
+                  {visibleColumns.has("acciones") && (
+                    <TableCell className="text-right py-4">
+                      <div className="flex justify-end gap-2">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 text-slate-400 hover:text-slate-900"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(record);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-8 w-8 text-slate-400 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("¿Estás seguro de eliminar este producto?")) {
+                              deleteMutation.mutate([record.id]);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <div className="min-h-[500px]">
+          {processedRecords.length === 0 ? (
+            <div className="w-full text-center py-24 text-slate-400 border-2 border-dashed border-slate-100 rounded-3xl">
+              No hay productos para mostrar en la galería.
+            </div>
+          ) : (
+            <Masonry columns={{ 640: 1, 768: 2, 1024: 3, 1280: 4 }} gap={16}>
+              {processedRecords.map((record) => {
+                const photos = [...(record.galeria || []), ...(record.fotos || [])];
+                return (
+                  <div 
+                    key={record.id} 
+                    className="group relative bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+                    onClick={() => setSelectedRecord(record)}
+                  >
+                    <div className="relative aspect-auto min-h-[200px] bg-slate-50">
+                      {photos.length > 0 ? (
+                        <img 
+                          src={photos[0].url} 
+                          alt={record.nombre} 
+                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-2">
+                          <Package className="w-8 h-8 opacity-20" />
+                          <span className="text-[10px] uppercase font-bold tracking-widest">Sin imagen</span>
+                        </div>
+                      )}
+                      
+                      {/* Selection Overlay */}
+                      <div 
+                        className="absolute top-3 left-3 z-10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelect(record.id);
+                        }}
+                      >
+                        <div className={cn(
+                          "w-5 h-5 rounded border border-white/50 backdrop-blur-sm flex items-center justify-center transition-colors",
+                          selectedIds.has(record.id) ? "bg-black text-white" : "bg-black/20"
+                        )}>
+                          {selectedIds.has(record.id) && <Plus className="w-3 h-3 rotate-45 shrink-0" />}
+                        </div>
+                      </div>
+
+                      {/* Info Overlay */}
+                      <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="flex justify-between items-end text-white">
+                          <div className="space-y-1">
+                            <h3 className="font-bold text-sm leading-tight">{record.nombre}</h3>
+                            <p className="text-[10px] opacity-70 uppercase tracking-wider">{record.categoria}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs font-bold">{record.precio ? currency.format(record.precio) : "—"}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </Masonry>
+          )}
+        </div>
+      )}
+
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedRecord} onOpenChange={(open) => !open && setSelectedRecord(null)}>
