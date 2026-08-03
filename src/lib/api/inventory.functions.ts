@@ -2,6 +2,42 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 
+const GOOGLE_DRIVE_GATEWAY = "https://connector-gateway.lovable.dev/google_drive/drive/v3";
+const ELEGANZZA_FOLDER_ID = "1R01f0ZjF_KufNmBlQa-2MX1fNt0sR3Zm";
+
+async function createDriveFolder(name: string) {
+  const lovableApiKey = process.env['LOVABLE_API_KEY'];
+  const googleDriveApiKey = process.env['GOOGLE_DRIVE_API_KEY'];
+
+  if (!lovableApiKey || !googleDriveApiKey) {
+    console.error("Missing Google Drive credentials");
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${GOOGLE_DRIVE_GATEWAY}/files`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'X-Connection-Api-Key': googleDriveApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: [ELEGANZZA_FOLDER_ID]
+      })
+    });
+
+    const data = await response.json();
+    return data.id;
+  } catch (error) {
+    console.error("Error creating Drive folder:", error);
+    return null;
+  }
+}
+
+
 export type Mueble = {
   id: string;
   nombre: string;
@@ -54,9 +90,18 @@ export const upsertMueble = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return result as Mueble;
     } else {
+      // Crear carpeta en Google Drive para el nuevo producto
+      const folderId = await createDriveFolder(data.nombre);
+      
       const { data: result, error } = await supabase
         .from('muebles')
-        .insert([updateData])
+        .insert([{
+          ...updateData,
+          detalles: { 
+            ...(typeof updateData.detalles === 'object' ? updateData.detalles : {}),
+            google_drive_folder_id: folderId 
+          }
+        }])
         .select()
         .single();
 
