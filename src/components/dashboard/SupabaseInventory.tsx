@@ -4,7 +4,7 @@ import { getSupabaseInventory, type Mueble } from "@/lib/api/inventory.functions
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Database, Search, X, Package, Info, Image as ImageIcon, RefreshCcw } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
