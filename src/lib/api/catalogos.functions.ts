@@ -37,6 +37,25 @@ export const createCatalogo = createServerFn({ method: "POST" })
     return newCatalogo;
   });
 
+function toBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
+function extractDriveId(url: string): string | null {
+  const patterns = [/[?&]id=([\w-]+)/, /\/file\/d\/([\w-]+)/, /\/d\/([\w-]+)/];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m?.[1]) return m[1];
+  }
+  return null;
+}
+
 export const extractProductsFromPDF = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({
     catalogoId: z.string(),
@@ -44,50 +63,117 @@ export const extractProductsFromPDF = createServerFn({ method: "POST" })
   }).parse(data))
   .handler(async ({ data }) => {
     const { supabase } = await import("@/lib/supabase-client");
-    const { generateMarketingCopy } = await import("./ai.functions");
-    
-    console.log("Procesando catálogo:", data.catalogoId);
-    
-    // 1. Simular la extracción de datos desde el PDF usando IA
-    // En una implementación real, aquí descargaríamos el PDF, convertiríamos a imágenes y usaríamos GPT-4o Vision.
-    // Para este MVP, simularemos que la IA encontró 2 productos de prueba que quedan en estado "borrador".
-    
-    const mockProducts = [
+
+    const lovableApiKey = process.env['LOVABLE_API_KEY'];
+    const driveKey = process.env['GOOGLE_DRIVE_API_KEY'];
+    if (!lovableApiKey) throw new Error("Falta LOVABLE_API_KEY en los secretos.");
+    if (!driveKey) throw new Error("Falta la conexión de Google Drive.");
+
+    const fileId = extractDriveId(data.pdfUrl);
+    if (!fileId) throw new Error("No se pudo identificar el PDF en Google Drive.");
+
+    // 1. Descargar el PDF desde Drive
+    const dl = await fetch(
+      `https://connector-gateway.lovable.dev/google_drive/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
       {
-        nombre: "Sofá Velvet Eleganzza (Borrador)",
-        categoria: "Salas",
-        precio: 15999,
-        descripcion: "Sofá de terciopelo extraído del catálogo.",
-        detalles: { 
-          source_catalogo_id: data.catalogoId,
-          status: "draft",
-          extracted_at: new Date().toISOString()
+        headers: {
+          Authorization: `Bearer ${lovableApiKey}`,
+          'X-Connection-Api-Key': driveKey,
         },
-        fotos: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800"]
       },
-      {
-        nombre: "Mesa Comedor Nórdica (Borrador)",
-        categoria: "Comedores",
-        precio: 8500,
-        descripcion: "Mesa de madera clara extraída del catálogo.",
-        detalles: { 
-          source_catalogo_id: data.catalogoId,
-          status: "draft",
-          extracted_at: new Date().toISOString()
-        },
-        fotos: ["https://images.unsplash.com/photo-1577145000247-a737ad733f9e?auto=format&fit=crop&q=80&w=800"]
-      }
-    ];
+    );
+    if (!dl.ok) {
+      const text = await dl.text();
+      throw new Error(`No se pudo descargar el PDF [${dl.status}]: ${text}`);
+    }
+    const base64 = toBase64(await dl.arrayBuffer());
 
-    // 2. Insertar en Supabase marcados como borrador
-    const { error } = await supabase
-      .from("muebles")
-      .insert(mockProducts);
+    // 2. Analizar el PDF con IA
+    const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        'Lovable-API-Key': lovableApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3.6-flash",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Eres un asistente que extrae productos de catálogos de muebles. Responde ÚNICAMENTE con un arreglo JSON válido, sin explicaciones ni bloques de código.",
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text:
+                  "Analiza este catálogo y extrae todos los muebles. Devuelve un arreglo JSON donde cada elemento tenga: nombre (string), categoria (string), precio (número en MXN o null), descripcion (string breve), medidas (string o null), materiales (string o null).",
+              },
+              {
+                type: "file",
+                file: {
+                  filename: "catalogo.pdf",
+                  file_data: `data:application/pdf;base64,${base64}`,
+                },
+              },
+            ],
+          },
+        ],
+      }),
+    });
 
+    if (!aiRes.ok) {
+      const text = await aiRes.text();
+      console.error(`AI Gateway error [${aiRes.status}]: ${text}`);
+      throw new Error(`Error de IA [${aiRes.status}]: ${text}`);
+    }
+
+    const aiJson = await aiRes.json();
+    const content: string = aiJson.choices?.[0]?.message?.content ?? "";
+    const cleaned = content.replace(/```json/gi, "").replace(/```/g, "").trim();
+    const start = cleaned.indexOf("[");
+    const end = cleaned.lastIndexOf("]");
+    if (start === -1 || end === -1) {
+      throw new Error("La IA no devolvió productos legibles del catálogo.");
+    }
+
+    let parsed: any[] = [];
+    try {
+      parsed = JSON.parse(cleaned.slice(start, end + 1));
+    } catch {
+      throw new Error("No se pudo interpretar la respuesta de la IA.");
+    }
+
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      return { success: true, count: 0, message: "No se encontraron muebles en el catálogo." };
+    }
+
+    const rows = parsed.slice(0, 100).map((p) => ({
+      nombre: String(p?.nombre ?? "Mueble sin nombre"),
+      categoria: p?.categoria ? String(p.categoria) : null,
+      precio: typeof p?.precio === "number" ? p.precio : Number(p?.precio) || null,
+      descripcion: p?.descripcion ? String(p.descripcion) : null,
+      detalles: {
+        source_catalogo_id: data.catalogoId,
+        status: "draft",
+        medidas: p?.medidas ?? null,
+        materiales: p?.materiales ?? null,
+        extracted_at: new Date().toISOString(),
+      },
+    }));
+
+    const { error } = await supabase.from("muebles").insert(rows);
     if (error) throw new Error(error.message);
-    
-    return { success: true, message: "Productos extraídos y guardados como borrador. Por favor, revísalos en la sección de Productos." };
+
+    return {
+      success: true,
+      count: rows.length,
+      message: `Se extrajeron ${rows.length} muebles como borrador.`,
+    };
   });
+
 
 export const publishProduct = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ id: z.string() }).parse(data))
