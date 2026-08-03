@@ -13,11 +13,13 @@ import {
   Palette,
   Settings,
   Menu,
-  X
+  X,
+  Sparkles as SparklesIcon
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { Suspense, useState, useEffect } from "react";
+import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,7 +40,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion";
+type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion" | "ia-generator";
 
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
@@ -71,6 +73,7 @@ function Index() {
     { id: "productos", label: "Productos", icon: Package },
     { id: "campañas", label: "Campañas", icon: Megaphone },
     { id: "marca", label: "Marca", icon: Palette },
+    { id: "ia-generator", label: "IA Generator", icon: SparklesIcon },
     { id: "configuracion", label: "Configuración", icon: Settings },
   ] as const;
 
@@ -282,6 +285,23 @@ function Index() {
               </div>
               <Suspense fallback={<div className="space-y-2"><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/></div>}>
                 <SupabaseInventory />
+              </Suspense>
+            </div>
+          )}
+
+          {view === "ia-generator" && (
+            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                    <SparklesIcon className="h-5 w-5 text-indigo-400" />
+                    IA Generator Creative Lab
+                  </h2>
+                  <p className="text-sm text-slate-500">Crea contenido publicitario vinculado a tus productos de Eleganzza.</p>
+                </div>
+              </div>
+              <Suspense fallback={<div className="space-y-4"><Skeleton className="h-40 w-full"/><Skeleton className="h-60 w-full"/></div>}>
+                <IAGenerator />
               </Suspense>
             </div>
           )}

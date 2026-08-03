@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 
 const OPENAI_GATEWAY = "https://ai-gateway.lovable.dev/v1/chat/completions";
@@ -103,4 +104,80 @@ export const cleanProductImage = createServerFn({ method: "POST" })
 
     const result = await res.json();
     return result.choices[0]?.message?.content || "Procesamiento de imagen iniciado.";
+  });
+
+export const generateProductCreative = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({
+    muebleId: z.string(),
+    type: z.enum(["story", "carousel", "post", "copy", "prompt"]),
+    context: z.string().optional(),
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const headers = aiHeaders();
+    
+    // 1. Obtener info del producto de Supabase
+    const { data: mueble, error } = await supabase
+      .from('muebles')
+      .select('*')
+      .eq('id', data.muebleId)
+      .single();
+      
+    if (error || !mueble) throw new Error("No se encontró el producto.");
+
+    // 2. Construir prompt según tipo
+    let systemMsg = "Eres un director creativo de marketing para Eleganzza Muebles. ";
+    let prompt = `Genera contenido para el producto: ${mueble.nombre}. Categoría: ${mueble.categoria}. `;
+    
+    if (data.type === "copy") {
+      systemMsg += "Crea textos persuasivos para redes sociales.";
+      prompt += "Crea 3 opciones de copys (Instagram, Facebook y WhatsApp) que resalten la elegancia y confort.";
+    } else if (data.type === "prompt") {
+      systemMsg += "Crea prompts técnicos para generadores de imágenes (Midjourney/DALL-E).";
+      prompt += "Genera un prompt detallado para crear una escena de estilo de vida de lujo donde este mueble sea el protagonista.";
+    } else {
+      systemMsg += `Diseña una estructura de ${data.type} visualmente impactante.`;
+      prompt += `Describe detalladamente los elementos visuales, colores y composición para un ${data.type} de este producto.`;
+    }
+
+    if (data.context) prompt += `\nContexto adicional: ${data.context}`;
+
+    const body = {
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemMsg },
+        { role: "user", content: prompt }
+      ],
+    };
+
+    const res = await fetch(OPENAI_GATEWAY, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    const result = await res.json();
+    const content = result.choices[0]?.message?.content;
+
+    // 3. Vincular con el producto guardando en una tabla de 'contenido_ia' o similar
+    // Si no existe la tabla, podemos guardarlo en el campo 'detalles' del mueble por ahora
+    const { data: updatedMueble } = await supabase
+      .from('muebles')
+      .select('detalles')
+      .eq('id', data.muebleId)
+      .single();
+
+    const detalles = updatedMueble?.detalles || {};
+    const aiContent = detalles.ai_content || [];
+    aiContent.push({
+      type: data.type,
+      content,
+      created_at: new Date().toISOString()
+    });
+
+    await supabase
+      .from('muebles')
+      .update({ detalles: { ...detalles, ai_content: aiContent } })
+      .eq('id', data.muebleId);
+
+    return content;
   });
