@@ -33,10 +33,26 @@ export function AirtableInventory() {
   );
 
   const getPhotos = (record: AirtableRecord) => {
-    const photos = record.fields["Fotos"] || record.fields["Foto"] || record.fields["Imagen"];
-    if (Array.isArray(photos)) return photos;
+    // Try different common names for attachment fields in Airtable
+    const photoField = record.fields["Fotos"] || 
+                       record.fields["Foto"] || 
+                       record.fields["Imagen"] || 
+                       record.fields["Attachments"] ||
+                       record.fields["Imágenes"];
+    
+    if (Array.isArray(photoField)) return photoField;
+    
+    // Sometimes it might not be an array if it's a single attachment or a different format
+    if (photoField && typeof photoField === 'object' && 'url' in photoField) {
+      return [photoField];
+    }
+    
     return [];
   };
+
+  // Debug helper to see field names if needed
+  // console.log("Field names:", Object.keys(records[0]?.fields || {}));
+
 
   return (
     <div className="space-y-4">
@@ -80,18 +96,24 @@ export function AirtableInventory() {
               >
                 <TableCell className="py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                      {getPhotos(record)[0]?.url ? (
-                        <img src={getPhotos(record)[0].url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <Package className="w-5 h-5 text-slate-400" />
-                      )}
+                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                      {(() => {
+                        const photos = getPhotos(record);
+                        const firstPhoto = photos[0];
+                        const url = firstPhoto?.url || firstPhoto?.thumbnails?.small?.url || firstPhoto?.thumbnails?.large?.url;
+                        
+                        if (url) {
+                          return <img src={url} alt="" className="w-full h-full object-cover" />;
+                        }
+                        return <Package className="w-5 h-5 text-slate-400" />;
+                      })()}
                     </div>
                     <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
                       {record.fields["Nombre"]}
                     </span>
                   </div>
                 </TableCell>
+
                 <TableCell className="py-4">
                   <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
                     {record.fields["Categoría"] || "Sin categoría"}
@@ -111,20 +133,25 @@ export function AirtableInventory() {
           {selectedRecord && (
             <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px]">
               {/* Carrusel de Fotos */}
-              <div className="w-full md:w-1/2 bg-slate-100 relative group">
+              <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
                 {getPhotos(selectedRecord).length > 0 ? (
                   <ScrollArea className="h-full">
-                    <div className="space-y-1 p-1">
-                      {getPhotos(selectedRecord).map((photo: any, i: number) => (
-                        <img 
-                          key={i} 
-                          src={photo.url} 
-                          alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`} 
-                          className="w-full object-contain bg-white rounded-lg shadow-sm"
-                        />
-                      ))}
+                    <div className="flex flex-col gap-2 p-2">
+                      {getPhotos(selectedRecord).map((photo: any, i: number) => {
+                        const url = photo.url || photo.thumbnails?.large?.url || photo.thumbnails?.full?.url;
+                        if (!url) return null;
+                        return (
+                          <img 
+                            key={i} 
+                            src={url} 
+                            alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`} 
+                            className="w-full rounded-lg shadow-sm bg-white"
+                          />
+                        );
+                      })}
                     </div>
                   </ScrollArea>
+
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                     <ImageIcon className="w-12 h-12 opacity-20" />
