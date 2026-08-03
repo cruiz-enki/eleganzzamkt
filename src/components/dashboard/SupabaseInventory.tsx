@@ -6,6 +6,7 @@ import {
   deleteMueble, 
   uploadToDrive,
   bulkCleanupCategories,
+  updateMuebleStatus,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
@@ -13,7 +14,7 @@ import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2, Clock } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2, Clock, Archive } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -62,7 +63,7 @@ export function SupabaseInventory() {
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "discontinued">("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
   const [lightboxIndex, setLightboxIndex] = useState(-1);
@@ -166,6 +167,19 @@ export function SupabaseInventory() {
     },
     onError: (error) => {
       toast.error("Error al publicar: " + error.message);
+    }
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: (args: { id: string, status: string }) => updateMuebleStatus({ data: args }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['supabase-inventory'] });
+      const label = variables.status === 'discontinued' ? 'descontinuado' : 
+                   variables.status === 'published' ? 'publicado' : 'borrador';
+      toast.success(`Estado actualizado a ${label}`);
+    },
+    onError: (error) => {
+      toast.error("Error al actualizar estado: " + error.message);
     }
   });
 
@@ -443,7 +457,7 @@ export function SupabaseInventory() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className={cn("h-9 border-slate-200", statusFilter !== "all" && "bg-indigo-50 border-indigo-200 text-indigo-700")}>
                 <Clock className="h-4 w-4 mr-2" />
-                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : "Publicados"}
+                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : statusFilter === "published" ? "Publicados" : "Descontinuados"}
                 <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -459,6 +473,9 @@ export function SupabaseInventory() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setStatusFilter("published")} className="text-emerald-600">
                 Solo Publicados
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("discontinued")} className="text-slate-500">
+                Solo Descontinuados
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -161,6 +161,26 @@ const normalizeCategory = (cat: string | null | undefined): string | null => {
   return cat.trim().charAt(0).toUpperCase() + cat.trim().slice(1);
 };
 
+export const updateMuebleStatus = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ id: z.string(), status: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: current } = await supabase
+      .from('muebles')
+      .select('detalles')
+      .eq('id', data.id)
+      .single();
+
+    const detalles = { ...(current?.detalles || {}), status: data.status };
+
+    const { error } = await supabase
+      .from('muebles')
+      .update({ detalles })
+      .eq('id', data.id);
+
+    if (error) throw new Error(error.message);
+    return { success: true };
+  });
+
 export const upsertMueble = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => muebleSchema.parse(data))
   .handler(async ({ data }) => {
