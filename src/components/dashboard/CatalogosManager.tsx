@@ -98,7 +98,7 @@ export function CatalogosManager() {
     toast.info("Iniciando extracción de productos con IA...");
     try {
       await extractProductsFromPDF({ data: { catalogoId: id, pdfUrl: url } });
-      toast.success("El proceso ha iniciado. Los productos aparecerán pronto en el inventario.");
+      toast.success("El proceso ha iniciado. Puedes ver el progreso en la sección de Productos.");
     } catch (error) {
       toast.error("Error al iniciar la extracción");
     }
