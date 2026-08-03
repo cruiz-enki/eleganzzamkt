@@ -150,10 +150,26 @@ const muebleSchema = z.object({
   detalles: z.any().optional().nullable(),
 });
 
+const normalizeCategory = (cat: string | null | undefined): string | null => {
+  if (!cat) return null;
+  const normalized = cat.trim().toLowerCase();
+  if (normalized === "sala" || normalized === "salas") return "Salas";
+  if (normalized === "comedor" || normalized === "comedores") return "Comedores";
+  if (normalized === "cubrecama" || normalized === "set de cubrecama") return "Cubrecamas";
+  
+  // Default: capitalize first letter
+  return cat.trim().charAt(0).toUpperCase() + cat.trim().slice(1);
+};
+
 export const upsertMueble = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => muebleSchema.parse(data))
   .handler(async ({ data }) => {
     const { id, ...updateData } = data;
+    
+    // Normalizar categoría antes de guardar
+    if (updateData.categoria) {
+      updateData.categoria = normalizeCategory(updateData.categoria);
+    }
 
     if (id) {
       // Si es una actualización, verificamos si ya tiene carpeta de Drive
@@ -229,4 +245,28 @@ export const deleteMueble = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
     return { success: true };
+  });
+
+export const bulkCleanupCategories = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const { data: muebles, error } = await supabase
+      .from('muebles')
+      .select('id, categoria');
+    
+    if (error) throw new Error(error.message);
+    
+    let updatedCount = 0;
+    for (const mueble of (muebles || [])) {
+      const normalized = normalizeCategory(mueble.categoria);
+      if (normalized !== mueble.categoria) {
+        const { error: updateError } = await supabase
+          .from('muebles')
+          .update({ categoria: normalized })
+          .eq('id', mueble.id);
+        
+        if (!updateError) updatedCount++;
+      }
+    }
+    
+    return { success: true, updatedCount };
   });

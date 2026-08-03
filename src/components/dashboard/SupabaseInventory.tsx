@@ -5,6 +5,7 @@ import {
   upsertMueble, 
   deleteMueble, 
   uploadToDrive,
+  bulkCleanupCategories,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
@@ -359,6 +360,29 @@ export function SupabaseInventory() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 mr-auto">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2"
+            onClick={async () => {
+              const loading = toast.loading("Agrupando categorías...");
+              try {
+                const res = await bulkCleanupCategories();
+                toast.dismiss(loading);
+                toast.success(`Se actualizaron ${res.updatedCount} productos`);
+                refetch();
+              } catch (e) {
+                toast.dismiss(loading);
+                toast.error("Error al agrupar categorías");
+              }
+            }}
+          >
+            <RefreshCcw className="h-3 w-3" />
+            Agrupar Categorías
+          </Button>
+        </div>
+
         <div className="relative min-w-[300px] flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
