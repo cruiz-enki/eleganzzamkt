@@ -288,11 +288,6 @@ export function SupabaseInventory() {
     setPendingFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
   };
 
-  const removePhoto = (index: number) => {
-    const newFotos = [...(formData.fotos || [])];
-    newFotos.splice(index, 1);
-    setFormData({ ...formData, fotos: newFotos });
-  };
 
   const currentIndex = useMemo(() => {
     if (!selectedRecord) return -1;
