@@ -517,33 +517,34 @@ export function SupabaseInventory() {
 
                 {visibleColumns.has("acciones") && (
                   <TableCell className="text-right py-4">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 text-slate-400 hover:text-slate-900"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit(record);
-                      }}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8 text-slate-400 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm("¿Estás seguro de eliminar este producto?")) {
-                          deleteMutation.mutate([record.id]);
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-slate-400 hover:text-slate-900"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(record);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="h-8 w-8 text-slate-400 hover:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm("¿Estás seguro de eliminar este producto?")) {
+                            deleteMutation.mutate([record.id]);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
