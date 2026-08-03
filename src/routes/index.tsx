@@ -16,6 +16,7 @@ import {
   X
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
+import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -230,13 +231,13 @@ function Index() {
                 <div>
                   <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
                     <TableIcon className="h-5 w-5 text-slate-400" />
-                    Inventario Completo
+                    Inventario de Productos
                   </h2>
-                  <p className="text-sm text-slate-500">Base de datos de Airtable: Tabla Total.</p>
+                  <p className="text-sm text-slate-500">Visualizando datos directamente desde Supabase.</p>
                 </div>
               </div>
               <Suspense fallback={<div className="space-y-2"><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/><Skeleton className="h-8 w-full"/></div>}>
-                <AirtableInventory />
+                <SupabaseInventory />
               </Suspense>
             </div>
           )}
