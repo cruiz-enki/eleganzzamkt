@@ -47,23 +47,26 @@ export function AirtableInventory() {
             <TableRow>
               <TableHead className="text-[10px] uppercase font-bold text-slate-400">Nombre</TableHead>
               <TableHead className="text-[10px] uppercase font-bold text-slate-400">Categoría</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 text-right">Stock</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold text-slate-400 text-right">Precio</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {filteredRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-slate-300" />
+                <TableCell colSpan={3} className="text-center py-8 text-sm text-slate-400">
+                  Sin resultados
                 </TableCell>
               </TableRow>
-            ) : filteredRecords?.map((record: any) => (
+            ) : filteredRecords.map((record) => (
               <TableRow key={record.id} className="hover:bg-slate-50/30 transition-colors">
-                <TableCell className="font-medium text-slate-700 py-3">{record.fields.Nombre}</TableCell>
-                <TableCell className="text-slate-500 py-3">{record.fields.Categoria}</TableCell>
-                <TableCell className="text-right text-slate-600 py-3">{record.fields.Stock}</TableCell>
+                <TableCell className="font-medium text-slate-700 py-3">{record.fields["Nombre"]}</TableCell>
+                <TableCell className="text-slate-500 py-3">{record.fields["Categoría"]}</TableCell>
+                <TableCell className="text-right text-slate-600 py-3">
+                  {typeof record.fields["Precio"] === "number" ? currency.format(record.fields["Precio"]) : "—"}
+                </TableCell>
               </TableRow>
             ))}
+
           </TableBody>
         </Table>
       </div>
