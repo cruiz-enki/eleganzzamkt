@@ -544,7 +544,14 @@ export function SupabaseInventory() {
                   {visibleColumns.has("nombre") && (
                     <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                        <div 
+                          className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0 cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const slideIndex = lightboxSlides.findIndex(s => s.title === record.nombre);
+                            if (slideIndex !== -1) setLightboxIndex(slideIndex);
+                          }}
+                        >
                           {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
                             <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
                           ) : (
