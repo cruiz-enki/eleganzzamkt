@@ -62,6 +62,18 @@ export function SupabaseInventory() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
+
+  const lightboxSlides = useMemo(() => {
+    return processedRecords.map(record => {
+      const photos = [...(record.galeria || []), ...(record.fotos || [])];
+      return {
+        src: photos.length > 0 ? photos[0].url : "",
+        title: record.nombre,
+        description: `${record.categoria} - ${record.precio ? currency.format(record.precio) : ""}`,
+      };
+    }).filter(slide => slide.src);
+  }, [processedRecords]);
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
