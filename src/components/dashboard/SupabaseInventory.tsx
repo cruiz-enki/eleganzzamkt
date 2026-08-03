@@ -7,6 +7,7 @@ import {
   uploadToDrive,
   bulkCleanupCategories,
   updateMuebleStatus,
+  bulkDiscontinueMuebles,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
@@ -394,6 +395,62 @@ export function SupabaseInventory() {
           >
             <RefreshCcw className="h-3 w-3" />
             Agrupar Categorías
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200"
+            onClick={async () => {
+              const list = [
+                "Sala American confort",
+                "Comedor capuccino buffete joy y vitrina MM",
+                "Sala Master",
+                "Sala Mastreta",
+                "Sala chat modular",
+                "Sala california",
+                "Sala italia",
+                "Sala africa",
+                "Sala africa modular",
+                "Sala Stacy Modular",
+                "Sala Michelin",
+                "Emma modular sala",
+                "Sala grecia",
+                "Sala maya",
+                "Sala charlotte.",
+                "Sala elda",
+                "Recamara milos",
+                "Sala Tokyo",
+                "Sala amelia",
+                "Sala waldos",
+                "Sala meghan",
+                "Sala tollocan modular",
+                "Sala valencia modular",
+                "Comedor iris",
+                "Sala colombo",
+                "Sala river",
+                "Sala montana esquinera",
+                "sala gina modular",
+                "comedor sky y mesa torino",
+                "comedor DT-2051*B6",
+                "recamara hollywood"
+              ];
+              
+              if (confirm(`¿Descontinuar ${list.length} productos específicos de la lista?`)) {
+                const loading = toast.loading("Descontinuando lista de productos...");
+                try {
+                  const res = await bulkDiscontinueMuebles({ data: { nombres: list } });
+                  toast.dismiss(loading);
+                  toast.success(`Se descontinuaron ${res.updatedCount} productos correctamente`);
+                  refetch();
+                } catch (e) {
+                  toast.dismiss(loading);
+                  toast.error("Error al procesar la lista");
+                }
+              }
+            }}
+          >
+            <Archive className="h-3 w-3" />
+            Descontinuar Lista
           </Button>
         </div>
 
