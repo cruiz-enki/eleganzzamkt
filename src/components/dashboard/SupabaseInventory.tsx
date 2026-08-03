@@ -189,6 +189,14 @@ export function SupabaseInventory() {
     if (categoryFilter !== "all") {
       result = result.filter(r => r.categoria === categoryFilter);
     }
+    
+    // Status filter (draft/published)
+    if (statusFilter !== "all") {
+      result = result.filter(r => {
+        const status = r.detalles?.status || "published";
+        return status === statusFilter;
+      });
+    }
 
     // Sort
     if (sortConfig.key) {
