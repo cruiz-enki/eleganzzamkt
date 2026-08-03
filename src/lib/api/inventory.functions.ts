@@ -157,7 +157,10 @@ export const upsertMueble = createServerFn({ method: "POST" })
       return result as Mueble;
     } else {
       // 1. Crear la carpeta en Google Drive para el nuevo producto
-      const folderId = await createDriveFolder(data.nombre);
+      const folderId = await createDriveFolder(data.nombre).catch(err => {
+        console.error("Folder creation failed but continuing:", err);
+        return null;
+      });
       
       // 2. Preparar los datos del mueble con el ID de la carpeta
       const muebleData = {
