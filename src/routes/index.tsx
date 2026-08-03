@@ -23,6 +23,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Eleganzza Marketing | Inventario" },
+      { name: "description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
+      { property: "og:title", content: "Eleganzza Marketing | Inventario" },
+      { property: "og:description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Index,
 });
 
