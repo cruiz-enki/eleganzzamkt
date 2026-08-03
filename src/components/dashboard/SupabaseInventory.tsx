@@ -632,10 +632,11 @@ export function SupabaseInventory() {
 
               <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px] overflow-hidden rounded-lg">
               <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
-                {selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0 ? (
+                {((selectedRecord.galeria && Array.isArray(selectedRecord.galeria) && selectedRecord.galeria.length > 0) || 
+                  (selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0)) ? (
                   <ScrollArea className="h-full">
                     <div className="flex flex-col gap-2 p-2">
-                      {selectedRecord.fotos.map((photo: any, i: number) => {
+                      {[...(selectedRecord.galeria || []), ...(selectedRecord.fotos || [])].map((photo: any, i: number) => {
                         const url = photo.url;
                         if (!url) return null;
                         return (
