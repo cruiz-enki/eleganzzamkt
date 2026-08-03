@@ -7,10 +7,11 @@ import {
   uploadToDrive,
   type Mueble 
 } from "@/lib/api/inventory.functions";
+import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -637,12 +638,34 @@ export function SupabaseInventory() {
                         const url = photo.url;
                         if (!url) return null;
                         return (
-                          <img 
-                            key={i} 
-                            src={url} 
-                            alt={`${selectedRecord.nombre} ${i + 1}`} 
-                            className="w-full rounded-lg shadow-sm bg-white"
-                          />
+                          <div key={i} className="relative group/photo overflow-hidden rounded-lg shadow-sm bg-white">
+                            <img 
+                              src={url} 
+                              alt={`${selectedRecord.nombre} ${i + 1}`} 
+                              className="w-full"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                className="h-8 text-[10px] gap-1 px-2 font-bold uppercase"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  try {
+                                    toast.loading("IA analizando imagen...");
+                                    const result = await cleanProductImage({ data: { imageUrl: url } });
+                                    toast.success("Análisis de IA completado");
+                                    console.log("IA Clean Result:", result);
+                                  } catch (e) {
+                                    toast.error("Error al procesar con IA");
+                                  }
+                                }}
+                              >
+                                <Wand2 className="h-3 w-3" />
+                                Limpiar con IA
+                              </Button>
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
