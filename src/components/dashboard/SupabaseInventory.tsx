@@ -7,10 +7,11 @@ import {
   uploadToDrive,
   type Mueble 
 } from "@/lib/api/inventory.functions";
+import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,

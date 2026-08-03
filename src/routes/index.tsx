@@ -18,7 +18,7 @@ import {
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { Suspense, useState, useEffect } from "react";
-import { generateMarketingCopy } from "@/lib/api/ai.functions";
+import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
