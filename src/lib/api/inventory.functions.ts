@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/lib/supabase-client";
+import { z } from "zod";
 
 export type Mueble = {
   id: string;
@@ -28,8 +29,17 @@ export const getSupabaseInventory = createServerFn({ method: "GET" })
   });
 
 export const upsertMueble = createServerFn({ method: "POST" })
-  .handler(async ({ data }: { data: Partial<Mueble> }) => {
-    const { id, ...updateData } = data;
+  .input(z.object({
+    id: z.string().optional(),
+    nombre: z.string(),
+    categoria: z.string().optional().nullable(),
+    precio: z.number().optional().nullable(),
+    fotos: z.array(z.any()).optional().nullable(),
+    descripcion: z.string().optional().nullable(),
+    detalles: z.any().optional().nullable(),
+  }))
+  .handler(async ({ input }) => {
+    const { id, ...updateData } = input;
     
     if (id) {
       const { data: result, error } = await supabase
@@ -54,11 +64,12 @@ export const upsertMueble = createServerFn({ method: "POST" })
   });
 
 export const deleteMueble = createServerFn({ method: "POST" })
-  .handler(async ({ data }: { data: { id: string } }) => {
+  .input(z.object({ id: z.string() }))
+  .handler(async ({ input }) => {
     const { error } = await supabase
       .from('muebles')
       .delete()
-      .eq('id', data.id);
+      .eq('id', input.id);
 
     if (error) throw new Error(error.message);
     return { success: true };
