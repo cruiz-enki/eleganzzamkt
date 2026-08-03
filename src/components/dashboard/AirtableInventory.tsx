@@ -127,20 +127,25 @@ export function AirtableInventory() {
           {selectedRecord && (
             <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px]">
               {/* Carrusel de Fotos */}
-              <div className="w-full md:w-1/2 bg-slate-100 relative group">
+              <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
                 {getPhotos(selectedRecord).length > 0 ? (
                   <ScrollArea className="h-full">
-                    <div className="space-y-1 p-1">
-                      {getPhotos(selectedRecord).map((photo: any, i: number) => (
-                        <img 
-                          key={i} 
-                          src={photo.url} 
-                          alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`} 
-                          className="w-full object-contain bg-white rounded-lg shadow-sm"
-                        />
-                      ))}
+                    <div className="flex flex-col gap-2 p-2">
+                      {getPhotos(selectedRecord).map((photo: any, i: number) => {
+                        const url = photo.url || photo.thumbnails?.large?.url || photo.thumbnails?.full?.url;
+                        if (!url) return null;
+                        return (
+                          <img 
+                            key={i} 
+                            src={url} 
+                            alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`} 
+                            className="w-full rounded-lg shadow-sm bg-white"
+                          />
+                        );
+                      })}
                     </div>
                   </ScrollArea>
+
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                     <ImageIcon className="w-12 h-12 opacity-20" />
