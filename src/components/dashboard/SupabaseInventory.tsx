@@ -51,13 +51,18 @@ export function SupabaseInventory() {
   });
 
   const upsertMutation = useMutation({
-    mutationFn: (data: Partial<Mueble>) => upsertMueble({ data }),
-    onSuccess: () => {
+    mutationFn: async (data: Partial<Mueble>) => {
+      console.log("Calling upsertMueble with:", data);
+      return await upsertMueble({ data });
+    },
+    onSuccess: (data) => {
+      console.log("Upsert success:", data);
       queryClient.invalidateQueries({ queryKey: ['supabase-inventory'] });
       toast.success(isAdding ? "Producto creado con éxito" : "Producto actualizado con éxito");
       closeForm();
     },
     onError: (error) => {
+      console.error("Upsert error details:", error);
       toast.error("Error al guardar: " + error.message);
     }
   });
@@ -105,8 +110,12 @@ export function SupabaseInventory() {
     setIsAdding(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.nombre) {
+      toast.error("El nombre del producto es obligatorio");
+      return;
+    }
     upsertMutation.mutate(formData);
   };
 
