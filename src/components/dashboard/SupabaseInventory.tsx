@@ -27,6 +27,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import Masonry from "react-layout-masonry";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 
 import {
   DropdownMenu,
@@ -60,6 +62,8 @@ export function SupabaseInventory() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
+  const [lightboxIndex, setLightboxIndex] = useState(-1);
+
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -190,6 +194,17 @@ export function SupabaseInventory() {
 
     return result;
   }, [records, searchTerm, categoryFilter, sortConfig]);
+
+  const lightboxSlides = useMemo(() => {
+    return processedRecords.map(record => {
+      const photos = [...(record.galeria || []), ...(record.fotos || [])];
+      return {
+        src: photos.length > 0 ? photos[0].url : "",
+        title: record.nombre,
+        description: `${record.categoria} - ${record.precio ? currency.format(record.precio) : ""}`,
+      };
+    }).filter(slide => slide.src);
+  }, [processedRecords]);
 
   const handleSort = (key: keyof Mueble) => {
     setSortConfig(current => ({
@@ -529,7 +544,14 @@ export function SupabaseInventory() {
                   {visibleColumns.has("nombre") && (
                     <TableCell className="py-4" onClick={() => setSelectedRecord(record)}>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                        <div 
+                          className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0 cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const slideIndex = lightboxSlides.findIndex(s => s.title === record.nombre);
+                            if (slideIndex !== -1) setLightboxIndex(slideIndex);
+                          }}
+                        >
                           {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
                             <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -625,7 +647,12 @@ export function SupabaseInventory() {
                         <img 
                           src={photos[0].url} 
                           alt={record.nombre} 
-                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const slideIndex = lightboxSlides.findIndex(s => s.title === record.nombre);
+                            if (slideIndex !== -1) setLightboxIndex(slideIndex);
+                          }}
                         />
                       ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-300 gap-2">
@@ -1039,6 +1066,13 @@ export function SupabaseInventory() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      <Lightbox
+        open={lightboxIndex >= 0}
+        index={lightboxIndex}
+        close={() => setLightboxIndex(-1)}
+        slides={lightboxSlides}
+      />
     </div>
   );
 }
