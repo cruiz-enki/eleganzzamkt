@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 
 const GOOGLE_DRIVE_GATEWAY = "https://connector-gateway.lovable.dev/google_drive/drive/v3";
-const ELEGANZZA_FOLDER_ID = "1R01f0ZjF_KufNmBlQa-2MX1fNt0sR3Zm";
+const ELEGANZZA_FOLDER_ID = "0AKMhdlaXwPtQUk9PVA";
 
 async function createDriveFolder(name: string) {
   const lovableApiKey = process.env['LOVABLE_API_KEY'];
