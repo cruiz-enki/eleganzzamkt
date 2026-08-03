@@ -8,19 +8,37 @@ import {
   Image as ImageIcon, 
   TrendingUp,
   Table as TableIcon,
-  Package
+  Package,
+  Megaphone,
+  Palette,
+  Settings,
+  Menu,
+  X
 } from "lucide-react";
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { Suspense, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
+type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion";
+
 function Index() {
-  const [view, setView] = useState<"dashboard" | "productos">("dashboard");
+  const [view, setView] = useState<ViewType>("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const menuItems = [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "productos", label: "Productos", icon: Package },
+    { id: "campañas", label: "Campañas", icon: Megaphone },
+    { id: "marca", label: "Marca", icon: Palette },
+    { id: "configuracion", label: "Configuración", icon: Settings },
+  ] as const;
+
 
   return (
     <div className="min-h-screen bg-[#fcfbf8] p-6 lg:p-10">
