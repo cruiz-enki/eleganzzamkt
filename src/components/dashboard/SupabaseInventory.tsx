@@ -67,6 +67,7 @@ export function SupabaseInventory() {
     precio_2: 0,
     precio_3: 0,
     descripcion: "",
+    galeria: [],
   });
 
   const { data: records, refetch } = useSuspenseQuery({
