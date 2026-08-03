@@ -90,9 +90,18 @@ export const upsertMueble = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return result as Mueble;
     } else {
+      // Crear carpeta en Google Drive para el nuevo producto
+      const folderId = await createDriveFolder(data.nombre);
+      
       const { data: result, error } = await supabase
         .from('muebles')
-        .insert([updateData])
+        .insert([{
+          ...updateData,
+          detalles: { 
+            ...(typeof updateData.detalles === 'object' ? updateData.detalles : {}),
+            google_drive_folder_id: folderId 
+          }
+        }])
         .select()
         .single();
 
