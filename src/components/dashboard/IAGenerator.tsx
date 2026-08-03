@@ -143,6 +143,22 @@ export function IAGenerator() {
     }
   };
 
+  const handleApprove = async (index: number) => {
+    if (!selectedProduct) return;
+    try {
+      await approveAIContent({
+        data: {
+          muebleId: selectedProduct.id,
+          index
+        }
+      });
+      toast.success("Contenido aprobado y publicado");
+      refetch();
+    } catch (error) {
+      toast.error("Error al aprobar contenido");
+    }
+  };
+
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copiado al portapapeles");
@@ -326,9 +342,20 @@ export function IAGenerator() {
                       {selectedProduct.detalles.ai_content.map((item: any, idx: number) => (
                         <div key={idx} className="p-4 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
                           <div className="flex items-center justify-between mb-2">
-                            <Badge variant="outline" className="capitalize text-[10px]">
-                              {item.type}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="capitalize text-[10px]">
+                                {item.type}
+                              </Badge>
+                              {item.status === "draft" ? (
+                                <Badge variant="secondary" className="bg-amber-100 text-amber-700 border-0 text-[8px] uppercase font-bold">
+                                  Borrador
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-0 text-[8px] uppercase font-bold">
+                                  Publicado
+                                </Badge>
+                              )}
+                            </div>
                             <span className="text-[10px] text-slate-400">
                               {new Date(item.created_at).toLocaleDateString()}
                             </span>
@@ -364,16 +391,27 @@ export function IAGenerator() {
                                   Ver completo →
                                 </Button>
                                 <div className="ml-auto flex items-center gap-1">
-                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-indigo-600" onClick={() => handleCopy(item.content)}>
+                                  {item.status === "draft" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-6 w-6 text-emerald-600 hover:bg-emerald-50" 
+                                      onClick={() => handleApprove(idx)}
+                                      title="Aprobar y publicar"
+                                    >
+                                      <CheckCircle2 className="h-3 w-3" />
+                                    </Button>
+                                  )}
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-indigo-600" onClick={() => handleCopy(item.content)} title="Copiar">
                                     <Copy className="h-3 w-3" />
                                   </Button>
                                   <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-indigo-600" onClick={() => {
                                     setEditingIndex(idx);
                                     setEditText(item.content);
-                                  }}>
+                                  }} title="Editar">
                                     <Edit2 className="h-3 w-3" />
                                   </Button>
-                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-600" onClick={() => handleDelete(idx)}>
+                                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-600" onClick={() => handleDelete(idx)} title="Eliminar">
                                     <Trash2 className="h-3 w-3" />
                                   </Button>
                                 </div>
