@@ -10,7 +10,8 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2 } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown } from "lucide-react";
+import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
   DialogContent,
@@ -216,6 +217,7 @@ export function SupabaseInventory() {
           <RefreshCcw className="h-4 w-4 mr-2" />
           Actualizar
         </Button>
+        <CSVImporter />
         <Button 
           size="sm" 
           className="h-9 bg-black text-white hover:bg-black/90"

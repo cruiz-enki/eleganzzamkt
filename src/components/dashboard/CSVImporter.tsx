@@ -58,31 +58,30 @@ export function CSVImporter() {
 
     const results = [];
     for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
+      const line = lines[i].trim();
+      if (!line) continue;
       
-      // Manejo básico de CSV con comas dentro de comillas
-      const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-      if (!row) continue;
+      const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+      if (!row || row.length === 0) continue;
 
       const clean = (val: string | undefined) => val?.trim().replace(/^"|"$/g, '') || "";
       
-      const nombre = clean(row[nameIdx]);
+      const nombre = nameIdx !== -1 ? clean(row[nameIdx]) : "";
       if (!nombre) continue;
 
-      // Extraer URL de imagen si viene en formato "nombre (url)"
-      let fotoUrl = clean(row[imgIdx]);
+      let fotoUrl = imgIdx !== -1 ? clean(row[imgIdx]) : "";
       const urlMatch = fotoUrl.match(/\((https?:\/\/[^\)]+)\)/);
       if (urlMatch) {
         fotoUrl = urlMatch[1];
       }
 
-      const precioStr = clean(row[priceIdx]).replace(/[^0-9.]/g, '');
+      const precioStr = priceIdx !== -1 ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
       const precio = precioStr ? parseFloat(precioStr) : 0;
 
       results.push({
         nombre,
-        categoria: clean(row[catIdx]),
-        descripcion: clean(row[descIdx]),
+        categoria: catIdx !== -1 ? clean(row[catIdx]) : "",
+        descripcion: descIdx !== -1 ? clean(row[descIdx]) : "",
         precio,
         fotos: fotoUrl ? [{ url: fotoUrl }] : [],
         detalles: { source: 'csv_import' }
