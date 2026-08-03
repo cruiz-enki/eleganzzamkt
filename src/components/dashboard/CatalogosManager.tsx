@@ -207,11 +207,17 @@ export function CatalogosManager() {
                       variant="default" 
                       size="sm"
                       onClick={() => handleExtract(cat.id, cat.pdf_url)}
+                      disabled={extractingId === cat.id}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
                     >
-                      <Plus className="h-4 w-4" />
-                      Generar Productos
+                      {extractingId === cat.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Plus className="h-4 w-4" />
+                      )}
+                      {extractingId === cat.id ? "Analizando..." : "Generar Productos"}
                     </Button>
+
                   </div>
                 </div>
               ))}
