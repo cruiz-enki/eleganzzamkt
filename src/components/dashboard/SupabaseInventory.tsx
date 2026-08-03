@@ -130,7 +130,8 @@ export function SupabaseInventory() {
       } catch (error) {
         await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
         const message = error instanceof Error ? error.message : "Error desconocido";
-        throw new Error(`El producto se guardó, pero no todas las fotos pudieron subirse a la carpeta de Drive: ${message}`);
+        console.error("Gallery update error:", error);
+        throw new Error(`El producto se guardó, pero no todas las fotos pudieron subirse a la carpeta de Drive. Verifica tu conexión.`);
       } finally {
         setUploading(false);
       }
