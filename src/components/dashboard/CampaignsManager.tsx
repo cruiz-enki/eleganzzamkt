@@ -83,8 +83,12 @@ export function CampaignsManager() {
         
         const base64Promise = new Promise<string>((resolve, reject) => {
           reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result.split(',')[1]);
+            const result = reader.result;
+            if (typeof result === 'string') {
+              resolve(result.split(',')[1]);
+            } else {
+              reject(new Error("Error al leer el archivo"));
+            }
           };
           reader.onerror = reject;
           reader.readAsDataURL(file);
