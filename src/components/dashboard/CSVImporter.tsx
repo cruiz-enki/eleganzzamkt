@@ -37,7 +37,7 @@ export function CSVImporter() {
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
+    if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
   };
@@ -46,7 +46,10 @@ export function CSVImporter() {
     const lines = text.split(/\r?\n/);
     if (lines.length < 2) return [];
 
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const firstLine = lines[0];
+    if (!firstLine) return [];
+    
+    const headers = firstLine.split(',').map(h => h.trim().replace(/^"|"$/g, ''));
     
     const nameIdx = headers.findIndex(h => h.toLowerCase().includes('nombre'));
     const catIdx = headers.findIndex(h => h.toLowerCase().includes('categoría') || h.toLowerCase().includes('categoria'));
@@ -56,7 +59,7 @@ export function CSVImporter() {
 
     const results = [];
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
+      const line = lines[i]?.trim();
       if (!line) continue;
       
       const row = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
@@ -70,7 +73,7 @@ export function CSVImporter() {
       let fotoUrl = imgIdx !== -1 && row[imgIdx] !== undefined ? clean(row[imgIdx]) : "";
       const urlMatch = fotoUrl.match(/\((https?:\/\/[^\)]+)\)/);
       if (urlMatch) {
-        fotoUrl = urlMatch[1];
+        fotoUrl = urlMatch[1] ?? "";
       }
 
       const precioStr = priceIdx !== -1 && row[priceIdx] !== undefined ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
@@ -132,7 +135,7 @@ export function CSVImporter() {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 gap-4">
+          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 gap-4 relative">
             <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm">
               <Upload className="h-6 w-6 text-slate-400" />
             </div>
