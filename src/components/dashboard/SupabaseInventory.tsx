@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   getSupabaseInventory, 
   upsertMueble, 
   deleteMueble, 
+  uploadImage,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
@@ -31,6 +33,7 @@ export function SupabaseInventory() {
   const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState<Partial<Mueble>>({
@@ -105,6 +108,40 @@ export function SupabaseInventory() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     upsertMutation.mutate(formData);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const newUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file) {
+          const url = await uploadImage(file);
+          newUrls.push(url);
+        }
+      }
+
+      const existingFotos = formData.fotos || [];
+      const newFotos = [...existingFotos, ...newUrls.map(url => ({ url }))];
+      setFormData({ ...formData, fotos: newFotos });
+      toast.success(`${files.length} foto(s) subida(s) correctamente`);
+    } catch (error: any) {
+      toast.error("Error al subir imagen: " + error.message);
+    } finally {
+      setUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    const newFotos = [...(formData.fotos || [])];
+    newFotos.splice(index, 1);
+    setFormData({ ...formData, fotos: newFotos });
   };
 
   return (
@@ -408,7 +445,43 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Fotos (URLs separadas por comas)</Label>
+                  <Label>Fotos del Producto</Label>
+                  <div className="grid grid-cols-4 gap-2 mb-2">
+                    {(formData.fotos || []).map((f: any, idx: number) => (
+                      <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
+                        <img src={f.url} alt="" className="w-full h-full object-cover" />
+                        <button 
+                          type="button"
+                          onClick={() => removePhoto(idx)}
+                          className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    <label className={cn(
+                      "aspect-square rounded-lg border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer hover:border-slate-300 hover:bg-slate-50 transition-all",
+                      uploading && "opacity-50 cursor-not-allowed"
+                    )}>
+                      {uploading ? (
+                        <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-6 w-6 text-slate-400" />
+                          <span className="text-[10px] font-medium text-slate-500 mt-1">Subir</span>
+                        </>
+                      )}
+                      <input 
+                        type="file" 
+                        multiple 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                    </label>
+                  </div>
+                  <Label className="text-xs text-slate-400 font-normal">O pega URLs (separadas por comas)</Label>
                   <Textarea 
                     placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
                     value={(formData.fotos || []).map((f: any) => f.url).join(', ')}
@@ -418,7 +491,6 @@ export function SupabaseInventory() {
                     }}
                     rows={2}
                   />
-                  <p className="text-[10px] text-slate-400">Pega las URLs de las fotos separadas por una coma.</p>
                 </div>
 
                 <div className="grid gap-2">
@@ -441,7 +513,7 @@ export function SupabaseInventory() {
               <Button 
                 type="submit" 
                 className="bg-black text-white hover:bg-black/90 px-8"
-                disabled={upsertMutation.isPending}
+                disabled={upsertMutation.isPending || uploading}
               >
                 {upsertMutation.isPending ? "Guardando..." : "Guardar Producto"}
               </Button>
