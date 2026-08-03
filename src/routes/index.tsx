@@ -25,11 +25,13 @@ import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
 import { CampaignsManager } from "@/components/dashboard/CampaignsManager";
+import { CatalogosManager } from "@/components/dashboard/CatalogosManager";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,7 +47,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion" | "ia-generator";
+type ViewType = "dashboard" | "productos" | "campañas" | "catalogos" | "marca" | "configuracion" | "ia-generator";
 
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
@@ -86,6 +88,7 @@ function Index() {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "productos", label: "Productos", icon: Package },
     { id: "campañas", label: "Campañas", icon: Megaphone },
+    { id: "catalogos", label: "Catálogos", icon: BookOpen },
     { id: "marca", label: "Marca", icon: Palette },
     { id: "ia-generator", label: "IA Generator", icon: SparklesIcon },
     { id: "configuracion", label: "Configuración", icon: Settings },
@@ -345,6 +348,14 @@ function Index() {
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
                 <CampaignsManager />
+              </Suspense>
+            </div>
+          )}
+
+          {view === "catalogos" && (
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
+                <CatalogosManager />
               </Suspense>
             </div>
           )}
