@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion";
+type ViewType = "dashboard" | "productos" | "campañas" | "marca" | "configuracion" | "ia-generator";
 
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
@@ -72,6 +72,7 @@ function Index() {
     { id: "productos", label: "Productos", icon: Package },
     { id: "campañas", label: "Campañas", icon: Megaphone },
     { id: "marca", label: "Marca", icon: Palette },
+    { id: "ia-generator", label: "IA Generator", icon: SparklesIcon },
     { id: "configuracion", label: "Configuración", icon: Settings },
   ] as const;
 
