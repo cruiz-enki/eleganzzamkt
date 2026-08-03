@@ -1073,6 +1073,31 @@ export function SupabaseInventory() {
         index={lightboxIndex}
         close={() => setLightboxIndex(-1)}
         slides={lightboxSlides}
+        render={{
+          slideFooter: ({ slide }: any) => (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 bg-black/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 text-white min-w-[320px] shadow-2xl">
+              <div className="text-center">
+                <h3 className="text-xl font-bold tracking-tight text-white">{slide.title}</h3>
+                <p className="text-sm text-slate-300 font-medium mt-1">{slide.description}</p>
+              </div>
+              {slide.record && (
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="mt-2 bg-white text-black hover:bg-slate-200 border-none px-8 font-bold h-10 rounded-full transition-transform hover:scale-105"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(slide.record);
+                    setLightboxIndex(-1);
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar Producto
+                </Button>
+              )}
+            </div>
+          ),
+        }}
       />
     </div>
   );
