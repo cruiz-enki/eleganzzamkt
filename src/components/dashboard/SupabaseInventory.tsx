@@ -295,13 +295,15 @@ export function SupabaseInventory() {
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setSelectedRecord(processedRecords[currentIndex - 1]);
+      const prevRecord = processedRecords[currentIndex - 1];
+      if (prevRecord) setSelectedRecord(prevRecord);
     }
   };
 
   const handleNext = () => {
     if (currentIndex < processedRecords.length - 1) {
-      setSelectedRecord(processedRecords[currentIndex + 1]);
+      const nextRecord = processedRecords[currentIndex + 1];
+      if (nextRecord) setSelectedRecord(nextRecord);
     }
   };
 
