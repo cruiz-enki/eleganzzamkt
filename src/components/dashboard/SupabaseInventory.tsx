@@ -122,6 +122,7 @@ export function SupabaseInventory() {
         const updatedProduct = await upsertMueble({
           data: {
             id: savedProduct.id,
+            nombre: savedProduct.nombre,
             galeria: [...(savedProduct.galeria || []), ...uploadedPhotos],
           },
         });
