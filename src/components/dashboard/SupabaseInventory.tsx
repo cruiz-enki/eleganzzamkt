@@ -6,6 +6,7 @@ import {
   deleteMueble, 
   uploadToDrive,
   bulkCleanupCategories,
+  updateMuebleStatus,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
@@ -13,7 +14,7 @@ import { cleanProductImage } from "@/lib/api/ai.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2, Clock } from "lucide-react";
+import { Search, X, Package, Info, Image as ImageIcon, RefreshCcw, Plus, Edit, Trash2, FolderOpen, Upload, Loader2, FileDown, Filter, ArrowUpDown, ChevronDown, Eye, Settings2, ChevronLeft, ChevronRight, Wand2, LayoutGrid, List, CheckCircle2, Clock, Archive } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
   Dialog,
@@ -62,7 +63,7 @@ export function SupabaseInventory() {
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "discontinued">("all");
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(new Set(["nombre", "categoria", "precio", "acciones"]));
   const [viewMode, setViewMode] = useState<"table" | "gallery">("table");
   const [lightboxIndex, setLightboxIndex] = useState(-1);
@@ -166,6 +167,19 @@ export function SupabaseInventory() {
     },
     onError: (error) => {
       toast.error("Error al publicar: " + error.message);
+    }
+  });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: (args: { id: string, status: string }) => updateMuebleStatus({ data: args }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['supabase-inventory'] });
+      const label = variables.status === 'discontinued' ? 'descontinuado' : 
+                   variables.status === 'published' ? 'publicado' : 'borrador';
+      toast.success(`Estado actualizado a ${label}`);
+    },
+    onError: (error) => {
+      toast.error("Error al actualizar estado: " + error.message);
     }
   });
 
@@ -443,7 +457,7 @@ export function SupabaseInventory() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className={cn("h-9 border-slate-200", statusFilter !== "all" && "bg-indigo-50 border-indigo-200 text-indigo-700")}>
                 <Clock className="h-4 w-4 mr-2" />
-                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : "Publicados"}
+                {statusFilter === "all" ? "Todos" : statusFilter === "draft" ? "Borradores" : statusFilter === "published" ? "Publicados" : "Descontinuados"}
                 <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
@@ -459,6 +473,9 @@ export function SupabaseInventory() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setStatusFilter("published")} className="text-emerald-600">
                 Solo Publicados
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter("discontinued")} className="text-slate-500">
+                Solo Descontinuados
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -635,6 +652,9 @@ export function SupabaseInventory() {
                             {record.detalles?.status === 'draft' && (
                               <Badge variant="outline" className="text-[9px] h-4 px-1 bg-amber-50 text-amber-600 border-amber-200">Borrador</Badge>
                             )}
+                            {record.detalles?.status === 'discontinued' && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-slate-100 text-slate-500 border-slate-200">Descontinuado</Badge>
+                            )}
                           </span>
                         </div>
                       </div>
@@ -697,6 +717,27 @@ export function SupabaseInventory() {
                           }}
                         >
                           <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className={cn(
+                            "h-8 w-8 transition-colors",
+                            record.detalles?.status === 'discontinued' ? "text-amber-500 hover:text-amber-700 hover:bg-amber-50" : "text-slate-400 hover:text-slate-900"
+                          )}
+                          title={record.detalles?.status === 'discontinued' ? "Reactivar producto" : "Marcar como descontinuado"}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newStatus = record.detalles?.status === 'discontinued' ? 'published' : 'discontinued';
+                            const confirmMsg = record.detalles?.status === 'discontinued' 
+                              ? "¿Reactivar este producto?" 
+                              : "¿Marcar este producto como descontinuado?";
+                            if (confirm(confirmMsg)) {
+                              updateStatusMutation.mutate({ id: record.id, status: newStatus });
+                            }
+                          }}
+                        >
+                          <Archive className="h-4 w-4" />
                         </Button>
                         <Button 
                           size="icon" 
@@ -778,6 +819,9 @@ export function SupabaseInventory() {
                               {record.nombre}
                               {record.detalles?.status === 'draft' && (
                                 <span className="bg-amber-500 text-[8px] text-white px-1 rounded">DRAFT</span>
+                              )}
+                              {record.detalles?.status === 'discontinued' && (
+                                <span className="bg-slate-500 text-[8px] text-white px-1 rounded">DISC</span>
                               )}
                             </h3>
                             <p className="text-[10px] opacity-70 uppercase tracking-wider">{record.categoria}</p>
