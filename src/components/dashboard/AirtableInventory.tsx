@@ -1,24 +1,27 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { getAirtableData } from "@/lib/api/airtable.functions";
+import { getAirtableData, type AirtableRecord } from "@/lib/api/airtable.functions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Database, Search, Loader2 } from "lucide-react";
+import { Database, Search } from "lucide-react";
+
+const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
 export function AirtableInventory() {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const { data: records, isLoading } = useSuspenseQuery({
+
+  const { data: records } = useSuspenseQuery({
     queryKey: ['airtable-inventory'],
-    queryFn: () => getAirtableData({ data: { baseId: 'appExample', table: 'Muebles' } }),
+    queryFn: () => getAirtableData({ data: {} }),
   });
 
-  const filteredRecords = records?.filter((r: any) => 
-    Object.values(r.fields).some(val => 
+  const filteredRecords = (records as AirtableRecord[]).filter((r) =>
+    Object.values(r.fields).some(val =>
       String(val).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
+
 
   return (
     <div className="space-y-4">
