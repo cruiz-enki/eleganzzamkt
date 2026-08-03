@@ -199,11 +199,12 @@ export function SupabaseInventory() {
     return processedRecords.map(record => {
       const photos = [...(record.galeria || []), ...(record.fotos || [])];
       return {
-        src: photos.length > 0 ? photos[0].url : "",
+        src: photos.length > 0 ? photos[0].url : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800",
         title: record.nombre,
         description: `${record.categoria} - ${record.precio ? currency.format(record.precio) : ""}`,
+        record: record // Pasamos el registro completo para poder editarlo
       };
-    }).filter(slide => slide.src);
+    });
   }, [processedRecords]);
 
   const handleSort = (key: keyof Mueble) => {
