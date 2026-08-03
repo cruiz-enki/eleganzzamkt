@@ -156,6 +156,27 @@ export const upsertMueble = createServerFn({ method: "POST" })
     const { id, ...updateData } = data;
 
     if (id) {
+      // Si es una actualización, verificamos si ya tiene carpeta de Drive
+      const { data: current } = await supabase
+        .from('muebles')
+        .select('detalles, nombre')
+        .eq('id', id)
+        .single();
+
+      let folderId = current?.detalles?.google_drive_folder_id;
+      
+      // Si no tiene carpeta (por ejemplo, importado de CSV sin carpeta), la creamos
+      if (!folderId) {
+        folderId = await createDriveFolder(updateData.nombre || current?.nombre || "Mueble sin nombre");
+        if (folderId) {
+          updateData.detalles = { 
+            ...(current?.detalles || {}), 
+            ...(updateData.detalles || {}), 
+            google_drive_folder_id: folderId 
+          };
+        }
+      }
+
       const { data: result, error } = await supabase
         .from('muebles')
         .update(updateData)
@@ -176,7 +197,7 @@ export const upsertMueble = createServerFn({ method: "POST" })
 
     let folderId: string | null = existingDetalles.google_drive_folder_id ?? null;
     if (!folderId) {
-      folderId = await createDriveFolder(data.nombre);
+      folderId = await createDriveFolder(updateData.nombre || "Nuevo Mueble");
     }
 
     const { data: result, error } = await supabase
