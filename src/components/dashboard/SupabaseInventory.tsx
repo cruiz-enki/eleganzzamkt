@@ -276,6 +276,20 @@ export function SupabaseInventory() {
                         <Info className="w-3 h-3" /> Descripción y Detalles
                       </h4>
                       <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
+                        {selectedRecord.detalles?.google_drive_folder_id && (
+                          <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Google Drive</span>
+                            <a 
+                              href={`https://drive.google.com/drive/folders/${selectedRecord.detalles.google_drive_folder_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:underline flex items-center gap-2 font-medium"
+                            >
+                              <FolderOpen className="w-4 h-4" />
+                              Abrir carpeta de activos
+                            </a>
+                          </div>
+                        )}
                         {selectedRecord.descripcion && (
                           <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Descripción</span>
