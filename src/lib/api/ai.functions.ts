@@ -200,7 +200,8 @@ export const generateProductCreative = createServerFn({ method: "POST" })
     aiContent.push({
       type: data.type,
       content,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      status: "draft"
     });
 
     await supabase
