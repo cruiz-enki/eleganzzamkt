@@ -232,7 +232,7 @@ function Index() {
                 icon={<TableIcon className="h-4 w-4 text-slate-400" />}
               >
                 <div className="mt-2">
-                  <p className="text-2xl font-semibold text-slate-700">Catálogo</p>
+                  <p className="text-2xl font-semibold text-slate-700 dark:text-slate-200">Catálogo</p>
                   <button 
                     onClick={() => setView("productos")}
                     className="text-xs text-blue-500 font-bold uppercase mt-2 hover:underline"
@@ -249,16 +249,16 @@ function Index() {
                 icon={<Sparkles className="h-4 w-4 text-indigo-400" />}
               >
                 <div className="mt-4 space-y-4">
-                  <p className="text-sm text-slate-600">Genera copys de marketing al instante con GPT-4o.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Genera copys de marketing al instante con GPT-4o.</p>
                   <textarea 
-                    className="w-full p-2 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
+                    className="w-full p-2 text-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
                     placeholder="Ej: Sofá de terciopelo azul para sala moderna..."
                     rows={2}
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
                   />
                   {aiResult && (
-                    <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-[10px] text-slate-700 max-h-32 overflow-y-auto">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg text-[10px] text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto">
                       {aiResult}
                     </div>
                   )}
@@ -279,8 +279,8 @@ function Index() {
                 icon={<TrendingUp className="h-4 w-4 text-emerald-400" />}
               >
                 <div className="mt-2">
-                  <p className="text-3xl font-serif text-slate-800">+12.4%</p>
-                  <p className="text-xs text-slate-400 mt-1">vs mes anterior</p>
+                  <p className="text-3xl font-serif text-slate-800 dark:text-white">+12.4%</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">vs mes anterior</p>
                 </div>
               </BentoItem>
 
@@ -292,8 +292,8 @@ function Index() {
               >
                 <div className="mt-2 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Supabase Propio</p>
-                    <p className="text-xs text-emerald-500 font-bold uppercase tracking-tighter">Online</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Supabase Propio</p>
+                    <p className="text-xs text-emerald-500 dark:text-emerald-400 font-bold uppercase tracking-tighter">Online</p>
                   </div>
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
