@@ -77,7 +77,8 @@ export function CSVImporter() {
       }
 
       const precioStr = priceIdx !== -1 && row[priceIdx] !== undefined ? clean(row[priceIdx]).replace(/[^0-9.]/g, '') : "";
-      const precio = precioStr ? parseFloat(precioStr) : 0;
+      let precio: number | null = precioStr ? parseFloat(precioStr) : 0;
+      if (isNaN(precio)) precio = 0;
 
       results.push({
         nombre,
