@@ -342,7 +342,7 @@ export function SupabaseInventory() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar en inventario de Supabase..."
-            className="pl-8 bg-white/50 border-slate-200"
+            className="pl-8 bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -462,10 +462,10 @@ export function SupabaseInventory() {
       </div>
 
       {viewMode === "table" ? (
-        <div className="rounded-xl border border-slate-100 bg-white shadow-sm overflow-hidden">
+        <div className="rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
           <Table>
-            <TableHeader className="bg-slate-50/50 border-b border-slate-100">
-              <TableRow className="hover:bg-transparent">
+            <TableHeader className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+              <TableRow className="hover:bg-transparent dark:border-slate-800">
                 <TableHead className="w-10 py-4">
                   <input 
                     type="checkbox" 

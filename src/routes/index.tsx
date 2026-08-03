@@ -191,18 +191,18 @@ function Index() {
                 icon={<LayoutDashboard className="h-4 w-4 text-slate-400" />}
               >
                 <div className="mt-4">
-                  <h2 className="text-2xl font-semibold text-slate-800">Elegannza Muebles</h2>
-                  <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  <h2 className="text-2xl font-semibold text-slate-800 dark:text-white">Elegannza Muebles</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
                     Gestión centralizada de campañas, activos digitales y base de datos estratégica.
                   </p>
                   <div className="mt-8 grid grid-cols-2 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                      <p className="text-xs text-slate-400 uppercase font-bold">Activos</p>
-                      <p className="text-xl font-semibold text-slate-700">1,240</p>
+                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Activos</p>
+                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">1,240</p>
                     </div>
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                      <p className="text-xs text-slate-400 uppercase font-bold">Leads</p>
-                      <p className="text-xl font-semibold text-slate-700">856</p>
+                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-slate-100 dark:border-slate-700">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold">Leads</p>
+                      <p className="text-xl font-semibold text-slate-700 dark:text-slate-200">856</p>
                     </div>
                   </div>
                 </div>
@@ -215,12 +215,12 @@ function Index() {
                 icon={<Cloud className="h-4 w-4 text-slate-400" />}
               >
                 <div className="flex items-center gap-3 mt-2">
-                  <div className="h-10 w-10 rounded bg-blue-50 flex items-center justify-center">
-                    <ImageIcon className="h-5 w-5 text-blue-500" />
+                  <div className="h-10 w-10 rounded bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                    <ImageIcon className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Unidad Compartida</p>
-                    <p className="text-xs text-slate-400 italic">Conexión establecida</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Unidad Compartida</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 italic">Conexión establecida</p>
                   </div>
                 </div>
               </BentoItem>
@@ -232,7 +232,7 @@ function Index() {
                 icon={<TableIcon className="h-4 w-4 text-slate-400" />}
               >
                 <div className="mt-2">
-                  <p className="text-2xl font-semibold text-slate-700">Catálogo</p>
+                  <p className="text-2xl font-semibold text-slate-700 dark:text-slate-200">Catálogo</p>
                   <button 
                     onClick={() => setView("productos")}
                     className="text-xs text-blue-500 font-bold uppercase mt-2 hover:underline"
@@ -249,16 +249,16 @@ function Index() {
                 icon={<Sparkles className="h-4 w-4 text-indigo-400" />}
               >
                 <div className="mt-4 space-y-4">
-                  <p className="text-sm text-slate-600">Genera copys de marketing al instante con GPT-4o.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Genera copys de marketing al instante con GPT-4o.</p>
                   <textarea 
-                    className="w-full p-2 text-xs border border-slate-200 rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
+                    className="w-full p-2 text-xs border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-lg focus:ring-1 focus:ring-indigo-400 outline-none resize-none"
                     placeholder="Ej: Sofá de terciopelo azul para sala moderna..."
                     rows={2}
                     value={aiPrompt}
                     onChange={(e) => setAiPrompt(e.target.value)}
                   />
                   {aiResult && (
-                    <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg text-[10px] text-slate-700 max-h-32 overflow-y-auto">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-lg text-[10px] text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto">
                       {aiResult}
                     </div>
                   )}
@@ -279,8 +279,8 @@ function Index() {
                 icon={<TrendingUp className="h-4 w-4 text-emerald-400" />}
               >
                 <div className="mt-2">
-                  <p className="text-3xl font-serif text-slate-800">+12.4%</p>
-                  <p className="text-xs text-slate-400 mt-1">vs mes anterior</p>
+                  <p className="text-3xl font-serif text-slate-800 dark:text-white">+12.4%</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">vs mes anterior</p>
                 </div>
               </BentoItem>
 
@@ -292,8 +292,8 @@ function Index() {
               >
                 <div className="mt-2 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-700">Supabase Propio</p>
-                    <p className="text-xs text-emerald-500 font-bold uppercase tracking-tighter">Online</p>
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Supabase Propio</p>
+                    <p className="text-xs text-emerald-500 dark:text-emerald-400 font-bold uppercase tracking-tighter">Online</p>
                   </div>
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
@@ -302,7 +302,7 @@ function Index() {
           )}
 
           {view === "productos" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -319,7 +319,7 @@ function Index() {
           )}
 
           {view === "ia-generator" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
@@ -336,13 +336,13 @@ function Index() {
           )}
 
           {view === "configuracion" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-8 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
               <PromptSettings />
             </div>
           )}
 
           {view === "campañas" && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
               <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
                 <CampaignsManager />
               </Suspense>

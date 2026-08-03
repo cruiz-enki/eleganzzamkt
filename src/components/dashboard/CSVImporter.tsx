@@ -149,7 +149,7 @@ export function CSVImporter() {
       <Button 
         variant="outline" 
         size="sm" 
-        className="h-9 border-slate-200 text-slate-600"
+        className="h-9 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
         onClick={() => setIsOpen(true)}
       >
         <FileDown className="h-4 w-4 mr-2" />
@@ -157,17 +157,17 @@ export function CSVImporter() {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md bg-white">
+        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle>Importar desde CSV</DialogTitle>
+            <DialogTitle className="dark:text-white">Importar desde CSV</DialogTitle>
             <DialogDescription>
               Selecciona el archivo "Total-Total.csv" para cargar el inventario automáticamente.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50 gap-4 relative">
-            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm">
-              <Upload className="h-6 w-6 text-slate-400" />
+          <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/50 gap-4 relative">
+            <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-900 flex items-center justify-center shadow-sm">
+              <Upload className="h-6 w-6 text-slate-400 dark:text-slate-500" />
             </div>
             
             <div className="text-center">
@@ -190,7 +190,7 @@ export function CSVImporter() {
             />
           </div>
 
-          <div className="bg-amber-50 border border-amber-100 p-3 rounded-lg flex flex-col gap-2">
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 p-3 rounded-lg flex flex-col gap-2">
             <div className="flex gap-3">
               <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
               <p className="text-xs text-amber-700">
