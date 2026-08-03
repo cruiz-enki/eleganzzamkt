@@ -79,8 +79,8 @@ export function SupabaseInventory() {
                 <TableCell className="py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                      {record.fotos && Array.isArray(record.fotos) && record.fotos[0]?.url ? (
-                        <img src={record.fotos[0].url} alt="" className="w-full h-full object-cover" />
+                      {record.fotos && Array.isArray(record.fotos) && (record.fotos[0] as any)?.url ? (
+                        <img src={(record.fotos[0] as any).url} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <Package className="w-5 h-5 text-slate-400" />
                       )}
@@ -111,10 +111,10 @@ export function SupabaseInventory() {
             <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px]">
               {/* Carrusel de Fotos */}
               <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
-                {record.fotos && Array.isArray(record.fotos) && record.fotos.length > 0 ? (
+                {selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0 ? (
                   <ScrollArea className="h-full">
                     <div className="flex flex-col gap-2 p-2">
-                      {record.fotos.map((photo: any, i: number) => {
+                      {selectedRecord.fotos.map((photo: any, i: number) => {
                         const url = photo.url;
                         if (!url) return null;
                         return (
