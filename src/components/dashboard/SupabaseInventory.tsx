@@ -112,7 +112,10 @@ export function SupabaseInventory() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting formData:", formData);
+    if (!formData.nombre) {
+      toast.error("El nombre del producto es obligatorio");
+      return;
+    }
     upsertMutation.mutate(formData);
   };
 
