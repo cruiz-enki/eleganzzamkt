@@ -163,8 +163,6 @@ export function SupabaseInventory() {
       e.target.value = '';
     }
   };
-    }
-  };
 
   const removePhoto = (index: number) => {
     const newFotos = [...(formData.fotos || [])];
