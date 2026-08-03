@@ -210,3 +210,63 @@ export const generateProductCreative = createServerFn({ method: "POST" })
 
     return content;
   });
+
+export const updateAIContent = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({
+    muebleId: z.string(),
+    index: z.number(),
+    content: z.string()
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: mueble, error } = await supabase
+      .from('muebles')
+      .select('detalles')
+      .eq('id', data.muebleId)
+      .single();
+      
+    if (error || !mueble) throw new Error("Producto no encontrado.");
+
+    const detalles = mueble.detalles || {};
+    const aiContent = [...(detalles.ai_content || [])];
+    
+    if (aiContent[data.index]) {
+      aiContent[data.index].content = data.content;
+      aiContent[data.index].updated_at = new Date().toISOString();
+    }
+
+    const { error: updateError } = await supabase
+      .from('muebles')
+      .update({ detalles: { ...detalles, ai_content: aiContent } })
+      .eq('id', data.muebleId);
+
+    if (updateError) throw updateError;
+    return true;
+  });
+
+export const deleteAIContent = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({
+    muebleId: z.string(),
+    index: z.number()
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: mueble, error } = await supabase
+      .from('muebles')
+      .select('detalles')
+      .eq('id', data.muebleId)
+      .single();
+      
+    if (error || !mueble) throw new Error("Producto no encontrado.");
+
+    const detalles = mueble.detalles || {};
+    let aiContent = [...(detalles.ai_content || [])];
+    
+    aiContent.splice(data.index, 1);
+
+    const { error: updateError } = await supabase
+      .from('muebles')
+      .update({ detalles: { ...detalles, ai_content: aiContent } })
+      .eq('id', data.muebleId);
+
+    if (updateError) throw updateError;
+    return true;
+  });
