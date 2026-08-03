@@ -745,7 +745,8 @@ export function SupabaseInventory() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
         </DialogContent>
       </Dialog>
 
