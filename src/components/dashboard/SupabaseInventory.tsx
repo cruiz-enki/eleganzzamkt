@@ -67,6 +67,7 @@ export function SupabaseInventory() {
     precio_2: 0,
     precio_3: 0,
     descripcion: "",
+    galeria: [],
   });
 
   const { data: records, refetch } = useSuspenseQuery({
@@ -103,7 +104,7 @@ export function SupabaseInventory() {
         return await upsertMueble({
           data: {
             ...savedProduct,
-            fotos: [...(savedProduct.fotos || []), ...uploadedPhotos],
+            galeria: [...(savedProduct.galeria || []), ...uploadedPhotos],
           },
         });
       } catch (error) {
@@ -216,7 +217,10 @@ export function SupabaseInventory() {
   };
 
   const handleEdit = (record: Mueble) => {
-    setFormData(record);
+    setFormData({
+      ...record,
+      galeria: record.galeria || []
+    });
     setPendingFiles([]);
     setIsEditing(true);
     setSelectedRecord(null); // Close detail view if open
@@ -231,6 +235,7 @@ export function SupabaseInventory() {
       precio_3: 0,
       descripcion: "",
       fotos: [],
+      galeria: [],
       detalles: {},
     });
     setIsAdding(true);
@@ -283,11 +288,6 @@ export function SupabaseInventory() {
     setPendingFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
   };
 
-  const removePhoto = (index: number) => {
-    const newFotos = [...(formData.fotos || [])];
-    newFotos.splice(index, 1);
-    setFormData({ ...formData, fotos: newFotos });
-  };
 
   const currentIndex = useMemo(() => {
     if (!selectedRecord) return -1;
@@ -631,10 +631,11 @@ export function SupabaseInventory() {
 
               <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px] overflow-hidden rounded-lg">
               <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
-                {selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0 ? (
+                {((selectedRecord.galeria && Array.isArray(selectedRecord.galeria) && selectedRecord.galeria.length > 0) || 
+                  (selectedRecord.fotos && Array.isArray(selectedRecord.fotos) && selectedRecord.fotos.length > 0)) ? (
                   <ScrollArea className="h-full">
                     <div className="flex flex-col gap-2 p-2">
-                      {selectedRecord.fotos.map((photo: any, i: number) => {
+                      {[...(selectedRecord.galeria || []), ...(selectedRecord.fotos || [])].map((photo: any, i: number) => {
                         const url = photo.url;
                         if (!url) return null;
                         return (
@@ -841,14 +842,18 @@ export function SupabaseInventory() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Fotos del Producto</Label>
+                  <Label>Galería de Imágenes (Múltiples fotos)</Label>
                   <div className="grid grid-cols-4 gap-2 mb-2">
-                    {(formData.fotos || []).map((f: any, idx: number) => (
+                    {(formData.galeria || []).map((f: any, idx: number) => (
                       <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
                         <img src={f.url} alt="" className="w-full h-full object-cover" />
                         <button 
                           type="button"
-                          onClick={() => removePhoto(idx)}
+                          onClick={() => {
+                            const newGaleria = [...(formData.galeria || [])];
+                            newGaleria.splice(idx, 1);
+                            setFormData({ ...formData, galeria: newGaleria });
+                          }}
                           className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-3 h-3" />
@@ -896,10 +901,10 @@ export function SupabaseInventory() {
                   <Label className="text-xs text-slate-400 font-normal">O pega URLs (separadas por comas)</Label>
                   <Textarea 
                     placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
-                    value={(formData.fotos || []).map((f: any) => f.url).join(', ')}
+                    value={(formData.galeria || []).map((f: any) => f.url).join(', ')}
                     onChange={(e) => {
                       const urls = e.target.value.split(',').map(u => u.trim()).filter(u => u !== '');
-                      setFormData({...formData, fotos: urls.map(url => ({ url }))});
+                      setFormData({...formData, galeria: urls.map(url => ({ url }))});
                     }}
                     rows={2}
                   />
