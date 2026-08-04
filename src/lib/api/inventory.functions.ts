@@ -450,7 +450,8 @@ export const syncAllDriveGalleries = createServerFn({ method: "POST" })
       try {
         const driveFiles = await listDriveImages(folderId);
         const { galeria, added } = mergeGaleria((record as any).galeria || [], driveFiles);
-        if (added > 0) {
+        const cambio = added > 0 || JSON.stringify(galeria) !== JSON.stringify((record as any).galeria || []);
+        if (cambio) {
           const { error: updateError } = await supabase
             .from('muebles')
             .update({ galeria })
@@ -460,6 +461,7 @@ export const syncAllDriveGalleries = createServerFn({ method: "POST" })
             fotosAgregadas += added;
           }
         }
+
       } catch (e) {
         console.error(`Sync failed for ${(record as any).id}:`, e);
       }
