@@ -8,6 +8,8 @@ import {
   bulkCleanupCategories,
   updateMuebleStatus,
   bulkDiscontinueMuebles,
+  syncDriveGallery,
+  syncAllDriveGalleries,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
@@ -398,6 +400,27 @@ export function SupabaseInventory() {
             <RefreshCcw className="h-3 w-3" />
             Agrupar Categorías
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+            onClick={async () => {
+              const loading = toast.loading("Sincronizando fotos desde Google Drive...");
+              try {
+                const res = await syncAllDriveGalleries();
+                toast.dismiss(loading);
+                toast.success(`${res.fotosAgregadas} fotos nuevas en ${res.productosActualizados} productos`);
+                refetch();
+              } catch (e: any) {
+                toast.dismiss(loading);
+                toast.error(e?.message || "Error al sincronizar con Drive");
+              }
+            }}
+          >
+            <FolderOpen className="h-3 w-3" />
+            Sincronizar Drive
+          </Button>
+
           <Button 
             variant="outline" 
             size="sm" 
@@ -1076,7 +1099,30 @@ export function SupabaseInventory() {
                               <FolderOpen className="w-4 h-4" />
                               Abrir carpeta de activos
                             </a>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="mt-2 h-8 w-fit text-[10px] font-bold uppercase gap-2"
+                              onClick={async () => {
+                                const loading = toast.loading("Buscando fotos en la carpeta...");
+                                try {
+                                  const res = await syncDriveGallery({ data: { id: selectedRecord.id } });
+                                  toast.dismiss(loading);
+                                  if (res.added === 0) toast.info("No hay fotos nuevas en la carpeta");
+                                  else toast.success(`Se enlazaron ${res.added} fotos nuevas`);
+                                  refetch();
+                                  setSelectedRecord(null);
+                                } catch (e: any) {
+                                  toast.dismiss(loading);
+                                  toast.error(e?.message || "Error al sincronizar con Drive");
+                                }
+                              }}
+                            >
+                              <RefreshCcw className="w-3 h-3" />
+                              Enlazar fotos de la carpeta
+                            </Button>
                           </div>
+
                         )}
                         {selectedRecord.descripcion && (
                           <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">

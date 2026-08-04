@@ -319,3 +319,119 @@ export const bulkCleanupCategories = createServerFn({ method: "POST" })
     
     return { success: true, updatedCount };
   });
+
+async function listDriveImages(folderId: string): Promise<Array<{ id: string; url: string }>> {
+  const headers = driveHeaders();
+  if (!headers) throw new Error("Faltan credenciales de Google Drive");
+
+  const results: Array<{ id: string; url: string }> = [];
+  let pageToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
+      fields: 'nextPageToken, files(id,name,mimeType)',
+      pageSize: '200',
+      supportsAllDrives: 'true',
+      includeItemsFromAllDrives: 'true',
+      corpora: 'allDrives',
+    });
+    if (pageToken) params.set('pageToken', pageToken);
+
+    const res = await fetchWithTimeout(`${GOOGLE_DRIVE_GATEWAY}/drive/v3/files?${params.toString()}`, {
+      method: 'GET',
+      headers,
+    }, 30000);
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`Drive list failed [${res.status}]: ${text}`);
+      throw new Error(`Error al leer la carpeta de Drive [${res.status}]`);
+    }
+
+    const json = await res.json();
+    for (const f of (json.files || [])) {
+      results.push({ id: f.id, url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000` });
+    }
+    pageToken = json.nextPageToken;
+  } while (pageToken);
+
+  return results;
+}
+
+function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: string }>) {
+  const current = Array.isArray(existing) ? existing : [];
+  const known = new Set<string>();
+  for (const item of current) {
+    if (item?.id) known.add(String(item.id));
+    if (typeof item?.url === 'string') {
+      const match = item.url.match(/[-\w]{25,}/);
+      if (match) known.add(match[0]);
+    }
+  }
+  const nuevos = driveFiles.filter((f) => !known.has(f.id));
+  return { galeria: [...current, ...nuevos], added: nuevos.length };
+}
+
+export const syncDriveGallery = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: record, error } = await supabase
+      .from('muebles')
+      .select('id, galeria, detalles')
+      .eq('id', data.id)
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    const folderId = record?.detalles?.google_drive_folder_id;
+    if (!folderId) throw new Error("Este producto no tiene una carpeta de Drive vinculada");
+
+    const driveFiles = await listDriveImages(folderId);
+    const { galeria, added } = mergeGaleria(record?.galeria || [], driveFiles);
+
+    if (added > 0) {
+      const { error: updateError } = await supabase
+        .from('muebles')
+        .update({ galeria })
+        .eq('id', data.id);
+      if (updateError) throw new Error(updateError.message);
+    }
+
+    return { success: true, added, total: galeria.length };
+  });
+
+export const syncAllDriveGalleries = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const { data: records, error } = await supabase
+      .from('muebles')
+      .select('id, galeria, detalles');
+
+    if (error) throw new Error(error.message);
+
+    let productosActualizados = 0;
+    let fotosAgregadas = 0;
+
+    for (const record of (records || [])) {
+      const folderId = (record as any)?.detalles?.google_drive_folder_id;
+      if (!folderId) continue;
+      try {
+        const driveFiles = await listDriveImages(folderId);
+        const { galeria, added } = mergeGaleria((record as any).galeria || [], driveFiles);
+        if (added > 0) {
+          const { error: updateError } = await supabase
+            .from('muebles')
+            .update({ galeria })
+            .eq('id', (record as any).id);
+          if (!updateError) {
+            productosActualizados++;
+            fotosAgregadas += added;
+          }
+        }
+      } catch (e) {
+        console.error(`Sync failed for ${(record as any).id}:`, e);
+      }
+    }
+
+    return { success: true, productosActualizados, fotosAgregadas };
+  });
