@@ -379,19 +379,29 @@ async function listDriveImages(folderId: string): Promise<Array<{ id: string; ur
 }
 
 
+function driveIdFromUrl(url: unknown): string | null {
+  if (typeof url !== 'string') return null;
+  const match = url.match(/[-\w]{25,}/);
+  return match ? match[0] : null;
+}
+
 function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: string }>) {
-  const current = Array.isArray(existing) ? existing : [];
+  const current = (Array.isArray(existing) ? existing : []).map((item) => {
+    const id = item?.id ?? driveIdFromUrl(item?.url);
+    if (!id) return item;
+    // Normalizamos a un formato de imagen que sí carga en el navegador
+    return { ...item, id, url: `https://lh3.googleusercontent.com/d/${id}=w1000` };
+  });
   const known = new Set<string>();
   for (const item of current) {
     if (item?.id) known.add(String(item.id));
-    if (typeof item?.url === 'string') {
-      const match = item.url.match(/[-\w]{25,}/);
-      if (match) known.add(match[0]);
-    }
+    const fromUrl = driveIdFromUrl(item?.url);
+    if (fromUrl) known.add(fromUrl);
   }
   const nuevos = driveFiles.filter((f) => !known.has(f.id));
   return { galeria: [...current, ...nuevos], added: nuevos.length };
 }
+
 
 export const syncDriveGallery = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
