@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Eleganzza Marketing | Centro de Operaciones" },
-      { name: "description", content: "Centro de operaciones definitivo de Eleganzza Muebles para el área de marketing." },
+      { title: "Eleganzza Marketing | Inventario" },
+      { name: "description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
       { name: "author", content: "Eleganzza Muebles" },
-      { property: "og:title", content: "Eleganzza Marketing | Centro de Operaciones" },
-      { property: "og:description", content: "Gestión de activos, contenido y datos para Eleganzza Muebles." },
+      { property: "og:title", content: "Eleganzza Marketing | Inventario" },
+      { property: "og:description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Eleganzza Marketing | Inventario" },
+      { name: "twitter:description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png" },
     ],
     links: [
       {
