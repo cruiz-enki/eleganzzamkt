@@ -133,7 +133,7 @@ export const uploadToDrive = createServerFn({ method: "POST" })
 
     return {
       id: uploaded.id as string,
-      url: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1000`,
+      url: `https://lh3.googleusercontent.com/d/${uploaded.id}=w1000`,
     };
   });
 
