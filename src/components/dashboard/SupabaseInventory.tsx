@@ -400,6 +400,27 @@ export function SupabaseInventory() {
             <RefreshCcw className="h-3 w-3" />
             Agrupar Categorías
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+            onClick={async () => {
+              const loading = toast.loading("Sincronizando fotos desde Google Drive...");
+              try {
+                const res = await syncAllDriveGalleries();
+                toast.dismiss(loading);
+                toast.success(`${res.fotosAgregadas} fotos nuevas en ${res.productosActualizados} productos`);
+                refetch();
+              } catch (e: any) {
+                toast.dismiss(loading);
+                toast.error(e?.message || "Error al sincronizar con Drive");
+              }
+            }}
+          >
+            <FolderOpen className="h-3 w-3" />
+            Sincronizar Drive
+          </Button>
+
           <Button 
             variant="outline" 
             size="sm" 
