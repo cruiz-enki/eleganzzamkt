@@ -8,6 +8,8 @@ import {
   bulkCleanupCategories,
   updateMuebleStatus,
   bulkDiscontinueMuebles,
+  syncDriveGallery,
+  syncAllDriveGalleries,
   type Mueble 
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
