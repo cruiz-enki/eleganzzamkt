@@ -420,13 +420,15 @@ export const syncDriveGallery = createServerFn({ method: "POST" })
     const driveFiles = await listDriveImages(folderId);
     const { galeria, added } = mergeGaleria(record?.galeria || [], driveFiles);
 
-    if (added > 0) {
+    const cambio = added > 0 || JSON.stringify(galeria) !== JSON.stringify(record?.galeria || []);
+    if (cambio) {
       const { error: updateError } = await supabase
         .from('muebles')
         .update({ galeria })
         .eq('id', data.id);
       if (updateError) throw new Error(updateError.message);
     }
+
 
     return { success: true, added, total: galeria.length };
   });
