@@ -320,6 +320,20 @@ export const bulkCleanupCategories = createServerFn({ method: "POST" })
     return { success: true, updatedCount };
   });
 
+async function makeDrivePublic(fileId: string) {
+  const headers = driveHeaders();
+  if (!headers) return;
+  try {
+    await fetchWithTimeout(
+      `${GOOGLE_DRIVE_GATEWAY}/drive/v3/files/${fileId}/permissions?supportsAllDrives=true`,
+      { method: 'POST', headers, body: JSON.stringify({ role: 'reader', type: 'anyone' }) },
+      15000,
+    );
+  } catch (e) {
+    console.error(`No se pudo hacer pública la imagen ${fileId}:`, e);
+  }
+}
+
 async function listDriveImages(folderId: string): Promise<Array<{ id: string; url: string }>> {
   const headers = driveHeaders();
   if (!headers) throw new Error("Faltan credenciales de Google Drive");
@@ -351,13 +365,19 @@ async function listDriveImages(folderId: string): Promise<Array<{ id: string; ur
 
     const json = await res.json();
     for (const f of (json.files || [])) {
-      results.push({ id: f.id, url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000` });
+      results.push({ id: f.id, url: `https://lh3.googleusercontent.com/d/${f.id}=w1000` });
     }
     pageToken = json.nextPageToken;
   } while (pageToken);
 
+  // Las imágenes que ya estaban en Drive suelen ser privadas: las hacemos visibles por enlace
+  for (const file of results) {
+    await makeDrivePublic(file.id);
+  }
+
   return results;
 }
+
 
 function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: string }>) {
   const current = Array.isArray(existing) ? existing : [];
