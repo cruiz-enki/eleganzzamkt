@@ -133,7 +133,7 @@ export const uploadToDrive = createServerFn({ method: "POST" })
 
     return {
       id: uploaded.id as string,
-      url: `https://drive.google.com/thumbnail?id=${uploaded.id}&sz=w1000`,
+      url: `https://lh3.googleusercontent.com/d/${uploaded.id}=w1000`,
     };
   });
 
@@ -320,6 +320,20 @@ export const bulkCleanupCategories = createServerFn({ method: "POST" })
     return { success: true, updatedCount };
   });
 
+async function makeDrivePublic(fileId: string) {
+  const headers = driveHeaders();
+  if (!headers) return;
+  try {
+    await fetchWithTimeout(
+      `${GOOGLE_DRIVE_GATEWAY}/drive/v3/files/${fileId}/permissions?supportsAllDrives=true`,
+      { method: 'POST', headers, body: JSON.stringify({ role: 'reader', type: 'anyone' }) },
+      15000,
+    );
+  } catch (e) {
+    console.error(`No se pudo hacer pública la imagen ${fileId}:`, e);
+  }
+}
+
 async function listDriveImages(folderId: string): Promise<Array<{ id: string; url: string }>> {
   const headers = driveHeaders();
   if (!headers) throw new Error("Faltan credenciales de Google Drive");
@@ -351,27 +365,43 @@ async function listDriveImages(folderId: string): Promise<Array<{ id: string; ur
 
     const json = await res.json();
     for (const f of (json.files || [])) {
-      results.push({ id: f.id, url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000` });
+      results.push({ id: f.id, url: `https://lh3.googleusercontent.com/d/${f.id}=w1000` });
     }
     pageToken = json.nextPageToken;
   } while (pageToken);
 
+  // Las imágenes que ya estaban en Drive suelen ser privadas: las hacemos visibles por enlace
+  for (const file of results) {
+    await makeDrivePublic(file.id);
+  }
+
   return results;
 }
 
+
+function driveIdFromUrl(url: unknown): string | null {
+  if (typeof url !== 'string') return null;
+  const match = url.match(/[-\w]{25,}/);
+  return match ? match[0] : null;
+}
+
 function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: string }>) {
-  const current = Array.isArray(existing) ? existing : [];
+  const current = (Array.isArray(existing) ? existing : []).map((item) => {
+    const id = item?.id ?? driveIdFromUrl(item?.url);
+    if (!id) return item;
+    // Normalizamos a un formato de imagen que sí carga en el navegador
+    return { ...item, id, url: `https://lh3.googleusercontent.com/d/${id}=w1000` };
+  });
   const known = new Set<string>();
   for (const item of current) {
     if (item?.id) known.add(String(item.id));
-    if (typeof item?.url === 'string') {
-      const match = item.url.match(/[-\w]{25,}/);
-      if (match) known.add(match[0]);
-    }
+    const fromUrl = driveIdFromUrl(item?.url);
+    if (fromUrl) known.add(fromUrl);
   }
   const nuevos = driveFiles.filter((f) => !known.has(f.id));
   return { galeria: [...current, ...nuevos], added: nuevos.length };
 }
+
 
 export const syncDriveGallery = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
@@ -390,13 +420,15 @@ export const syncDriveGallery = createServerFn({ method: "POST" })
     const driveFiles = await listDriveImages(folderId);
     const { galeria, added } = mergeGaleria(record?.galeria || [], driveFiles);
 
-    if (added > 0) {
+    const cambio = added > 0 || JSON.stringify(galeria) !== JSON.stringify(record?.galeria || []);
+    if (cambio) {
       const { error: updateError } = await supabase
         .from('muebles')
         .update({ galeria })
         .eq('id', data.id);
       if (updateError) throw new Error(updateError.message);
     }
+
 
     return { success: true, added, total: galeria.length };
   });
@@ -418,7 +450,8 @@ export const syncAllDriveGalleries = createServerFn({ method: "POST" })
       try {
         const driveFiles = await listDriveImages(folderId);
         const { galeria, added } = mergeGaleria((record as any).galeria || [], driveFiles);
-        if (added > 0) {
+        const cambio = added > 0 || JSON.stringify(galeria) !== JSON.stringify((record as any).galeria || []);
+        if (cambio) {
           const { error: updateError } = await supabase
             .from('muebles')
             .update({ galeria })
@@ -428,6 +461,7 @@ export const syncAllDriveGalleries = createServerFn({ method: "POST" })
             fotosAgregadas += added;
           }
         }
+
       } catch (e) {
         console.error(`Sync failed for ${(record as any).id}:`, e);
       }
