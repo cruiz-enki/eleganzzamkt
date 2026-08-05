@@ -1,7 +1,13 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const FUNCTION_NAME = "woo-sync-product";
-const REQUEST_TIMEOUT_MS = 20000;
+const PRODUCT_REQUEST_TIMEOUT_MS = 20000;
+const IMAGE_REQUEST_TIMEOUT_MS = 120000;
+const MAX_IMAGES_PER_SYNC = 20;
+
+declare const EdgeRuntime: {
+  waitUntil(promise: Promise<unknown>): void;
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,6 +36,8 @@ type WooProductResponse = {
   permalink?: string;
   status?: string;
 };
+
+type WooRequestResult = Awaited<ReturnType<typeof wooRequest>>;
 
 function json(body: JsonRecord, status = 200) {
   return Response.json(body, {
@@ -171,7 +179,7 @@ function collectImages(product: Mueble) {
   for (const image of allImages) {
     const url = imageUrlFrom(image);
     if (url) urls.add(url);
-    if (urls.size >= 10) break;
+    if (urls.size >= MAX_IMAGES_PER_SYNC) break;
   }
 
   return Array.from(urls).map((src, index) => ({
@@ -205,7 +213,6 @@ function buildWooPayload(product: Mueble) {
     regular_price: price !== null ? String(price) : undefined,
     description: buildDescription(product),
     short_description: product.descripcion ?? "",
-    images: collectImages(product),
     manage_stock: false,
     meta_data: [
       { key: "eleganzza_supabase_id", value: product.id },
@@ -217,9 +224,17 @@ function buildWooPayload(product: Mueble) {
   };
 }
 
-async function fetchWithTimeout(url: string, init: RequestInit) {
+function buildWooImagePayload(product: Mueble) {
+  return { images: collectImages(product) };
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = PRODUCT_REQUEST_TIMEOUT_MS,
+) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     return await fetch(url, { ...init, signal: controller.signal });
   } finally {
@@ -227,17 +242,27 @@ async function fetchWithTimeout(url: string, init: RequestInit) {
   }
 }
 
-async function wooRequest(storeUrl: string, credentials: string, path: string, init: RequestInit) {
-  const response = await fetchWithTimeout(`${storeUrl}/wp-json/wc/v3${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Basic ${credentials}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "User-Agent": `${FUNCTION_NAME}/1.0`,
-      ...(init.headers ?? {}),
+async function wooRequest(
+  storeUrl: string,
+  credentials: string,
+  path: string,
+  init: RequestInit,
+  timeoutMs = PRODUCT_REQUEST_TIMEOUT_MS,
+) {
+  const response = await fetchWithTimeout(
+    `${storeUrl}/wp-json/wc/v3${path}`,
+    {
+      ...init,
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": `${FUNCTION_NAME}/1.0`,
+        ...(init.headers ?? {}),
+      },
     },
-  });
+    timeoutMs,
+  );
 
   const contentType = response.headers.get("content-type") ?? "";
   const isJson = contentType.toLowerCase().includes("application/json");
@@ -251,6 +276,108 @@ function mapWooError(status: number) {
   if (status === 403) return "WOOCOMMERCE_FORBIDDEN";
   if (status === 404) return "WOOCOMMERCE_NOT_FOUND";
   return "WOOCOMMERCE_SYNC_FAILED";
+}
+
+function wooErrorMessage(body: unknown, fallback: string) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return fallback;
+
+  const message = (body as JsonRecord)["message"];
+  return typeof message === "string" && message.trim() ? message : fallback;
+}
+
+function isValidWooProduct(body: WooRequestResult["body"]): body is WooProductResponse {
+  return (
+    !!body && typeof body === "object" && !Array.isArray(body) && !!(body as WooProductResponse).id
+  );
+}
+
+async function updateWooImageSyncStatus(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  productId: string,
+  status: "pending" | "synced" | "failed" | "skipped",
+  message: string,
+) {
+  const { data } = await supabaseAdmin
+    .from("muebles")
+    .select("detalles")
+    .eq("id", productId)
+    .single();
+  const details = asDetails(data?.detalles);
+  const woocommerce = asDetails(details["woocommerce"]);
+
+  await supabaseAdmin
+    .from("muebles")
+    .update({
+      detalles: {
+        ...details,
+        woocommerce: {
+          ...woocommerce,
+          imageSyncStatus: status,
+          imageSyncMessage: message,
+          imageSyncedAt: new Date().toISOString(),
+        },
+      },
+    })
+    .eq("id", productId);
+}
+
+async function syncImagesInBackground(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  storeUrl: string,
+  credentials: string,
+  productId: string,
+  wooProductId: number,
+  product: Mueble,
+) {
+  const images = buildWooImagePayload(product).images;
+  if (images.length === 0) {
+    await updateWooImageSyncStatus(
+      supabaseAdmin,
+      productId,
+      "skipped",
+      "El producto no tiene imágenes",
+    );
+    return;
+  }
+
+  try {
+    const imageResult = await wooRequest(
+      storeUrl,
+      credentials,
+      `/products/${wooProductId}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ images }),
+      },
+      IMAGE_REQUEST_TIMEOUT_MS,
+    );
+
+    if (imageResult.response.ok && isValidWooProduct(imageResult.body)) {
+      await updateWooImageSyncStatus(
+        supabaseAdmin,
+        productId,
+        "synced",
+        `${images.length} imagen(es) sincronizada(s)`,
+      );
+      return;
+    }
+
+    await updateWooImageSyncStatus(
+      supabaseAdmin,
+      productId,
+      "failed",
+      wooErrorMessage(imageResult.body, "WooCommerce no pudo importar las imágenes"),
+    );
+  } catch (error) {
+    await updateWooImageSyncStatus(
+      supabaseAdmin,
+      productId,
+      "failed",
+      error instanceof DOMException && error.name === "AbortError"
+        ? "WooCommerce tardó demasiado importando imágenes"
+        : "No fue posible conectar con WooCommerce para importar imágenes",
+    );
+  }
 }
 
 Deno.serve(async (req) => {
@@ -333,11 +460,11 @@ Deno.serve(async (req) => {
         mapWooError(response.status),
         response.status === 401 || response.status === 403
           ? "WooCommerce rechazó la sincronización. Revisa permisos de la clave REST"
-          : "WooCommerce respondió con un error al sincronizar el producto",
+          : wooErrorMessage(body, "WooCommerce respondió con un error al sincronizar el producto"),
       );
     }
 
-    if (!body || typeof body !== "object" || Array.isArray(body)) {
+    if (!isValidWooProduct(body)) {
       return errorResponse(
         502,
         "WOOCOMMERCE_INVALID_RESPONSE",
@@ -345,14 +472,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    const wooProduct = body as WooProductResponse;
-    if (!wooProduct.id) {
-      return errorResponse(
-        502,
-        "WOOCOMMERCE_INVALID_RESPONSE",
-        "WooCommerce no devolvió el ID del producto",
-      );
-    }
+    const wooProduct = body;
+    const images = buildWooImagePayload(mueble).images;
+    const imageSyncStatus: "pending" | "skipped" = images.length > 0 ? "pending" : "skipped";
+    const imageSyncMessage =
+      images.length > 0
+        ? `Importando ${images.length} imagen(es) en segundo plano`
+        : "El producto no tiene imágenes";
 
     const nextDetails = {
       ...details,
@@ -363,6 +489,8 @@ Deno.serve(async (req) => {
         status: wooProduct.status ?? payload.status,
         lastSyncedAt: syncedAt,
         lastSyncAction: existingWooId ? "updated" : "created",
+        imageSyncStatus,
+        imageSyncMessage,
       },
     };
 
@@ -379,6 +507,19 @@ Deno.serve(async (req) => {
       );
     }
 
+    if (images.length > 0) {
+      EdgeRuntime.waitUntil(
+        syncImagesInBackground(
+          supabaseAdmin,
+          storeUrl,
+          credentials,
+          productId,
+          wooProduct.id,
+          mueble,
+        ),
+      );
+    }
+
     return json({
       success: true,
       status: response.status,
@@ -386,9 +527,16 @@ Deno.serve(async (req) => {
       productId,
       wooProductId: wooProduct.id,
       permalink: wooProduct.permalink ?? null,
-      message: existingWooId
-        ? "Producto actualizado en WooCommerce"
-        : "Producto creado en WooCommerce como borrador",
+      imageSyncStatus,
+      imageSyncMessage,
+      message:
+        images.length > 0
+          ? existingWooId
+            ? `Producto actualizado en WooCommerce. ${imageSyncMessage}`
+            : `Producto creado en WooCommerce como borrador. ${imageSyncMessage}`
+          : existingWooId
+            ? "Producto actualizado en WooCommerce"
+            : "Producto creado en WooCommerce como borrador",
       syncedAt,
     });
   } catch (error) {

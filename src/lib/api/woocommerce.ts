@@ -27,6 +27,8 @@ export type WooProductSyncSuccess = {
   productId: string;
   wooProductId: number;
   permalink: string | null;
+  imageSyncStatus?: "pending" | "skipped" | "synced" | "failed";
+  imageSyncMessage?: string;
   message: string;
   syncedAt: string;
 };
@@ -83,6 +85,35 @@ function isProductSyncFailurePayload(
   );
 }
 
+async function readFunctionFailure(error: unknown): Promise<WooProductSyncFailure | null> {
+  const context =
+    typeof error === "object" && error ? (error as { context?: unknown }).context : null;
+  if (!(context instanceof Response)) return null;
+
+  const payload = (await context.json().catch(() => null)) as ProductSyncPayload & {
+    code?: string;
+  };
+  if (isProductSyncFailurePayload(payload)) return payload;
+
+  const message =
+    typeof payload?.message === "string" ? payload.message : "No fue posible autenticar la sesión";
+  const code = typeof payload?.code === "string" ? payload.code : "WOOCOMMERCE_FUNCTION_ERROR";
+
+  return {
+    success: false,
+    status: context.status,
+    errorCode:
+      context.status === 401 || code.includes("AUTH")
+        ? "WOOCOMMERCE_AUTH_REQUIRED"
+        : "WOOCOMMERCE_FUNCTION_ERROR",
+    message:
+      context.status === 401
+        ? "Inicia sesión en Supabase antes de sincronizar productos con WooCommerce"
+        : message,
+    syncedAt: new Date().toISOString(),
+  };
+}
+
 export async function testWooCommerceConnection(): Promise<WooConnectionResult> {
   const { data, error } =
     await supabase.functions.invoke<WooConnectionResult>("woo-test-connection");
@@ -108,6 +139,8 @@ export async function syncProductToWooCommerce(productId: string): Promise<WooPr
 
   if (error) {
     if (isProductSyncFailurePayload(data)) return data;
+    const functionFailure = await readFunctionFailure(error);
+    if (functionFailure) return functionFailure;
 
     return {
       success: false,
