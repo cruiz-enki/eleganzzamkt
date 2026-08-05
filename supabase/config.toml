@@ -1,3 +1,21 @@
+[auth]
+site_url = "https://eleganzzamkt.vercel.app"
+additional_redirect_urls = [
+  "https://eleganzzamkt.vercel.app",
+  "https://eleganzzamkt.vercel.app/**",
+  "http://localhost:5173/**",
+  "http://localhost:3000/**",
+]
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.email]
+enable_confirmations = true
+max_frequency = "1s"
+otp_length = 8
+
 [functions.woo-test-connection]
 verify_jwt = true
 
