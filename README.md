@@ -71,3 +71,7 @@ función con:
 ```sh
 supabase functions deploy woo-test-connection
 ```
+
+En la app, entra a **Configuración → Integración con WooCommerce**, envía el
+enlace de acceso al correo administrador y vuelve desde ese enlace para que el
+navegador tenga una sesión Supabase antes de probar la conexión.
