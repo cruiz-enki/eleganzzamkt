@@ -82,14 +82,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
       { name: "author", content: "Eleganzza Muebles" },
       { property: "og:title", content: "Eleganzza Marketing | Inventario" },
-      { property: "og:description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
+      {
+        property: "og:description",
+        content: "Centro de operaciones e inventario de Eleganzza Muebles.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "theme-color", content: "#7f1d1d" },
       { name: "twitter:title", content: "Eleganzza Marketing | Inventario" },
-      { name: "twitter:description", content: "Centro de operaciones e inventario de Eleganzza Muebles." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png" },
+      {
+        name: "twitter:description",
+        content: "Centro de operaciones e inventario de Eleganzza Muebles.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/239b0428-dd95-4768-b845-97edb9f1b576/id-preview-8660972f--8ddcb816-e674-4695-b60a-0c200f9ac7f0.lovable.app-1785814227875.png",
+      },
     ],
     links: [
       {
@@ -97,6 +112,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
