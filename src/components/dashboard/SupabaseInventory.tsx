@@ -70,6 +70,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase-client";
+import { getDisplayImageUrl, getFirstDisplayImageUrl } from "@/lib/image-url";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -385,11 +386,11 @@ export function SupabaseInventory() {
   const lightboxSlides = useMemo(() => {
     return processedRecords.map((record) => {
       const photos = [...(record.galeria || []), ...(record.fotos || [])];
+      const imageUrl = getFirstDisplayImageUrl(photos);
       return {
         src:
-          photos.length > 0
-            ? photos[0].url
-            : "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800",
+          imageUrl ||
+          "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800",
         title: record.nombre,
         description: `${record.categoria} - ${record.precio ? currency.format(record.precio) : ""}`,
         record: record, // Pasamos el registro completo para poder editarlo
@@ -989,13 +990,20 @@ export function SupabaseInventory() {
                               if (slideIndex !== -1) setLightboxIndex(slideIndex);
                             }}
                           >
-                            {record.fotos &&
-                            Array.isArray(record.fotos) &&
-                            (record.fotos[0] as any)?.url ? (
+                            {getFirstDisplayImageUrl([
+                              ...(record.galeria || []),
+                              ...(record.fotos || []),
+                            ]) ? (
                               <img
-                                src={(record.fotos[0] as any).url}
+                                src={getFirstDisplayImageUrl([
+                                  ...(record.galeria || []),
+                                  ...(record.fotos || []),
+                                ])}
                                 alt=""
                                 className="w-full h-full object-cover"
+                                onError={(event) => {
+                                  event.currentTarget.style.display = "none";
+                                }}
                               />
                             ) : (
                               <Package className="w-5 h-5 text-slate-400" />
@@ -1184,6 +1192,7 @@ export function SupabaseInventory() {
             <Masonry columns={{ 640: 1, 768: 2, 1024: 3, 1280: 4 }} gap={16}>
               {processedRecords.map((record) => {
                 const photos = [...(record.galeria || []), ...(record.fotos || [])];
+                const imageUrl = getFirstDisplayImageUrl(photos);
                 return (
                   <div
                     key={record.id}
@@ -1191,11 +1200,14 @@ export function SupabaseInventory() {
                     onClick={() => setSelectedRecord(record)}
                   >
                     <div className="relative aspect-auto min-h-[200px] bg-slate-50">
-                      {photos.length > 0 ? (
+                      {imageUrl ? (
                         <img
-                          src={photos[0].url}
+                          src={imageUrl}
                           alt={record.nombre}
                           className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
                           onClick={(e) => {
                             e.stopPropagation();
                             const slideIndex = lightboxSlides.findIndex(
@@ -1340,7 +1352,7 @@ export function SupabaseInventory() {
                       <div className="flex flex-col gap-2 p-2">
                         {[...(selectedRecord.galeria || []), ...(selectedRecord.fotos || [])].map(
                           (photo: any, i: number) => {
-                            const url = photo.url;
+                            const url = getDisplayImageUrl(photo);
                             if (!url) return null;
                             return (
                               <div
@@ -1351,6 +1363,9 @@ export function SupabaseInventory() {
                                   src={url}
                                   alt={`${selectedRecord.nombre} ${i + 1}`}
                                   className="w-full"
+                                  onError={(event) => {
+                                    event.currentTarget.style.display = "none";
+                                  }}
                                 />
                                 <div className="absolute top-2 right-2 z-10">
                                   <Button
@@ -1683,7 +1698,14 @@ export function SupabaseInventory() {
                         key={idx}
                         className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group"
                       >
-                        <img src={f.url} alt="" className="w-full h-full object-cover" />
+                        <img
+                          src={getDisplayImageUrl(f)}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
                         <button
                           type="button"
                           onClick={() => {
