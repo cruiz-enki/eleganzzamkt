@@ -2,6 +2,7 @@
 site_url = "https://eleganzzamkt.vercel.app"
 additional_redirect_urls = [
   "https://eleganzzamkt.vercel.app",
+  "https://eleganzzamkt.vercel.app?auth_action=recovery",
   "https://eleganzzamkt.vercel.app/**",
   "http://localhost:5173/**",
   "http://localhost:3000/**",

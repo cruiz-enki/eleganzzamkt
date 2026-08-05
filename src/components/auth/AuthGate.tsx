@@ -31,6 +31,26 @@ function getAuthRedirectUrl() {
   return isLocalhost ? PRODUCTION_APP_URL : window.location.origin;
 }
 
+function getPasswordRecoveryRedirectUrl() {
+  const redirectUrl = new URL(getAuthRedirectUrl());
+  redirectUrl.searchParams.set("auth_action", "recovery");
+  return redirectUrl.toString();
+}
+
+function isPasswordRecoveryRedirect() {
+  if (typeof window === "undefined") return false;
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+
+  return (
+    searchParams.get("auth_action") === "recovery" ||
+    searchParams.get("type") === "recovery" ||
+    hashParams.get("auth_action") === "recovery" ||
+    hashParams.get("type") === "recovery"
+  );
+}
+
 export function AuthGate({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [email, setEmail] = useState(ALLOWED_EMAIL);
@@ -41,16 +61,20 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSendingRecovery, setIsSendingRecovery] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-  const [isRecoveryMode, setIsRecoveryMode] = useState(false);
+  const [isRecoveryMode, setIsRecoveryMode] = useState(isPasswordRecoveryRedirect);
 
   const isAllowed = useMemo(() => isAllowedSession(session), [session]);
   const signedEmail = normalizeEmail(session?.user.email);
 
   useEffect(() => {
     let mounted = true;
+    const startedFromPasswordRecovery = isPasswordRecoveryRedirect();
 
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
+      if (startedFromPasswordRecovery && data.session) {
+        setIsRecoveryMode(true);
+      }
       setSession(data.session);
       setIsLoadingSession(false);
     });
@@ -129,7 +153,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     setIsSendingRecovery(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: getAuthRedirectUrl(),
+        redirectTo: getPasswordRecoveryRedirectUrl(),
       });
 
       if (error) throw error;
@@ -166,6 +190,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setNewPassword("");
       setConfirmPassword("");
       setIsRecoveryMode(false);
+      window.history.replaceState({}, document.title, window.location.pathname);
       toast.success("Contraseña actualizada. Tu sesión quedó iniciada.");
     } catch (error) {
       const message =
