@@ -1,2 +1,5 @@
 [functions.woo-test-connection]
 verify_jwt = true
+
+[functions.woo-sync-product]
+verify_jwt = true

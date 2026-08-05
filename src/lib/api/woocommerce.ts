@@ -20,7 +20,29 @@ export type WooConnectionFailure = {
 
 export type WooConnectionResult = WooConnectionSuccess | WooConnectionFailure;
 
+export type WooProductSyncSuccess = {
+  success: true;
+  status: number;
+  action: "created" | "updated";
+  productId: string;
+  wooProductId: number;
+  permalink: string | null;
+  message: string;
+  syncedAt: string;
+};
+
+export type WooProductSyncFailure = {
+  success: false;
+  status: number;
+  errorCode: string;
+  message: string;
+  syncedAt: string;
+};
+
+export type WooProductSyncResult = WooProductSyncSuccess | WooProductSyncFailure;
+
 type FunctionPayload = Partial<WooConnectionResult> | null | undefined;
+type ProductSyncPayload = Partial<WooProductSyncResult> | null | undefined;
 
 function isFailurePayload(payload: FunctionPayload): payload is WooConnectionFailure {
   return (
@@ -49,6 +71,18 @@ export function transformWooConnectionError(error: unknown, payload?: FunctionPa
   } satisfies WooConnectionFailure;
 }
 
+function isProductSyncFailurePayload(
+  payload: ProductSyncPayload,
+): payload is WooProductSyncFailure {
+  return (
+    payload?.success === false &&
+    typeof payload.status === "number" &&
+    typeof payload.errorCode === "string" &&
+    typeof payload.message === "string" &&
+    typeof payload.syncedAt === "string"
+  );
+}
+
 export async function testWooCommerceConnection(): Promise<WooConnectionResult> {
   const { data, error } =
     await supabase.functions.invoke<WooConnectionResult>("woo-test-connection");
@@ -59,6 +93,39 @@ export async function testWooCommerceConnection(): Promise<WooConnectionResult> 
 
   if (!data) {
     return transformWooConnectionError(new Error("Empty function response"));
+  }
+
+  return data;
+}
+
+export async function syncProductToWooCommerce(productId: string): Promise<WooProductSyncResult> {
+  const { data, error } = await supabase.functions.invoke<WooProductSyncResult>(
+    "woo-sync-product",
+    {
+      body: { productId },
+    },
+  );
+
+  if (error) {
+    if (isProductSyncFailurePayload(data)) return data;
+
+    return {
+      success: false,
+      status: 500,
+      errorCode: "WOOCOMMERCE_FUNCTION_ERROR",
+      message: "No fue posible ejecutar la sincronización con WooCommerce",
+      syncedAt: new Date().toISOString(),
+    };
+  }
+
+  if (!data) {
+    return {
+      success: false,
+      status: 500,
+      errorCode: "WOOCOMMERCE_EMPTY_RESPONSE",
+      message: "WooCommerce no devolvió respuesta de sincronización",
+      syncedAt: new Date().toISOString(),
+    };
   }
 
   return data;
