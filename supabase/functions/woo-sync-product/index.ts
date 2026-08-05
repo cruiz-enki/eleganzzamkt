@@ -37,6 +37,11 @@ type WooProductResponse = {
   status?: string;
 };
 
+type WooCategoryResponse = {
+  id?: number;
+  name?: string;
+};
+
 type WooRequestResult = Awaited<ReturnType<typeof wooRequest>>;
 
 function json(body: JsonRecord, status = 200) {
@@ -161,32 +166,51 @@ function getExistingWooId(details: JsonRecord) {
   return parsed && parsed > 0 ? Math.trunc(parsed) : null;
 }
 
-function imageUrlFrom(value: unknown): string | null {
+function imageFrom(
+  value: unknown,
+  supabaseUrl: string,
+): { src: string; sourceId: string | null } | null {
   if (!value || typeof value !== "object") return null;
+  const id = (value as JsonRecord)["id"];
   const url = (value as JsonRecord)["url"];
-  if (typeof url !== "string") return null;
+
+  if (typeof id === "string" && /^[A-Za-z0-9_-]{10,}$/.test(id)) {
+    return {
+      src: `${supabaseUrl}/functions/v1/woo-image-proxy/${id}.jpg`,
+      sourceId: id,
+    };
+  }
+
+  if (typeof url !== "string" || !/\.(jpe?g|png|webp)(\?|$)/i.test(url)) return null;
+
   try {
     const parsed = new URL(url);
-    return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
+    return ["http:", "https:"].includes(parsed.protocol)
+      ? { src: parsed.toString(), sourceId: null }
+      : null;
   } catch {
     return null;
   }
 }
 
-function collectImages(product: Mueble) {
+function collectImages(product: Mueble, supabaseUrl: string) {
   const urls = new Set<string>();
+  const images: Array<{ src: string; name: string; alt: string }> = [];
   const allImages = [...(product.galeria ?? []), ...(product.fotos ?? [])];
   for (const image of allImages) {
-    const url = imageUrlFrom(image);
-    if (url) urls.add(url);
-    if (urls.size >= MAX_IMAGES_PER_SYNC) break;
+    const nextImage = imageFrom(image, supabaseUrl);
+    if (!nextImage || urls.has(nextImage.src)) continue;
+
+    urls.add(nextImage.src);
+    images.push({
+      src: nextImage.src,
+      name: `${product.nombre} ${images.length + 1}.jpg`,
+      alt: product.nombre,
+    });
+    if (images.length >= MAX_IMAGES_PER_SYNC) break;
   }
 
-  return Array.from(urls).map((src, index) => ({
-    src,
-    name: `${product.nombre} ${index + 1}`,
-    alt: product.nombre,
-  }));
+  return images;
 }
 
 function buildDescription(product: Mueble) {
@@ -199,7 +223,7 @@ function buildDescription(product: Mueble) {
   return rows.join("\n\n");
 }
 
-function buildWooPayload(product: Mueble) {
+function buildWooPayload(product: Mueble, wooCategoryId: number | null) {
   const price = asNumber(product.precio);
   const details = asDetails(product.detalles);
   const currentWoo = asDetails(details["woocommerce"]);
@@ -213,6 +237,7 @@ function buildWooPayload(product: Mueble) {
     regular_price: price !== null ? String(price) : undefined,
     description: buildDescription(product),
     short_description: product.descripcion ?? "",
+    categories: wooCategoryId ? [{ id: wooCategoryId }] : undefined,
     manage_stock: false,
     meta_data: [
       { key: "eleganzza_supabase_id", value: product.id },
@@ -224,8 +249,8 @@ function buildWooPayload(product: Mueble) {
   };
 }
 
-function buildWooImagePayload(product: Mueble) {
-  return { images: collectImages(product) };
+function buildWooImagePayload(product: Mueble, supabaseUrl: string) {
+  return { images: collectImages(product, supabaseUrl) };
 }
 
 async function fetchWithTimeout(
@@ -291,6 +316,53 @@ function isValidWooProduct(body: WooRequestResult["body"]): body is WooProductRe
   );
 }
 
+function normalizeName(value: string) {
+  return value.trim().toLocaleLowerCase("es-MX");
+}
+
+async function ensureWooCategory(
+  storeUrl: string,
+  credentials: string,
+  categoryName: string | null,
+) {
+  const name = categoryName?.trim();
+  if (!name) return null;
+
+  const searchResult = await wooRequest(
+    storeUrl,
+    credentials,
+    `/products/categories?search=${encodeURIComponent(name)}&per_page=100`,
+    { method: "GET" },
+  );
+
+  if (!searchResult.response.ok || !Array.isArray(searchResult.body)) {
+    throw new Error(
+      wooErrorMessage(searchResult.body, "WooCommerce no permitió buscar categorías"),
+    );
+  }
+
+  const existing = (searchResult.body as WooCategoryResponse[]).find(
+    (category) =>
+      typeof category.name === "string" && normalizeName(category.name) === normalizeName(name),
+  );
+  if (existing?.id) return existing.id;
+
+  const createResult = await wooRequest(storeUrl, credentials, "/products/categories", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+
+  if (!createResult.response.ok || !createResult.body || Array.isArray(createResult.body)) {
+    throw new Error(
+      wooErrorMessage(createResult.body, "WooCommerce no permitió crear la categoría"),
+    );
+  }
+
+  const created = createResult.body as WooCategoryResponse;
+  if (!created.id) throw new Error("WooCommerce no devolvió el ID de la categoría");
+  return created.id;
+}
+
 async function updateWooImageSyncStatus(
   supabaseAdmin: ReturnType<typeof createClient>,
   productId: string,
@@ -323,13 +395,14 @@ async function updateWooImageSyncStatus(
 
 async function syncImagesInBackground(
   supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseUrl: string,
   storeUrl: string,
   credentials: string,
   productId: string,
   wooProductId: number,
   product: Mueble,
 ) {
-  const images = buildWooImagePayload(product).images;
+  const images = buildWooImagePayload(product, supabaseUrl).images;
   if (images.length === 0) {
     await updateWooImageSyncStatus(
       supabaseAdmin,
@@ -442,11 +515,24 @@ Deno.serve(async (req) => {
 
   const details = asDetails(mueble.detalles);
   const existingWooId = getExistingWooId(details);
-  const payload = buildWooPayload(mueble);
   const credentials = btoa(`${consumerKey}:${consumerSecret}`);
   const syncedAt = new Date().toISOString();
 
   try {
+    let wooCategoryId: number | null = null;
+    try {
+      wooCategoryId = await ensureWooCategory(storeUrl, credentials, mueble.categoria);
+    } catch (categoryError) {
+      return errorResponse(
+        502,
+        "WOOCOMMERCE_CATEGORY_SYNC_FAILED",
+        categoryError instanceof Error
+          ? categoryError.message
+          : "No fue posible sincronizar la categoría con WooCommerce",
+      );
+    }
+
+    const payload = buildWooPayload(mueble, wooCategoryId);
     const path = existingWooId ? `/products/${existingWooId}` : "/products";
     const method = existingWooId ? "PUT" : "POST";
     const { response, body } = await wooRequest(storeUrl, credentials, path, {
@@ -473,7 +559,7 @@ Deno.serve(async (req) => {
     }
 
     const wooProduct = body;
-    const images = buildWooImagePayload(mueble).images;
+    const images = buildWooImagePayload(mueble, supabaseUrl).images;
     const imageSyncStatus: "pending" | "skipped" = images.length > 0 ? "pending" : "skipped";
     const imageSyncMessage =
       images.length > 0
@@ -491,6 +577,8 @@ Deno.serve(async (req) => {
         lastSyncAction: existingWooId ? "updated" : "created",
         imageSyncStatus,
         imageSyncMessage,
+        categoryId: wooCategoryId,
+        categoryName: mueble.categoria ?? null,
       },
     };
 
@@ -511,6 +599,7 @@ Deno.serve(async (req) => {
       EdgeRuntime.waitUntil(
         syncImagesInBackground(
           supabaseAdmin,
+          supabaseUrl,
           storeUrl,
           credentials,
           productId,
