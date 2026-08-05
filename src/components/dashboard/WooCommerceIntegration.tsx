@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { Session } from "@supabase/supabase-js";
-import { CheckCircle2, Loader2, LogOut, PlugZap, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, PlugZap, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWooCommerceConnection } from "@/hooks/use-woocommerce-connection";
-import { supabase } from "@/lib/supabase-client";
 import type { WooConnectionResult, WooConnectionStatus } from "@/lib/api/woocommerce";
 
 const STORAGE_KEY = "eleganzza_woocommerce_connection";
@@ -30,9 +28,6 @@ function getStatusLabel(status: WooConnectionStatus) {
 
 export function WooCommerceIntegration() {
   const [lastResult, setLastResult] = useState<WooConnectionResult | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [authEmail, setAuthEmail] = useState("cruiz@enkisoluciones.mx");
-  const [isSendingLink, setIsSendingLink] = useState(false);
   const connection = useWooCommerceConnection();
 
   useEffect(() => {
@@ -46,31 +41,12 @@ export function WooCommerceIntegration() {
     }
   }, []);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user.email) setAuthEmail(data.session.user.email);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      if (nextSession?.user.email) setAuthEmail(nextSession.user.email);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
   const status = useMemo<WooConnectionStatus>(() => {
     if (!lastResult) return "untested";
     return lastResult.success ? "connected" : "error";
   }, [lastResult]);
 
   const handleTestConnection = async () => {
-    if (!session) {
-      toast.error("Inicia sesión en Supabase antes de probar WooCommerce");
-      return;
-    }
-
     const result = await connection.mutateAsync();
     setLastResult(result);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
@@ -80,38 +56,6 @@ export function WooCommerceIntegration() {
     } else {
       toast.error(result.message);
     }
-  };
-
-  const handleSendAccessLink = async () => {
-    const email = authEmail.trim();
-    if (!email) {
-      toast.error("Ingresa un correo para recibir el enlace de acceso");
-      return;
-    }
-
-    setIsSendingLink(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
-
-      if (error) throw error;
-      toast.success("Enlace de acceso enviado");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo enviar el enlace";
-      toast.error(message);
-    } finally {
-      setIsSendingLink(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    toast.success("Sesión cerrada");
   };
 
   const storeUrl = lastResult?.success ? lastResult.storeUrl : "";
@@ -142,48 +86,6 @@ export function WooCommerceIntegration() {
         </div>
       </CardHeader>
       <CardContent className="space-y-5 pt-6">
-        <div className="rounded-md border border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-950/40">
-          {session ? (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Sesión Supabase
-                </p>
-                <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {session.user.email}
-                </p>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Cerrar sesión
-              </Button>
-            </div>
-          ) : (
-            <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Correo administrador
-                </Label>
-                <Input
-                  type="email"
-                  value={authEmail}
-                  onChange={(event) => setAuthEmail(event.target.value)}
-                />
-              </div>
-              <Button variant="outline" onClick={handleSendAccessLink} disabled={isSendingLink}>
-                {isSendingLink ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Enviando
-                  </>
-                ) : (
-                  "Enviar enlace de acceso"
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
-
         <div className="grid gap-4 md:grid-cols-[1fr_220px]">
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -221,7 +123,7 @@ export function WooCommerceIntegration() {
 
         <Button
           onClick={handleTestConnection}
-          disabled={connection.isPending || !session}
+          disabled={connection.isPending}
           className="bg-slate-900 text-white"
         >
           {connection.isPending ? (

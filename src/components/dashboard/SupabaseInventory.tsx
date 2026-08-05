@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import type { Session } from "@supabase/supabase-js";
 import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getSupabaseInventory,
@@ -53,7 +52,6 @@ import {
   CheckCircle2,
   Clock,
   Archive,
-  LogOut,
 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import {
@@ -69,7 +67,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase-client";
 import { getDisplayImageUrl, getFirstDisplayImageUrl } from "@/lib/image-url";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
@@ -102,9 +99,6 @@ export function SupabaseInventory() {
   const [isAdding, setIsAdding] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [session, setSession] = useState<Session | null>(null);
-  const [authEmail, setAuthEmail] = useState("cruiz@enkisoluciones.mx");
-  const [isSendingLink, setIsSendingLink] = useState(false);
 
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
@@ -133,20 +127,6 @@ export function SupabaseInventory() {
     queryKey: ["supabase-inventory"],
     queryFn: () => getSupabaseInventory(),
   });
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user.email) setAuthEmail(data.session.user.email);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      if (nextSession?.user.email) setAuthEmail(nextSession.user.email);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
 
   const upsertMutation = useMutation({
     mutationFn: async (data: Partial<Mueble>) => {
@@ -261,11 +241,6 @@ export function SupabaseInventory() {
   });
 
   const handleSyncWooCommerce = async (record: Mueble) => {
-    if (!session) {
-      toast.error("Inicia sesión en Supabase antes de sincronizar productos con WooCommerce");
-      return;
-    }
-
     const wooProductId = record.detalles?.woocommerce?.productId;
     const action = wooProductId ? "actualizar" : "crear";
     const message = wooProductId
@@ -299,38 +274,6 @@ export function SupabaseInventory() {
         error instanceof Error ? error.message : "Error al sincronizar WooCommerce";
       toast.error(errorMessage);
     }
-  };
-
-  const handleSendAccessLink = async () => {
-    const email = authEmail.trim();
-    if (!email) {
-      toast.error("Ingresa un correo para recibir el enlace de acceso");
-      return;
-    }
-
-    setIsSendingLink(true);
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
-
-      if (error) throw error;
-      toast.success("Enlace de acceso enviado. Abre tu correo y confirma el acceso.");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "No se pudo enviar el enlace";
-      toast.error(message);
-    } finally {
-      setIsSendingLink(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    toast.success("Sesión Supabase cerrada");
   };
 
   const categories = useMemo(() => {
@@ -527,50 +470,6 @@ export function SupabaseInventory() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950/60">
-        {session ? (
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Sesión Supabase para WooCommerce
-              </p>
-              <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
-                {session.user.email}
-              </p>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Cerrar sesión
-            </Button>
-          </div>
-        ) : (
-          <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Acceso requerido para enviar productos a WooCommerce
-              </Label>
-              <Input
-                type="email"
-                value={authEmail}
-                onChange={(event) => setAuthEmail(event.target.value)}
-                placeholder="correo administrador"
-                className="bg-white dark:bg-slate-900"
-              />
-            </div>
-            <Button variant="outline" onClick={handleSendAccessLink} disabled={isSendingLink}>
-              {isSendingLink ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando
-                </>
-              ) : (
-                "Enviar enlace de acceso"
-              )}
-            </Button>
-          </div>
-        )}
-      </div>
-
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 mr-auto">
           <Button
