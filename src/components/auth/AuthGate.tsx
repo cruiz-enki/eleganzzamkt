@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { Loader2, LogOut, Mail, ShieldCheck } from "lucide-react";
+import { KeyRound, Loader2, LogOut, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,9 @@ function isAllowedSession(session: Session | null) {
 export function AuthGate({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [email, setEmail] = useState(ALLOWED_EMAIL);
+  const [password, setPassword] = useState("");
   const [isLoadingSession, setIsLoadingSession] = useState(true);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSendingLink, setIsSendingLink] = useState(false);
 
   const isAllowed = useMemo(() => isAllowedSession(session), [session]);
@@ -54,6 +56,45 @@ export function AuthGate({ children }: { children: ReactNode }) {
       toast.error("Esta aplicación solo está habilitada para cruiz@enkisoluciones.mx");
     });
   }, [isAllowed, session]);
+
+  const handlePasswordSignIn = async () => {
+    const normalizedEmail = normalizeEmail(email);
+
+    if (normalizedEmail !== ALLOWED_EMAIL) {
+      toast.error("Solo cruiz@enkisoluciones.mx puede acceder a esta aplicación");
+      return;
+    }
+
+    if (!password) {
+      toast.error("Ingresa tu contraseña");
+      return;
+    }
+
+    setIsSigningIn(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (!isAllowedSession(data.session)) {
+        await supabase.auth.signOut();
+        setSession(null);
+        toast.error("Esta aplicación solo está habilitada para cruiz@enkisoluciones.mx");
+        return;
+      }
+
+      setPassword("");
+      toast.success("Sesión iniciada");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "No fue posible iniciar sesión";
+      toast.error(message);
+    } finally {
+      setIsSigningIn(false);
+    }
+  };
 
   const handleSendAccessLink = async () => {
     const normalizedEmail = normalizeEmail(email);
@@ -144,15 +185,50 @@ export function AuthGate({ children }: { children: ReactNode }) {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") void handleSendAccessLink();
+                if (event.key === "Enter") void handlePasswordSignIn();
+              }}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="auth-password" className="text-xs font-bold uppercase tracking-wider">
+              Contraseña
+            </Label>
+            <Input
+              id="auth-password"
+              type="password"
+              value={password}
+              autoComplete="current-password"
+              onChange={(event) => setPassword(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") void handlePasswordSignIn();
               }}
             />
           </div>
 
           <Button
             className="w-full bg-slate-900 text-white hover:bg-slate-800"
+            onClick={handlePasswordSignIn}
+            disabled={isSigningIn}
+          >
+            {isSigningIn ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Entrando
+              </>
+            ) : (
+              <>
+                <KeyRound className="mr-2 h-4 w-4" />
+                Entrar con contraseña
+              </>
+            )}
+          </Button>
+
+          <Button
+            variant="ghost"
+            className="w-full"
             onClick={handleSendAccessLink}
-            disabled={isSendingLink}
+            disabled={isSendingLink || isSigningIn}
           >
             {isSendingLink ? (
               <>
@@ -169,7 +245,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
         </div>
 
         <p className="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
-          Después de abrir el enlace desde tu correo, la sesión quedará guardada en este navegador.
+          La sesión quedará guardada en este navegador. Usa el enlace por correo solo si necesitas
+          recuperar el acceso.
         </p>
       </div>
     </div>
