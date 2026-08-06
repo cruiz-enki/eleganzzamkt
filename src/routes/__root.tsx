@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -141,13 +142,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isPublicCatalog = pathname.startsWith("/catalogo/");
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthGate>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      {isPublicCatalog ? (
         <Outlet />
-      </AuthGate>
+      ) : (
+        <AuthGate>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </AuthGate>
+      )}
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
   );
