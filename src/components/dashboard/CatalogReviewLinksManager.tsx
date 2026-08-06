@@ -66,7 +66,7 @@ function productStatus(detalles: unknown) {
     const status = (detalles as { status?: unknown }).status;
     if (typeof status === "string") return status;
   }
-  return "draft";
+  return "published";
 }
 
 export function CatalogReviewLinksManager() {

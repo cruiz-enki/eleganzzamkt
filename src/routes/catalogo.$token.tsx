@@ -82,7 +82,7 @@ const actionConfig: Record<
 
 function productStatus(product: CatalogReviewProduct) {
   const status = product.detalles?.status;
-  return typeof status === "string" ? status : "draft";
+  return typeof status === "string" ? status : "published";
 }
 
 function statusLabel(status: string) {

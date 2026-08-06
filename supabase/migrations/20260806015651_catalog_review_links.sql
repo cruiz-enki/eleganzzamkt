@@ -176,7 +176,7 @@ begin
     and (
       not (v_filters ? 'statuses')
       or jsonb_array_length(coalesce(v_filters -> 'statuses', '[]'::jsonb)) = 0
-      or coalesce(m.detalles ->> 'status', 'draft') in (
+      or coalesce(m.detalles ->> 'status', 'published') in (
         select jsonb_array_elements_text(coalesce(v_filters -> 'statuses', '[]'::jsonb))
       )
     )
