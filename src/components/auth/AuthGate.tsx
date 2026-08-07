@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase-client";
 
 const ALLOWED_EMAIL = "cruiz@enkisoluciones.mx";
-const PRODUCTION_APP_URL = "https://eleganzzamkt.vercel.app";
+const PRODUCTION_APP_URL = "https://eleganzzamkt.enkidad.com";
 
 function normalizeEmail(value?: string | null) {
   return value?.trim().toLowerCase() ?? "";

@@ -57,7 +57,7 @@ type ReviewMarkListItem = {
 
 function reviewUrl(token: string) {
   const origin =
-    typeof window === "undefined" ? "https://eleganzzamkt.vercel.app" : window.location.origin;
+    typeof window === "undefined" ? "https://eleganzzamkt.enkidad.com" : window.location.origin;
   return `${origin}/catalogo/${token}`;
 }
 
