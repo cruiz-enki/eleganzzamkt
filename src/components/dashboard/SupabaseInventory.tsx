@@ -14,7 +14,8 @@ import {
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
 import { cleanProductImage } from "@/lib/api/ai.functions";
-import { useWooCommerceProductSync } from "@/hooks/use-woocommerce-product-sync";
+import { useWooCommerceSyncQueue } from "@/hooks/use-woocommerce-sync-queue";
+import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
 import {
   Table,
   TableBody,
@@ -89,9 +90,31 @@ type SortConfig = {
   direction: "asc" | "desc";
 };
 
+type ProductLightboxSlide = {
+  src: string;
+  title: string;
+  description: string;
+  record: Mueble;
+};
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function galleryUrl(value: unknown) {
+  if (!value || typeof value !== "object") return "";
+  const url = (value as { url?: unknown }).url;
+  return typeof url === "string" ? url : "";
+}
+
+function displayImageUrl(value: unknown) {
+  if (!value || typeof value !== "object") return "";
+  return getDisplayImageUrl(value as { id?: unknown; url?: unknown });
+}
+
 export function SupabaseInventory() {
   const queryClient = useQueryClient();
-  const wooSyncMutation = useWooCommerceProductSync();
+  const wooSyncQueue = useWooCommerceSyncQueue();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -242,29 +265,28 @@ export function SupabaseInventory() {
 
   const handleSyncWooCommerce = async (record: Mueble) => {
     const wooProductId = record.detalles?.woocommerce?.productId;
-    const action = wooProductId ? "actualizar" : "crear";
     const message = wooProductId
-      ? `¿Actualizar "${record.nombre}" en WooCommerce?`
-      : `¿Crear "${record.nombre}" en WooCommerce como borrador?`;
+      ? `¿Agregar "${record.nombre}" a la cola para actualizar WooCommerce?`
+      : `¿Agregar "${record.nombre}" a la cola para crear en WooCommerce como borrador?`;
 
     if (!confirm(message)) return;
 
     const loading = toast.loading(
       wooProductId
-        ? "Actualizando producto en WooCommerce..."
-        : "Creando producto en WooCommerce...",
+        ? "Agregando y procesando actualización WooCommerce..."
+        : "Agregando y procesando creación WooCommerce...",
     );
 
     try {
-      const result = await wooSyncMutation.mutateAsync(record.id);
+      const job = await wooSyncQueue.enqueueAndProcess.mutateAsync(record.id);
       toast.dismiss(loading);
 
-      if (!result.success) {
-        toast.error(result.message);
+      if (job.status === "failed") {
+        toast.error(job.last_error || "La sincronización terminó con error");
         return;
       }
 
-      toast.success(result.message);
+      toast.success(job.result?.message || "Producto sincronizado con WooCommerce");
       await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
       await refetch();
       if (selectedRecord?.id === record.id) setSelectedRecord(null);
@@ -272,6 +294,28 @@ export function SupabaseInventory() {
       toast.dismiss(loading);
       const errorMessage =
         error instanceof Error ? error.message : "Error al sincronizar WooCommerce";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleQueueSelectedWooCommerce = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    if (!confirm(`¿Agregar ${ids.length} producto(s) a la cola de WooCommerce?`)) return;
+
+    const loading = toast.loading("Agregando productos a la cola...");
+    try {
+      for (const id of ids) {
+        await wooSyncQueue.enqueue.mutateAsync(id);
+      }
+      toast.dismiss(loading);
+      toast.success(`${ids.length} producto(s) agregados a la cola`);
+      setSelectedIds(new Set());
+      await wooSyncQueue.queue.refetch();
+    } catch (error) {
+      toast.dismiss(loading);
+      const errorMessage =
+        error instanceof Error ? error.message : "No fue posible agregar productos a la cola";
       toast.error(errorMessage);
     }
   };
@@ -326,7 +370,7 @@ export function SupabaseInventory() {
     return result;
   }, [records, searchTerm, categoryFilter, statusFilter, sortConfig]);
 
-  const lightboxSlides = useMemo(() => {
+  const lightboxSlides = useMemo<ProductLightboxSlide[]>(() => {
     return processedRecords.map((record) => {
       const photos = [...(record.galeria || []), ...(record.fotos || [])];
       const imageUrl = getFirstDisplayImageUrl(photos);
@@ -470,6 +514,8 @@ export function SupabaseInventory() {
 
   return (
     <div className="space-y-4">
+      <WooCommerceSyncQueue />
+
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 mr-auto">
           <Button
@@ -505,9 +551,9 @@ export function SupabaseInventory() {
                   `${res.fotosAgregadas} fotos nuevas en ${res.productosActualizados} productos`,
                 );
                 refetch();
-              } catch (e: any) {
+              } catch (e: unknown) {
                 toast.dismiss(loading);
-                toast.error(e?.message || "Error al sincronizar con Drive");
+                toast.error(getErrorMessage(e, "Error al sincronizar con Drive"));
               }
             }}
           >
@@ -734,19 +780,31 @@ export function SupabaseInventory() {
           </DropdownMenu>
 
           {selectedIds.size > 0 && (
-            <Button
-              size="sm"
-              variant="destructive"
-              className="h-9"
-              onClick={() => {
-                if (confirm(`¿Estás seguro de eliminar ${selectedIds.size} productos?`)) {
-                  deleteMutation.mutate(Array.from(selectedIds));
-                }
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Eliminar ({selectedIds.size})
-            </Button>
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-9 border-blue-200 text-blue-700 hover:bg-blue-50"
+                disabled={wooSyncQueue.isWorking}
+                onClick={handleQueueSelectedWooCommerce}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Encolar Woo ({selectedIds.size})
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                className="h-9"
+                onClick={() => {
+                  if (confirm(`¿Estás seguro de eliminar ${selectedIds.size} productos?`)) {
+                    deleteMutation.mutate(Array.from(selectedIds));
+                  }
+                }}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Eliminar ({selectedIds.size})
+              </Button>
+            </>
           )}
 
           <Button
@@ -1009,7 +1067,7 @@ export function SupabaseInventory() {
                                 ? "Actualizar en WooCommerce"
                                 : "Crear en WooCommerce"
                             }
-                            disabled={wooSyncMutation.isPending}
+                            disabled={wooSyncQueue.isWorking}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSyncWooCommerce(record);
@@ -1250,8 +1308,8 @@ export function SupabaseInventory() {
                     <ScrollArea className="h-full">
                       <div className="flex flex-col gap-2 p-2">
                         {[...(selectedRecord.galeria || []), ...(selectedRecord.fotos || [])].map(
-                          (photo: any, i: number) => {
-                            const url = getDisplayImageUrl(photo);
+                          (photo: unknown, i: number) => {
+                            const url = displayImageUrl(photo);
                             if (!url) return null;
                             return (
                               <div
@@ -1410,9 +1468,11 @@ export function SupabaseInventory() {
                                     else toast.success(`Se enlazaron ${res.added} fotos nuevas`);
                                     refetch();
                                     setSelectedRecord(null);
-                                  } catch (e: any) {
+                                  } catch (e: unknown) {
                                     toast.dismiss(loading);
-                                    toast.error(e?.message || "Error al sincronizar con Drive");
+                                    toast.error(
+                                      getErrorMessage(e, "Error al sincronizar con Drive"),
+                                    );
                                   }
                                 }}
                               >
@@ -1468,10 +1528,10 @@ export function SupabaseInventory() {
                   <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
                     <Button
                       className="flex-1 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all font-medium border-0 gap-2"
-                      disabled={wooSyncMutation.isPending}
+                      disabled={wooSyncQueue.isWorking}
                       onClick={() => handleSyncWooCommerce(selectedRecord)}
                     >
-                      {wooSyncMutation.isPending ? (
+                      {wooSyncQueue.isWorking ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Upload className="h-4 w-4" />
@@ -1592,13 +1652,13 @@ export function SupabaseInventory() {
                 <div className="grid gap-2">
                   <Label>Galería de Imágenes (Múltiples fotos)</Label>
                   <div className="grid grid-cols-4 gap-2 mb-2">
-                    {(formData.galeria || []).map((f: any, idx: number) => (
+                    {(formData.galeria || []).map((f: unknown, idx: number) => (
                       <div
                         key={idx}
                         className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group"
                       >
                         <img
-                          src={getDisplayImageUrl(f)}
+                          src={displayImageUrl(f)}
                           alt=""
                           className="w-full h-full object-cover"
                           onError={(event) => {
@@ -1668,7 +1728,7 @@ export function SupabaseInventory() {
                   </Label>
                   <Textarea
                     placeholder="https://ejemplo.com/foto1.jpg, https://ejemplo.com/foto2.jpg"
-                    value={(formData.galeria || []).map((f: any) => f.url).join(", ")}
+                    value={(formData.galeria || []).map((f: unknown) => galleryUrl(f)).join(", ")}
                     onChange={(e) => {
                       const urls = e.target.value
                         .split(",")
@@ -1715,29 +1775,37 @@ export function SupabaseInventory() {
         close={() => setLightboxIndex(-1)}
         slides={lightboxSlides}
         render={{
-          slideFooter: ({ slide }: any) => (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 bg-black/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 text-white min-w-[320px] shadow-2xl">
-              <div className="text-center">
-                <h3 className="text-xl font-bold tracking-tight text-white">{slide.title}</h3>
-                <p className="text-sm text-slate-300 font-medium mt-1">{slide.description}</p>
+          slideFooter: ({ slide }) => {
+            const productSlide = slide as ProductLightboxSlide;
+
+            return (
+              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 bg-black/60 backdrop-blur-md p-5 rounded-2xl border border-white/10 text-white min-w-[320px] shadow-2xl">
+                <div className="text-center">
+                  <h3 className="text-xl font-bold tracking-tight text-white">
+                    {productSlide.title}
+                  </h3>
+                  <p className="text-sm text-slate-300 font-medium mt-1">
+                    {productSlide.description}
+                  </p>
+                </div>
+                {productSlide.record && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mt-2 bg-white text-black hover:bg-slate-200 border-none px-8 font-bold h-10 rounded-full transition-transform hover:scale-105"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(productSlide.record);
+                      setLightboxIndex(-1);
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Editar Producto
+                  </Button>
+                )}
               </div>
-              {slide.record && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="mt-2 bg-white text-black hover:bg-slate-200 border-none px-8 font-bold h-10 rounded-full transition-transform hover:scale-105"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(slide.record);
-                    setLightboxIndex(-1);
-                  }}
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Editar Producto
-                </Button>
-              )}
-            </div>
-          ),
+            );
+          },
         }}
       />
     </div>
