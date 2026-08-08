@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, RefreshCw, FileText, Camera, Layout, History, Wand2 } from "lucide-react";
+import { SystemHealthPanel } from "@/components/dashboard/SystemHealthPanel";
 import { WooCommerceIntegration } from "@/components/dashboard/WooCommerceIntegration";
 
 const DEFAULT_PROMPTS = {
@@ -118,6 +119,8 @@ export function PromptSettings() {
           </Button>
         </div>
       </div>
+
+      <SystemHealthPanel />
 
       <WooCommerceIntegration />
 
