@@ -7,6 +7,7 @@ import {
   uploadToDrive,
   bulkCleanupCategories,
   updateMuebleStatus,
+  updateMuebleGallery,
   bulkDiscontinueMuebles,
   syncDriveGallery,
   syncAllDriveGalleries,
@@ -19,6 +20,7 @@ import { useWooCommerceSyncQueue } from "@/hooks/use-woocommerce-sync-queue";
 import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
 import { WooCommerceProductHistory } from "@/components/dashboard/WooCommerceProductHistory";
 import { WooCommerceProductPreviewDialog } from "@/components/dashboard/WooCommerceProductPreviewDialog";
+import { ProductImageManager } from "@/components/dashboard/ProductImageManager";
 import {
   Table,
   TableBody,
@@ -50,7 +52,6 @@ import {
   Settings2,
   ChevronLeft,
   ChevronRight,
-  Wand2,
   LayoutGrid,
   List,
   CheckCircle2,
@@ -71,7 +72,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { getDisplayImageUrl, getFirstDisplayImageUrl } from "@/lib/image-url";
+import { getFirstDisplayImageUrl } from "@/lib/image-url";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -108,11 +109,6 @@ function galleryUrl(value: unknown) {
   if (!value || typeof value !== "object") return "";
   const url = (value as { url?: unknown }).url;
   return typeof url === "string" ? url : "";
-}
-
-function displayImageUrl(value: unknown) {
-  if (!value || typeof value !== "object") return "";
-  return getDisplayImageUrl(value as { id?: unknown; url?: unknown });
 }
 
 export function SupabaseInventory() {
@@ -268,6 +264,30 @@ export function SupabaseInventory() {
       toast.error("Error al actualizar estado: " + error.message);
     },
   });
+
+  const galleryMutation = useMutation({
+    mutationFn: (args: { id: string; galeria: unknown[] }) => updateMuebleGallery({ data: args }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
+      toast.success("Galería actualizada");
+    },
+    onError: (error) => {
+      toast.error("Error al actualizar galería: " + error.message);
+    },
+  });
+
+  const handleAnalyzeImage = async (url: string) => {
+    try {
+      toast.loading("IA analizando imagen...");
+      const result = await cleanProductImage({
+        data: { imageUrl: url },
+      });
+      toast.success("Análisis de IA completado");
+      toast.info(result, { duration: 5000 });
+    } catch {
+      toast.error("Error al procesar con IA. Verifica tu conexión.");
+    }
+  };
 
   const handleSyncWooCommerce = async (record: Mueble) => {
     const wooProductId = record.detalles?.woocommerce?.productId;
@@ -1326,70 +1346,43 @@ export function SupabaseInventory() {
 
               <div className="flex flex-col md:flex-row h-[85vh] md:h-[600px] overflow-hidden rounded-lg">
                 <div className="w-full md:w-1/2 bg-slate-100 relative group overflow-hidden">
-                  {(selectedRecord.galeria &&
-                    Array.isArray(selectedRecord.galeria) &&
-                    selectedRecord.galeria.length > 0) ||
-                  (selectedRecord.fotos &&
-                    Array.isArray(selectedRecord.fotos) &&
-                    selectedRecord.fotos.length > 0) ? (
-                    <ScrollArea className="h-full">
-                      <div className="flex flex-col gap-2 p-2">
-                        {[...(selectedRecord.galeria || []), ...(selectedRecord.fotos || [])].map(
-                          (photo: unknown, i: number) => {
-                            const url = displayImageUrl(photo);
-                            if (!url) return null;
-                            return (
-                              <div
-                                key={i}
-                                className="relative group/photo overflow-hidden rounded-lg shadow-sm bg-white"
-                              >
-                                <img
-                                  src={url}
-                                  alt={`${selectedRecord.nombre} ${i + 1}`}
-                                  className="w-full"
-                                  onError={(event) => {
-                                    event.currentTarget.style.display = "none";
-                                  }}
-                                />
-                                <div className="absolute top-2 right-2 z-10">
-                                  <Button
-                                    size="sm"
-                                    variant="secondary"
-                                    className="h-8 text-[10px] gap-1 px-2 font-bold uppercase shadow-lg border border-slate-200"
-                                    onClick={async (e) => {
-                                      e.stopPropagation();
-                                      try {
-                                        toast.loading("IA analizando imagen...");
-                                        const result = await cleanProductImage({
-                                          data: { imageUrl: url },
-                                        });
-                                        toast.success("Análisis de IA completado");
-                                        console.log("IA Clean Result:", result);
-                                        // Mostramos el resultado en un toast informativo para que el usuario vea que funcionó
-                                        toast.info(result, { duration: 5000 });
-                                      } catch (e) {
-                                        toast.error(
-                                          "Error al procesar con IA. Verifica tu conexión.",
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    <Wand2 className="h-3 w-3" />
-                                    Limpiar con IA
-                                  </Button>
-                                </div>
-                              </div>
-                            );
-                          },
-                        )}
-                      </div>
-                    </ScrollArea>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
-                      <ImageIcon className="w-12 h-12 opacity-20" />
-                      <span className="text-xs font-medium">Sin fotos disponibles</span>
+                  <ScrollArea className="h-full">
+                    <div className="p-3">
+                      <ProductImageManager
+                        images={[
+                          ...(selectedRecord.galeria || []),
+                          ...(selectedRecord.fotos || []),
+                        ]}
+                        productName={selectedRecord.nombre}
+                        isBusy={galleryMutation.isPending}
+                        onAnalyze={handleAnalyzeImage}
+                        onReimport={async () => {
+                          const loading = toast.loading("Buscando fotos en la carpeta...");
+                          try {
+                            const res = await syncDriveGallery({
+                              data: { id: selectedRecord.id },
+                            });
+                            toast.dismiss(loading);
+                            if (res.added === 0) toast.info("No hay fotos nuevas en la carpeta");
+                            else toast.success(`Se enlazaron ${res.added} fotos nuevas`);
+                            await refetch();
+                            setSelectedRecord(null);
+                          } catch (e: unknown) {
+                            toast.dismiss(loading);
+                            toast.error(getErrorMessage(e, "Error al sincronizar con Drive"));
+                          }
+                        }}
+                        onChange={(galeria) => {
+                          galleryMutation.mutate({ id: selectedRecord.id, galeria });
+                          setSelectedRecord({
+                            ...selectedRecord,
+                            galeria,
+                            fotos: [],
+                          });
+                        }}
+                      />
                     </div>
-                  )}
+                  </ScrollArea>
                 </div>
 
                 <div className="w-full md:w-1/2 flex flex-col bg-white">
@@ -1679,33 +1672,13 @@ export function SupabaseInventory() {
 
                 <div className="grid gap-2">
                   <Label>Galería de Imágenes (Múltiples fotos)</Label>
+                  <ProductImageManager
+                    images={formData.galeria || []}
+                    productName={formData.nombre || "Producto"}
+                    isBusy={uploading}
+                    onChange={(galeria) => setFormData({ ...formData, galeria })}
+                  />
                   <div className="grid grid-cols-4 gap-2 mb-2">
-                    {(formData.galeria || []).map((f: unknown, idx: number) => (
-                      <div
-                        key={idx}
-                        className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group"
-                      >
-                        <img
-                          src={displayImageUrl(f)}
-                          alt=""
-                          className="w-full h-full object-cover"
-                          onError={(event) => {
-                            event.currentTarget.style.display = "none";
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newGaleria = [...(formData.galeria || [])];
-                            newGaleria.splice(idx, 1);
-                            setFormData({ ...formData, galeria: newGaleria });
-                          }}
-                          className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
                     {pendingFiles.map((file, idx) => (
                       <div
                         key={`${file.name}-${idx}`}

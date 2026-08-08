@@ -115,6 +115,36 @@ export const updateMuebleStatus = createServerFn({ method: "POST" })
     return { success: true };
   });
 
+export const updateMuebleGallery = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) =>
+    z.object({ id: z.string(), galeria: z.array(z.any()) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { data: current, error: fetchError } = await supabase
+      .from("muebles")
+      .select("detalles")
+      .eq("id", data.id)
+      .single();
+
+    if (fetchError) throw new Error(fetchError.message);
+
+    const firstImage = data.galeria[0] || null;
+    const detalles = {
+      ...(current?.detalles || {}),
+      primary_image_id: firstImage?.id ?? null,
+      primary_image_url: firstImage?.url ?? null,
+      gallery_updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase
+      .from("muebles")
+      .update({ galeria: data.galeria, detalles })
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { success: true, total: data.galeria.length };
+  });
+
 export const upsertMueble = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => muebleSchema.parse(data))
   .handler(async ({ data }) => {
