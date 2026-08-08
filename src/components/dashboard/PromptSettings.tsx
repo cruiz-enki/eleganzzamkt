@@ -5,9 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Save, RefreshCw, FileText, Camera, Layout, History, Wand2 } from "lucide-react";
+import {
+  Activity,
+  Camera,
+  FileText,
+  History,
+  Layout,
+  PlugZap,
+  RefreshCw,
+  Save,
+  Wand2,
+} from "lucide-react";
 import { SystemHealthPanel } from "@/components/dashboard/SystemHealthPanel";
 import { WooCommerceIntegration } from "@/components/dashboard/WooCommerceIntegration";
+import { cn } from "@/lib/utils";
 
 const DEFAULT_PROMPTS = {
   copy: {
@@ -37,8 +48,17 @@ const DEFAULT_PROMPTS = {
   },
 };
 
+type SettingsSection = "health" | "woocommerce" | "prompts";
+
+const SETTINGS_SECTIONS = [
+  { id: "health", label: "Salud", icon: Activity },
+  { id: "woocommerce", label: "WooCommerce", icon: PlugZap },
+  { id: "prompts", label: "Prompts IA", icon: Wand2 },
+] as const;
+
 export function PromptSettings() {
   const [prompts, setPrompts] = useState(DEFAULT_PROMPTS);
+  const [activeSection, setActiveSection] = useState<SettingsSection>("health");
 
   useEffect(() => {
     const saved = localStorage.getItem("eleganzza_ai_prompts");
@@ -101,80 +121,110 @@ export function PromptSettings() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-5">
         <div>
           <h2 className="text-2xl font-serif font-bold text-slate-900 dark:text-white">
-            Configuración de Prompts IA
+            Configuración
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Personaliza cómo la inteligencia artificial genera tu contenido.
+            Revisa conexiones, servicios externos y preferencias de generación.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReset} className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" /> Restablecer
-          </Button>
-          <Button onClick={handleSave} className="bg-slate-900 text-white flex items-center gap-2">
-            <Save className="h-4 w-4" /> Guardar Cambios
-          </Button>
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="grid grid-cols-3 gap-2 rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
+            {SETTINGS_SECTIONS.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => setActiveSection(section.id)}
+                className={cn(
+                  "flex h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white",
+                  activeSection === section.id &&
+                    "bg-slate-900 text-white hover:bg-slate-900 hover:text-white dark:bg-white dark:text-slate-900 dark:hover:bg-white dark:hover:text-slate-900",
+                )}
+              >
+                <section.icon className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">{section.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {activeSection === "prompts" && (
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleReset} className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" /> Restablecer
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="bg-slate-900 text-white flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" /> Guardar Cambios
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      <SystemHealthPanel />
+      {activeSection === "health" && <SystemHealthPanel />}
 
-      <WooCommerceIntegration />
+      {activeSection === "woocommerce" && <WooCommerceIntegration />}
 
-      <div className="grid gap-8">
-        {(Object.keys(prompts) as Array<keyof typeof DEFAULT_PROMPTS>).map((type) => (
-          <Card key={type} className="border-slate-200">
-            <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
-                  {getIcon(type)}
+      {activeSection === "prompts" && (
+        <div className="grid gap-8">
+          {(Object.keys(prompts) as Array<keyof typeof DEFAULT_PROMPTS>).map((type) => (
+            <Card key={type} className="border-slate-200">
+              <CardHeader className="bg-slate-50/50 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-white rounded-lg border border-slate-200 text-slate-600">
+                    {getIcon(type)}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-serif capitalize">
+                      {type === "copy" ? "Marketing Copy" : type}
+                    </CardTitle>
+                    <CardDescription>
+                      Configura las instrucciones para este tipo de contenido.
+                    </CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle className="text-lg font-serif capitalize">
-                    {type === "copy" ? "Marketing Copy" : type}
-                  </CardTitle>
-                  <CardDescription>
-                    Configura las instrucciones para este tipo de contenido.
-                  </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    System Prompt (Personalidad)
+                  </Label>
+                  <Textarea
+                    value={prompts[type].system}
+                    onChange={(e) => updatePrompt(type, "system", e.target.value)}
+                    className="min-h-[80px] text-sm"
+                    placeholder="Instrucciones sobre el rol de la IA..."
+                  />
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  System Prompt (Personalidad)
-                </Label>
-                <Textarea
-                  value={prompts[type].system}
-                  onChange={(e) => updatePrompt(type, "system", e.target.value)}
-                  className="min-h-[80px] text-sm"
-                  placeholder="Instrucciones sobre el rol de la IA..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  User Prompt (Instrucción)
-                </Label>
-                <Textarea
-                  value={prompts[type].user}
-                  onChange={(e) => updatePrompt(type, "user", e.target.value)}
-                  className="min-h-[120px] text-sm"
-                  placeholder="Instrucciones específicas del contenido..."
-                />
-                <p className="text-[10px] text-slate-400 mt-1">
-                  Usa variables como{" "}
-                  <code className="bg-slate-100 px-1 rounded text-slate-600">{"{nombre}"}</code> y{" "}
-                  <code className="bg-slate-100 px-1 rounded text-slate-600">{"{categoria}"}</code>{" "}
-                  que se reemplazarán automáticamente.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    User Prompt (Instrucción)
+                  </Label>
+                  <Textarea
+                    value={prompts[type].user}
+                    onChange={(e) => updatePrompt(type, "user", e.target.value)}
+                    className="min-h-[120px] text-sm"
+                    placeholder="Instrucciones específicas del contenido..."
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    Usa variables como{" "}
+                    <code className="bg-slate-100 px-1 rounded text-slate-600">{"{nombre}"}</code> y{" "}
+                    <code className="bg-slate-100 px-1 rounded text-slate-600">
+                      {"{categoria}"}
+                    </code>{" "}
+                    que se reemplazarán automáticamente.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
