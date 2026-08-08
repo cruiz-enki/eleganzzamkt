@@ -43,6 +43,18 @@ const CREATIVE_TYPES = [
   { id: "prompt", label: "AI Prompt", icon: Wand2, description: "Prompt para Midjourney/DALL-E" },
 ] as const;
 
+type AIContentEntry = {
+  type: string;
+  status?: "draft" | "published" | string;
+  content: string;
+  created_at: string;
+};
+
+const getAIContent = (mueble: Mueble | null | undefined): AIContentEntry[] => {
+  const aiContent = (mueble?.detalles as { ai_content?: unknown } | null | undefined)?.ai_content;
+  return Array.isArray(aiContent) ? (aiContent as AIContentEntry[]) : [];
+};
+
 export function IAGenerator() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Mueble | null>(null);
@@ -115,7 +127,7 @@ export function IAGenerator() {
   };
 
   const hasContentFor = (mueble: Mueble, type: string) => {
-    return mueble.detalles?.ai_content?.some((c: any) => c.type === type);
+    return getAIContent(mueble).some((content) => content.type === type);
   };
 
   const handleUpdate = async (index: number) => {
@@ -173,13 +185,15 @@ export function IAGenerator() {
     toast.success("Copiado al portapapeles");
   };
 
+  const selectedAIContent = getAIContent(selectedProduct);
+
   return (
-    <div className="flex gap-6 h-[calc(100vh-200px)] relative overflow-hidden">
+    <div className="relative flex flex-col gap-6 overflow-visible lg:min-h-[calc(100vh-220px)] lg:flex-row">
       {/* Selector de Producto (Slide Sidebar) */}
       <div
         className={cn(
-          "flex flex-col gap-4 transition-all duration-300 ease-in-out shrink-0",
-          isSidebarOpen ? "w-80" : "w-0 opacity-0 -translate-x-full",
+          "flex shrink-0 flex-col gap-4 transition-all duration-300 ease-in-out lg:h-[calc(100vh-220px)]",
+          isSidebarOpen ? "w-full lg:w-80" : "w-0 opacity-0 -translate-x-full",
         )}
       >
         <Card className="flex-1 flex flex-col overflow-hidden border-slate-200 dark:border-slate-800 dark:bg-slate-900">
@@ -206,11 +220,12 @@ export function IAGenerator() {
               />
             </div>
           </CardHeader>
-          <CardContent className="p-0 flex-1 overflow-hidden">
+          <CardContent className="min-h-0 flex-1 overflow-hidden max-h-[28rem] lg:max-h-none">
             <ScrollArea className="h-full">
               <div className="p-4 space-y-2">
                 {filteredProducts.map((product) => {
                   const imageUrl = getFirstDisplayImageUrl(product.galeria || product.fotos);
+                  const aiContentCount = getAIContent(product).length;
 
                   return (
                     <button
@@ -250,12 +265,12 @@ export function IAGenerator() {
                           <span className="text-[10px] opacity-60 uppercase font-bold tracking-tighter">
                             {product.categoria || "Sin categoría"}
                           </span>
-                          {product.detalles?.ai_content?.length > 0 && (
+                          {aiContentCount > 0 && (
                             <Badge
                               variant="secondary"
                               className="h-4 px-1 text-[8px] bg-emerald-100 text-emerald-700 border-0"
                             >
-                              {product.detalles.ai_content.length} IA
+                              {aiContentCount} IA
                             </Badge>
                           )}
                         </div>
@@ -282,8 +297,8 @@ export function IAGenerator() {
       )}
 
       {/* Selector de Tipo y Generador */}
-      <div className="flex-1 space-y-6 flex flex-col min-w-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0">
+      <div className="flex-1 min-w-0 space-y-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Tipos de Contenido */}
           <Card className="border-slate-200">
             <CardHeader>
@@ -348,14 +363,14 @@ export function IAGenerator() {
           </Card>
 
           {/* Resultado / Historial */}
-          <Card className="border-slate-200 flex flex-col overflow-hidden">
+          <Card className="flex flex-col overflow-hidden border-slate-200 lg:max-h-[calc(100vh-220px)]">
             <CardHeader className="border-b border-slate-50">
               <CardTitle className="text-lg font-serif flex items-center gap-2">
                 <History className="h-5 w-5 text-slate-400" />
                 {generatedContent ? "Contenido Generado" : "Historial del Producto"}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0 flex-1">
+            <CardContent className="min-h-[20rem] flex-1 overflow-hidden p-0">
               <ScrollArea className="h-full">
                 <div className="p-6">
                   {generatedContent ? (
@@ -373,10 +388,10 @@ export function IAGenerator() {
                         Ver todo el historial
                       </Button>
                     </div>
-                  ) : selectedProduct && selectedProduct.detalles?.ai_content?.length > 0 ? (
+                  ) : selectedProduct && selectedAIContent.length > 0 ? (
                     <div className="space-y-4">
-                      {selectedProduct.detalles.ai_content
-                        .map((item: any, idx: number) => (
+                      {selectedAIContent
+                        .map((item, idx) => (
                           <div
                             key={idx}
                             className="p-4 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors"
