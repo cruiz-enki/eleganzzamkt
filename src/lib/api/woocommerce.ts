@@ -43,8 +43,77 @@ export type WooProductSyncFailure = {
 
 export type WooProductSyncResult = WooProductSyncSuccess | WooProductSyncFailure;
 
+export type WooProductPreviewChange = {
+  field: string;
+  current: string | number | null;
+  next: string | number | null;
+};
+
+export type WooProductPreviewImage = {
+  src: string;
+  originalUrl: string | null;
+  sourceId: string | null;
+  name: string;
+  alt: string;
+};
+
+export type WooProductPreviewSuccess = {
+  success: true;
+  status: number;
+  storeUrl: string;
+  action: "created" | "updated";
+  productId: string;
+  wooProductId: number | null;
+  currentWooFound: boolean;
+  currentWooStatus: number | null;
+  permalink: string | null;
+  product: {
+    nombre: string;
+    descripcion: string;
+    precio: string | null;
+    precio_2: string | number | null;
+    precio_3: string | number | null;
+    categoria: string | null;
+    status: string;
+  };
+  category: {
+    name: string | null;
+    id: number | null;
+    exists: boolean;
+    willCreate: boolean;
+  };
+  images: {
+    total: number;
+    max: number;
+    items: WooProductPreviewImage[];
+  };
+  changes: WooProductPreviewChange[];
+  payloadPreview: {
+    name: string;
+    status: string;
+    regular_price: string | null;
+    description: string;
+    short_description: string;
+    categories: Array<{ id: number; name: string }>;
+    manage_stock: boolean;
+  };
+  message: string;
+  previewedAt: string;
+};
+
+export type WooProductPreviewFailure = {
+  success: false;
+  status: number;
+  errorCode: string;
+  message: string;
+  previewedAt: string;
+};
+
+export type WooProductPreviewResult = WooProductPreviewSuccess | WooProductPreviewFailure;
+
 type FunctionPayload = Partial<WooConnectionResult> | null | undefined;
 type ProductSyncPayload = Partial<WooProductSyncResult> | null | undefined;
+type ProductPreviewPayload = Partial<WooProductPreviewResult> | null | undefined;
 
 function isFailurePayload(payload: FunctionPayload): payload is WooConnectionFailure {
   return (
@@ -82,6 +151,18 @@ function isProductSyncFailurePayload(
     typeof payload.errorCode === "string" &&
     typeof payload.message === "string" &&
     typeof payload.syncedAt === "string"
+  );
+}
+
+function isProductPreviewFailurePayload(
+  payload: ProductPreviewPayload,
+): payload is WooProductPreviewFailure {
+  return (
+    payload?.success === false &&
+    typeof payload.status === "number" &&
+    typeof payload.errorCode === "string" &&
+    typeof payload.message === "string" &&
+    typeof payload.previewedAt === "string"
   );
 }
 
@@ -161,6 +242,41 @@ export async function syncProductToWooCommerce(
       errorCode: "WOOCOMMERCE_EMPTY_RESPONSE",
       message: "WooCommerce no devolvió respuesta de sincronización",
       syncedAt: new Date().toISOString(),
+    };
+  }
+
+  return data;
+}
+
+export async function previewProductWooCommerce(
+  productId: string,
+): Promise<WooProductPreviewResult> {
+  const { data, error } = await supabase.functions.invoke<WooProductPreviewResult>(
+    "woo-preview-product",
+    {
+      body: { productId },
+    },
+  );
+
+  if (error) {
+    if (isProductPreviewFailurePayload(data)) return data;
+
+    return {
+      success: false,
+      status: 500,
+      errorCode: "WOOCOMMERCE_PREVIEW_FUNCTION_ERROR",
+      message: "No fue posible previsualizar la sincronización con WooCommerce",
+      previewedAt: new Date().toISOString(),
+    };
+  }
+
+  if (!data) {
+    return {
+      success: false,
+      status: 500,
+      errorCode: "WOOCOMMERCE_PREVIEW_EMPTY_RESPONSE",
+      message: "WooCommerce no devolvió respuesta de previsualización",
+      previewedAt: new Date().toISOString(),
     };
   }
 

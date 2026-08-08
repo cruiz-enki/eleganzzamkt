@@ -14,9 +14,11 @@ import {
 } from "@/lib/api/inventory.functions";
 import { publishProduct } from "@/lib/api/catalogos.functions";
 import { cleanProductImage } from "@/lib/api/ai.functions";
+import { previewProductWooCommerce, type WooProductPreviewResult } from "@/lib/api/woocommerce";
 import { useWooCommerceSyncQueue } from "@/hooks/use-woocommerce-sync-queue";
 import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
 import { WooCommerceProductHistory } from "@/components/dashboard/WooCommerceProductHistory";
+import { WooCommerceProductPreviewDialog } from "@/components/dashboard/WooCommerceProductPreviewDialog";
 import {
   Table,
   TableBody,
@@ -118,6 +120,9 @@ export function SupabaseInventory() {
   const wooSyncQueue = useWooCommerceSyncQueue();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
+  const [wooPreviewRecord, setWooPreviewRecord] = useState<Mueble | null>(null);
+  const [wooPreview, setWooPreview] = useState<WooProductPreviewResult | null>(null);
+  const [wooPreviewLoading, setWooPreviewLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -266,12 +271,6 @@ export function SupabaseInventory() {
 
   const handleSyncWooCommerce = async (record: Mueble) => {
     const wooProductId = record.detalles?.woocommerce?.productId;
-    const message = wooProductId
-      ? `¿Agregar "${record.nombre}" a la cola para actualizar WooCommerce?`
-      : `¿Agregar "${record.nombre}" a la cola para crear en WooCommerce como borrador?`;
-
-    if (!confirm(message)) return;
-
     const loading = toast.loading(
       wooProductId
         ? "Agregando y procesando actualización WooCommerce..."
@@ -290,12 +289,39 @@ export function SupabaseInventory() {
       toast.success(job.result?.message || "Producto sincronizado con WooCommerce");
       await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
       await refetch();
+      setWooPreviewRecord(null);
+      setWooPreview(null);
       if (selectedRecord?.id === record.id) setSelectedRecord(null);
     } catch (error) {
       toast.dismiss(loading);
       const errorMessage =
         error instanceof Error ? error.message : "Error al sincronizar WooCommerce";
       toast.error(errorMessage);
+    }
+  };
+
+  const handlePreviewWooCommerce = async (record: Mueble) => {
+    setWooPreviewRecord(record);
+    setWooPreview(null);
+    setWooPreviewLoading(true);
+
+    try {
+      const preview = await previewProductWooCommerce(record.id);
+      setWooPreview(preview);
+      if (!preview.success) toast.error(preview.message);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "No fue posible generar la vista previa";
+      toast.error(errorMessage);
+      setWooPreview({
+        success: false,
+        status: 500,
+        errorCode: "WOOCOMMERCE_PREVIEW_CLIENT_ERROR",
+        message: errorMessage,
+        previewedAt: new Date().toISOString(),
+      });
+    } finally {
+      setWooPreviewLoading(false);
     }
   };
 
@@ -1071,7 +1097,7 @@ export function SupabaseInventory() {
                             disabled={wooSyncQueue.isWorking}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSyncWooCommerce(record);
+                              handlePreviewWooCommerce(record);
                             }}
                           >
                             <Upload className="h-4 w-4" />
@@ -1530,17 +1556,17 @@ export function SupabaseInventory() {
                   <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
                     <Button
                       className="flex-1 h-12 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all font-medium border-0 gap-2"
-                      disabled={wooSyncQueue.isWorking}
-                      onClick={() => handleSyncWooCommerce(selectedRecord)}
+                      disabled={wooSyncQueue.isWorking || wooPreviewLoading}
+                      onClick={() => handlePreviewWooCommerce(selectedRecord)}
                     >
-                      {wooSyncQueue.isWorking ? (
+                      {wooSyncQueue.isWorking || wooPreviewLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
                         <Upload className="h-4 w-4" />
                       )}
                       {selectedRecord.detalles?.woocommerce?.productId
-                        ? "Actualizar Woo"
-                        : "Enviar a Woo"}
+                        ? "Previsualizar Woo"
+                        : "Previsualizar envío"}
                     </Button>
                     {selectedRecord.detalles?.status === "draft" && (
                       <Button
@@ -1770,6 +1796,21 @@ export function SupabaseInventory() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <WooCommerceProductPreviewDialog
+        open={Boolean(wooPreviewRecord)}
+        preview={wooPreview}
+        isLoading={wooPreviewLoading}
+        isSyncing={wooSyncQueue.isWorking}
+        onOpenChange={(open) => {
+          if (open) return;
+          setWooPreviewRecord(null);
+          setWooPreview(null);
+        }}
+        onConfirm={() => {
+          if (wooPreviewRecord) handleSyncWooCommerce(wooPreviewRecord);
+        }}
+      />
 
       <Lightbox
         open={lightboxIndex >= 0}
