@@ -72,7 +72,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { getFirstDisplayImageUrl } from "@/lib/image-url";
+import { getFirstDisplayImageUrl, inspectImage } from "@/lib/image-url";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -109,6 +109,43 @@ function galleryUrl(value: unknown) {
   if (!value || typeof value !== "object") return "";
   const url = (value as { url?: unknown }).url;
   return typeof url === "string" ? url : "";
+}
+
+function textDetail(details: unknown, keys: string[]) {
+  if (!details || typeof details !== "object" || Array.isArray(details)) return "";
+  const record = details as Record<string, unknown>;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number") return String(value);
+  }
+  return "";
+}
+
+function csvCell(value: unknown) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function htmlCell(value: unknown) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function downloadExport(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 export function SupabaseInventory() {
@@ -432,6 +469,99 @@ export function SupabaseInventory() {
     });
   }, [processedRecords]);
 
+  const getExportRecords = () => {
+    if (selectedIds.size === 0) return processedRecords;
+    return processedRecords.filter((record) => selectedIds.has(record.id));
+  };
+
+  const buildExportRows = () =>
+    getExportRecords().map((record) => {
+      const photos = [...(record.galeria || []), ...(record.fotos || [])];
+      const inspected = photos.map((photo) =>
+        inspectImage(photo as { id?: unknown; url?: unknown }),
+      );
+      const primaryImage = inspected[0] ?? null;
+      const woo = record.detalles?.woocommerce ?? {};
+
+      return {
+        id: record.id,
+        nombre: record.nombre,
+        categoria: record.categoria ?? "",
+        estado: record.detalles?.status ?? "published",
+        precio: record.precio ?? "",
+        precio_2: record.precio_2 ?? "",
+        precio_3: record.precio_3 ?? "",
+        descripcion: record.descripcion ?? "",
+        notas: textDetail(record.detalles, ["notas", "nota", "notes", "note", "observaciones"]),
+        imagen_principal: primaryImage?.displayUrl ?? "",
+        imagen_principal_drive_id: primaryImage?.driveId ?? "",
+        imagenes_total: inspected.length,
+        imagenes_urls: inspected.map((image) => image.displayUrl || image.sourceUrl).join(" | "),
+        imagenes_drive_ids: inspected
+          .map((image) => image.driveId)
+          .filter(Boolean)
+          .join(" | "),
+        imagenes_origen: inspected
+          .map((image) => image.sourceUrl)
+          .filter(Boolean)
+          .join(" | "),
+        google_drive_folder_id: record.detalles?.google_drive_folder_id ?? "",
+        woo_id: woo.productId ?? woo.id ?? "",
+        woo_permalink: woo.permalink ?? "",
+        woo_status: woo.status ?? "",
+        woo_last_synced_at: woo.lastSyncedAt ?? "",
+        woo_image_status: woo.imageSyncStatus ?? "",
+        woo_image_message: woo.imageSyncMessage ?? "",
+        creado: record.created_at,
+      };
+    });
+
+  const handleExport = (format: "csv" | "xls") => {
+    const rows = buildExportRows();
+    if (rows.length === 0) {
+      toast.info("No hay productos para exportar");
+      return;
+    }
+
+    const headers = Object.keys(rows[0] ?? {});
+    const stamp = new Date().toISOString().slice(0, 10);
+    const scope = selectedIds.size > 0 ? "seleccionados" : "filtrados";
+
+    if (format === "csv") {
+      const csv = [
+        headers.map(csvCell).join(","),
+        ...rows.map((row) =>
+          headers.map((header) => csvCell(row[header as keyof typeof row])).join(","),
+        ),
+      ].join("\n");
+      downloadExport(
+        `\ufeff${csv}`,
+        `eleganzza-productos-${scope}-${stamp}.csv`,
+        "text/csv;charset=utf-8",
+      );
+      toast.success(`${rows.length} producto(s) exportados a CSV`);
+      return;
+    }
+
+    const tableRows = rows
+      .map(
+        (row) =>
+          `<tr>${headers
+            .map((header) => `<td>${htmlCell(row[header as keyof typeof row])}</td>`)
+            .join("")}</tr>`,
+      )
+      .join("");
+    const xls = `<!doctype html><html><head><meta charset="utf-8"></head><body><table><thead><tr>${headers
+      .map((header) => `<th>${htmlCell(header)}</th>`)
+      .join("")}</tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
+    downloadExport(
+      xls,
+      `eleganzza-productos-${scope}-${stamp}.xls`,
+      "application/vnd.ms-excel;charset=utf-8",
+    );
+    toast.success(`${rows.length} producto(s) exportados a Excel`);
+  };
+
   const handleSort = (key: keyof Mueble) => {
     setSortConfig((current) => ({
       key,
@@ -663,6 +793,26 @@ export function SupabaseInventory() {
           >
             <Archive className="h-3 w-3" />
             Descontinuar Lista
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
+            onClick={() => handleExport("csv")}
+            disabled={processedRecords.length === 0}
+          >
+            <FileDown className="h-3 w-3" />
+            CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
+            onClick={() => handleExport("xls")}
+            disabled={processedRecords.length === 0}
+          >
+            <FileDown className="h-3 w-3" />
+            Excel
           </Button>
         </div>
 
