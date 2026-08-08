@@ -59,6 +59,7 @@ import {
   Archive,
 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
+import { AirtableImporter } from "./AirtableImporter";
 import {
   Dialog,
   DialogContent,
@@ -1015,6 +1016,8 @@ export function SupabaseInventory() {
           </Button>
 
           <CSVImporter />
+
+          <AirtableImporter />
 
           <Button
             size="sm"
