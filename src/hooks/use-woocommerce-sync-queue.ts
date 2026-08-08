@@ -23,6 +23,7 @@ export function useWooCommerceSyncQueue() {
 
   const invalidateQueue = async () => {
     await queryClient.invalidateQueries({ queryKey: wooSyncQueueQueryKey });
+    await queryClient.invalidateQueries({ queryKey: ["woocommerce-sync-history"] });
     await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
   };
 

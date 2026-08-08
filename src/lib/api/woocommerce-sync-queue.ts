@@ -184,7 +184,7 @@ export async function getNextPendingWooSyncJob() {
 
 export async function processWooSyncJob(job: WooSyncJob) {
   const runningJob = job.status === "running" ? job : await claimJob(job);
-  const result = await syncProductToWooCommerce(runningJob.product_id);
+  const result = await syncProductToWooCommerce(runningJob.product_id, runningJob.id);
   const nextStatus: WooSyncJobStatus = result.success ? "synced" : "failed";
 
   const { data, error } = await supabase

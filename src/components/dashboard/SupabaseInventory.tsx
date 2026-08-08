@@ -16,6 +16,7 @@ import { publishProduct } from "@/lib/api/catalogos.functions";
 import { cleanProductImage } from "@/lib/api/ai.functions";
 import { useWooCommerceSyncQueue } from "@/hooks/use-woocommerce-sync-queue";
 import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
+import { WooCommerceProductHistory } from "@/components/dashboard/WooCommerceProductHistory";
 import {
   Table,
   TableBody,
@@ -1510,6 +1511,7 @@ export function SupabaseInventory() {
                               )}
                             </div>
                           )}
+                          <WooCommerceProductHistory productId={selectedRecord.id} />
                           {selectedRecord.descripcion && (
                             <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">

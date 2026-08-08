@@ -3,6 +3,6 @@ import { syncProductToWooCommerce } from "@/lib/api/woocommerce";
 
 export function useWooCommerceProductSync() {
   return useMutation({
-    mutationFn: syncProductToWooCommerce,
+    mutationFn: (productId: string) => syncProductToWooCommerce(productId),
   });
 }

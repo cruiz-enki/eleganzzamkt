@@ -129,11 +129,14 @@ export async function testWooCommerceConnection(): Promise<WooConnectionResult> 
   return data;
 }
 
-export async function syncProductToWooCommerce(productId: string): Promise<WooProductSyncResult> {
+export async function syncProductToWooCommerce(
+  productId: string,
+  jobId?: string,
+): Promise<WooProductSyncResult> {
   const { data, error } = await supabase.functions.invoke<WooProductSyncResult>(
     "woo-sync-product",
     {
-      body: { productId },
+      body: { productId, jobId },
     },
   );
 

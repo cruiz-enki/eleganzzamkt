@@ -17,6 +17,11 @@ const corsHeaders = {
 
 type JsonRecord = Record<string, unknown>;
 
+type AdminUser = {
+  id: string;
+  email: string | null;
+};
+
 type Mueble = {
   id: string;
   nombre: string;
@@ -43,6 +48,16 @@ type WooCategoryResponse = {
 };
 
 type WooRequestResult = Awaited<ReturnType<typeof wooRequest>>;
+
+type SyncAuditContext = {
+  jobId: string | null;
+  changedBy: AdminUser;
+  action: "created" | "updated";
+  wooProductId: number;
+  wooPermalink: string | null;
+  categoryId: number | null;
+  payloadSummary: ReturnType<typeof buildSyncPayloadSummary>;
+};
 
 function json(body: JsonRecord, status = 200) {
   return Response.json(body, {
@@ -134,12 +149,18 @@ async function requireAdminUser(req: Request) {
     };
   }
 
-  return { ok: true as const };
+  return {
+    ok: true as const,
+    user: {
+      id: data.user.id,
+      email: data.user.email ?? null,
+    },
+  };
 }
 
 async function readJsonBody(req: Request) {
   try {
-    return (await req.json()) as { productId?: unknown };
+    return (await req.json()) as { productId?: unknown; jobId?: unknown };
   } catch {
     return {};
   }
@@ -169,7 +190,7 @@ function getExistingWooId(details: JsonRecord) {
 function imageFrom(
   value: unknown,
   supabaseUrl: string,
-): { src: string; sourceId: string | null } | null {
+): { src: string; sourceId: string | null; originalUrl: string | null } | null {
   if (!value || typeof value !== "object") return null;
   const id = (value as JsonRecord)["id"];
   const url = (value as JsonRecord)["url"];
@@ -178,6 +199,7 @@ function imageFrom(
     return {
       src: `${supabaseUrl}/functions/v1/woo-image-proxy/${id}.jpg`,
       sourceId: id,
+      originalUrl: typeof url === "string" ? url : null,
     };
   }
 
@@ -186,7 +208,7 @@ function imageFrom(
   try {
     const parsed = new URL(url);
     return ["http:", "https:"].includes(parsed.protocol)
-      ? { src: parsed.toString(), sourceId: null }
+      ? { src: parsed.toString(), sourceId: null, originalUrl: parsed.toString() }
       : null;
   } catch {
     return null;
@@ -195,7 +217,13 @@ function imageFrom(
 
 function collectImages(product: Mueble, supabaseUrl: string) {
   const urls = new Set<string>();
-  const images: Array<{ src: string; name: string; alt: string }> = [];
+  const images: Array<{
+    src: string;
+    name: string;
+    alt: string;
+    sourceId: string | null;
+    originalUrl: string | null;
+  }> = [];
   const allImages = [...(product.galeria ?? []), ...(product.fotos ?? [])];
   for (const image of allImages) {
     const nextImage = imageFrom(image, supabaseUrl);
@@ -206,11 +234,25 @@ function collectImages(product: Mueble, supabaseUrl: string) {
       src: nextImage.src,
       name: `${product.nombre} ${images.length + 1}.jpg`,
       alt: product.nombre,
+      sourceId: nextImage.sourceId,
+      originalUrl: nextImage.originalUrl,
     });
     if (images.length >= MAX_IMAGES_PER_SYNC) break;
   }
 
   return images;
+}
+
+function imagesForWoo(
+  images: Array<{
+    src: string;
+    name: string;
+    alt: string;
+    sourceId: string | null;
+    originalUrl: string | null;
+  }>,
+) {
+  return images.map(({ src, name, alt }) => ({ src, name, alt }));
 }
 
 function buildDescription(product: Mueble) {
@@ -250,7 +292,105 @@ function buildWooPayload(product: Mueble, wooCategoryId: number | null) {
 }
 
 function buildWooImagePayload(product: Mueble, supabaseUrl: string) {
-  return { images: collectImages(product, supabaseUrl) };
+  return { images: imagesForWoo(collectImages(product, supabaseUrl)) };
+}
+
+function buildSyncPayloadSummary(
+  product: Mueble,
+  payload: ReturnType<typeof buildWooPayload>,
+  wooCategoryId: number | null,
+  images: ReturnType<typeof collectImages>,
+) {
+  return {
+    name: payload.name,
+    status: payload.status,
+    regularPrice: payload.regular_price ?? null,
+    categoryName: product.categoria ?? null,
+    categoryId: wooCategoryId,
+    price2: product.precio_2 ?? null,
+    price3: product.precio_3 ?? null,
+    descriptionSent: Boolean(payload.description),
+    imageCount: images.length,
+  };
+}
+
+function imageSummaryFrom(
+  images: ReturnType<typeof collectImages>,
+  status: "pending" | "synced" | "failed" | "skipped",
+  message: string,
+) {
+  return {
+    status,
+    message,
+    total: images.length,
+    sent: status === "synced" ? images.length : 0,
+    failed: status === "failed" ? images.length : 0,
+    failedImages:
+      status === "failed"
+        ? images.map((image) => ({
+            src: image.src,
+            sourceId: image.sourceId,
+            originalUrl: image.originalUrl,
+            name: image.name,
+          }))
+        : [],
+    images: images.map((image) => ({
+      src: image.src,
+      sourceId: image.sourceId,
+      originalUrl: image.originalUrl,
+      name: image.name,
+    })),
+  };
+}
+
+async function recordSyncHistory(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  productId: string,
+  event: {
+    jobId?: string | null;
+    eventType: "product_sync" | "image_sync";
+    status: "success" | "failed" | "pending" | "skipped";
+    action?: "created" | "updated" | null;
+    changedBy: AdminUser;
+    wooProductId?: number | null;
+    wooPermalink?: string | null;
+    categoryName?: string | null;
+    categoryId?: number | null;
+    regularPrice?: string | null;
+    price2?: string | number | null;
+    price3?: string | number | null;
+    changedFields?: string[];
+    payloadSummary?: unknown;
+    imageSummary?: unknown;
+    errorCode?: string | null;
+    errorMessage?: string | null;
+    message: string;
+    syncedAt?: string;
+  },
+) {
+  await supabaseAdmin.from("woocommerce_sync_history").insert({
+    product_id: productId,
+    job_id: event.jobId ?? null,
+    event_type: event.eventType,
+    status: event.status,
+    action: event.action ?? null,
+    changed_by: event.changedBy.id,
+    changed_by_email: event.changedBy.email,
+    woo_product_id: event.wooProductId ?? null,
+    woo_permalink: event.wooPermalink ?? null,
+    category_name: event.categoryName ?? null,
+    category_id: event.categoryId ?? null,
+    regular_price: event.regularPrice ?? null,
+    price_2: event.price2 === null || event.price2 === undefined ? null : String(event.price2),
+    price_3: event.price3 === null || event.price3 === undefined ? null : String(event.price3),
+    changed_fields: event.changedFields ?? [],
+    payload_summary: event.payloadSummary ?? {},
+    image_summary: event.imageSummary ?? {},
+    error_code: event.errorCode ?? null,
+    error_message: event.errorMessage ?? null,
+    message: event.message,
+    synced_at: event.syncedAt ?? new Date().toISOString(),
+  });
 }
 
 async function fetchWithTimeout(
@@ -318,6 +458,15 @@ function isValidWooProduct(body: WooRequestResult["body"]): body is WooProductRe
 
 function normalizeName(value: string) {
   return value.trim().toLocaleLowerCase("es-MX");
+}
+
+function asUuid(value: unknown) {
+  if (typeof value !== "string") return null;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  )
+    ? value
+    : null;
 }
 
 async function ensureWooCategory(
@@ -399,17 +548,31 @@ async function syncImagesInBackground(
   storeUrl: string,
   credentials: string,
   productId: string,
-  wooProductId: number,
   product: Mueble,
+  audit: SyncAuditContext,
 ) {
-  const images = buildWooImagePayload(product, supabaseUrl).images;
+  const images = collectImages(product, supabaseUrl);
   if (images.length === 0) {
-    await updateWooImageSyncStatus(
-      supabaseAdmin,
-      productId,
-      "skipped",
-      "El producto no tiene imágenes",
-    );
+    const message = "El producto no tiene imágenes";
+    await updateWooImageSyncStatus(supabaseAdmin, productId, "skipped", message);
+    await recordSyncHistory(supabaseAdmin, productId, {
+      jobId: audit.jobId,
+      eventType: "image_sync",
+      status: "skipped",
+      action: audit.action,
+      changedBy: audit.changedBy,
+      wooProductId: audit.wooProductId,
+      wooPermalink: audit.wooPermalink,
+      categoryName: product.categoria ?? null,
+      categoryId: audit.categoryId,
+      regularPrice: audit.payloadSummary.regularPrice as string | null,
+      price2: product.precio_2,
+      price3: product.precio_3,
+      changedFields: ["images"],
+      payloadSummary: audit.payloadSummary,
+      imageSummary: imageSummaryFrom(images, "skipped", message),
+      message,
+    });
     return;
   }
 
@@ -417,39 +580,89 @@ async function syncImagesInBackground(
     const imageResult = await wooRequest(
       storeUrl,
       credentials,
-      `/products/${wooProductId}`,
+      `/products/${audit.wooProductId}`,
       {
         method: "PUT",
-        body: JSON.stringify({ images }),
+        body: JSON.stringify({ images: imagesForWoo(images) }),
       },
       IMAGE_REQUEST_TIMEOUT_MS,
     );
 
     if (imageResult.response.ok && isValidWooProduct(imageResult.body)) {
-      await updateWooImageSyncStatus(
-        supabaseAdmin,
-        productId,
-        "synced",
-        `${images.length} imagen(es) sincronizada(s)`,
-      );
+      const message = `${images.length} imagen(es) sincronizada(s)`;
+      await updateWooImageSyncStatus(supabaseAdmin, productId, "synced", message);
+      await recordSyncHistory(supabaseAdmin, productId, {
+        jobId: audit.jobId,
+        eventType: "image_sync",
+        status: "success",
+        action: audit.action,
+        changedBy: audit.changedBy,
+        wooProductId: audit.wooProductId,
+        wooPermalink: audit.wooPermalink,
+        categoryName: product.categoria ?? null,
+        categoryId: audit.categoryId,
+        regularPrice: audit.payloadSummary.regularPrice as string | null,
+        price2: product.precio_2,
+        price3: product.precio_3,
+        changedFields: ["images"],
+        payloadSummary: audit.payloadSummary,
+        imageSummary: imageSummaryFrom(images, "synced", message),
+        message,
+      });
       return;
     }
 
-    await updateWooImageSyncStatus(
-      supabaseAdmin,
-      productId,
-      "failed",
-      wooErrorMessage(imageResult.body, "WooCommerce no pudo importar las imágenes"),
-    );
+    const message = wooErrorMessage(imageResult.body, "WooCommerce no pudo importar las imágenes");
+    await updateWooImageSyncStatus(supabaseAdmin, productId, "failed", message);
+    await recordSyncHistory(supabaseAdmin, productId, {
+      jobId: audit.jobId,
+      eventType: "image_sync",
+      status: "failed",
+      action: audit.action,
+      changedBy: audit.changedBy,
+      wooProductId: audit.wooProductId,
+      wooPermalink: audit.wooPermalink,
+      categoryName: product.categoria ?? null,
+      categoryId: audit.categoryId,
+      regularPrice: audit.payloadSummary.regularPrice as string | null,
+      price2: product.precio_2,
+      price3: product.precio_3,
+      changedFields: ["images"],
+      payloadSummary: audit.payloadSummary,
+      imageSummary: imageSummaryFrom(images, "failed", message),
+      errorCode: mapWooError(imageResult.response.status),
+      errorMessage: message,
+      message,
+    });
   } catch (error) {
-    await updateWooImageSyncStatus(
-      supabaseAdmin,
-      productId,
-      "failed",
+    const message =
       error instanceof DOMException && error.name === "AbortError"
         ? "WooCommerce tardó demasiado importando imágenes"
-        : "No fue posible conectar con WooCommerce para importar imágenes",
-    );
+        : "No fue posible conectar con WooCommerce para importar imágenes";
+    await updateWooImageSyncStatus(supabaseAdmin, productId, "failed", message);
+    await recordSyncHistory(supabaseAdmin, productId, {
+      jobId: audit.jobId,
+      eventType: "image_sync",
+      status: "failed",
+      action: audit.action,
+      changedBy: audit.changedBy,
+      wooProductId: audit.wooProductId,
+      wooPermalink: audit.wooPermalink,
+      categoryName: product.categoria ?? null,
+      categoryId: audit.categoryId,
+      regularPrice: audit.payloadSummary.regularPrice as string | null,
+      price2: product.precio_2,
+      price3: product.precio_3,
+      changedFields: ["images"],
+      payloadSummary: audit.payloadSummary,
+      imageSummary: imageSummaryFrom(images, "failed", message),
+      errorCode:
+        error instanceof DOMException && error.name === "AbortError"
+          ? "WOOCOMMERCE_IMAGE_TIMEOUT"
+          : "WOOCOMMERCE_IMAGE_NETWORK_ERROR",
+      errorMessage: message,
+      message,
+    });
   }
 }
 
@@ -465,10 +678,11 @@ Deno.serve(async (req) => {
   const adminCheck = await requireAdminUser(req);
   if (!adminCheck.ok) return adminCheck.response;
 
-  const { productId } = await readJsonBody(req);
+  const { productId, jobId: rawJobId } = await readJsonBody(req);
   if (typeof productId !== "string" || !productId.trim()) {
     return errorResponse(400, "WOOCOMMERCE_INVALID_PRODUCT", "Falta el producto a sincronizar");
   }
+  const jobId = asUuid(rawJobId);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -523,16 +737,47 @@ Deno.serve(async (req) => {
     try {
       wooCategoryId = await ensureWooCategory(storeUrl, credentials, mueble.categoria);
     } catch (categoryError) {
+      const message =
+        categoryError instanceof Error
+          ? categoryError.message
+          : "No fue posible sincronizar la categoría con WooCommerce";
+      await recordSyncHistory(supabaseAdmin, productId, {
+        jobId,
+        eventType: "product_sync",
+        status: "failed",
+        action: existingWooId ? "updated" : "created",
+        changedBy: adminCheck.user,
+        wooProductId: existingWooId,
+        wooPermalink: null,
+        categoryName: mueble.categoria ?? null,
+        categoryId: null,
+        regularPrice: asNumber(mueble.precio) !== null ? String(asNumber(mueble.precio)) : null,
+        price2: mueble.precio_2,
+        price3: mueble.precio_3,
+        changedFields: ["category"],
+        payloadSummary: {
+          name: mueble.nombre,
+          regularPrice: asNumber(mueble.precio) !== null ? String(asNumber(mueble.precio)) : null,
+          categoryName: mueble.categoria ?? null,
+          categoryId: null,
+          price2: mueble.precio_2,
+          price3: mueble.precio_3,
+        },
+        imageSummary: {},
+        errorCode: "WOOCOMMERCE_CATEGORY_SYNC_FAILED",
+        errorMessage: message,
+        message,
+      });
       return errorResponse(
         502,
         "WOOCOMMERCE_CATEGORY_SYNC_FAILED",
-        categoryError instanceof Error
-          ? categoryError.message
-          : "No fue posible sincronizar la categoría con WooCommerce",
+        message,
       );
     }
 
     const payload = buildWooPayload(mueble, wooCategoryId);
+    const images = collectImages(mueble, supabaseUrl);
+    const payloadSummary = buildSyncPayloadSummary(mueble, payload, wooCategoryId, images);
     const path = existingWooId ? `/products/${existingWooId}` : "/products";
     const method = existingWooId ? "PUT" : "POST";
     const { response, body } = await wooRequest(storeUrl, credentials, path, {
@@ -541,16 +786,58 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
+      const message =
+        response.status === 401 || response.status === 403
+          ? "WooCommerce rechazó la sincronización. Revisa permisos de la clave REST"
+          : wooErrorMessage(body, "WooCommerce respondió con un error al sincronizar el producto");
+      await recordSyncHistory(supabaseAdmin, productId, {
+        jobId,
+        eventType: "product_sync",
+        status: "failed",
+        action: existingWooId ? "updated" : "created",
+        changedBy: adminCheck.user,
+        wooProductId: existingWooId,
+        wooPermalink: null,
+        categoryName: mueble.categoria ?? null,
+        categoryId: wooCategoryId,
+        regularPrice: payload.regular_price ?? null,
+        price2: mueble.precio_2,
+        price3: mueble.precio_3,
+        changedFields: ["name", "status", "regular_price", "category", "description"],
+        payloadSummary,
+        imageSummary: imageSummaryFrom(images, "skipped", "Las imágenes no se enviaron"),
+        errorCode: mapWooError(response.status),
+        errorMessage: message,
+        message,
+      });
       return errorResponse(
         response.status,
         mapWooError(response.status),
-        response.status === 401 || response.status === 403
-          ? "WooCommerce rechazó la sincronización. Revisa permisos de la clave REST"
-          : wooErrorMessage(body, "WooCommerce respondió con un error al sincronizar el producto"),
+        message,
       );
     }
 
     if (!isValidWooProduct(body)) {
+      await recordSyncHistory(supabaseAdmin, productId, {
+        jobId,
+        eventType: "product_sync",
+        status: "failed",
+        action: existingWooId ? "updated" : "created",
+        changedBy: adminCheck.user,
+        wooProductId: existingWooId,
+        wooPermalink: null,
+        categoryName: mueble.categoria ?? null,
+        categoryId: wooCategoryId,
+        regularPrice: payload.regular_price ?? null,
+        price2: mueble.precio_2,
+        price3: mueble.precio_3,
+        changedFields: ["name", "status", "regular_price", "category", "description"],
+        payloadSummary,
+        imageSummary: imageSummaryFrom(images, "skipped", "Las imágenes no se enviaron"),
+        errorCode: "WOOCOMMERCE_INVALID_RESPONSE",
+        errorMessage: "WooCommerce no devolvió un producto válido",
+        message: "WooCommerce no devolvió un producto válido",
+      });
       return errorResponse(
         502,
         "WOOCOMMERCE_INVALID_RESPONSE",
@@ -559,7 +846,6 @@ Deno.serve(async (req) => {
     }
 
     const wooProduct = body;
-    const images = buildWooImagePayload(mueble, supabaseUrl).images;
     const imageSyncStatus: "pending" | "skipped" = images.length > 0 ? "pending" : "skipped";
     const imageSyncMessage =
       images.length > 0
@@ -588,12 +874,55 @@ Deno.serve(async (req) => {
       .eq("id", productId);
 
     if (updateError) {
+      await recordSyncHistory(supabaseAdmin, productId, {
+        jobId,
+        eventType: "product_sync",
+        status: "failed",
+        action: existingWooId ? "updated" : "created",
+        changedBy: adminCheck.user,
+        wooProductId: wooProduct.id,
+        wooPermalink: wooProduct.permalink ?? null,
+        categoryName: mueble.categoria ?? null,
+        categoryId: wooCategoryId,
+        regularPrice: payload.regular_price ?? null,
+        price2: mueble.precio_2,
+        price3: mueble.precio_3,
+        changedFields: ["woocommerce_metadata"],
+        payloadSummary,
+        imageSummary: imageSummaryFrom(images, "skipped", "Las imágenes no se enviaron"),
+        errorCode: "WOOCOMMERCE_METADATA_UPDATE_FAILED",
+        errorMessage: "El producto se sincronizó, pero no se pudo guardar el ID de WooCommerce",
+        message: "El producto se sincronizó, pero no se pudo guardar el ID de WooCommerce",
+      });
       return errorResponse(
         500,
         "WOOCOMMERCE_METADATA_UPDATE_FAILED",
         "El producto se sincronizó, pero no se pudo guardar el ID de WooCommerce",
       );
     }
+
+    const action = existingWooId ? "updated" : "created";
+    await recordSyncHistory(supabaseAdmin, productId, {
+      jobId,
+      eventType: "product_sync",
+      status: "success",
+      action,
+      changedBy: adminCheck.user,
+      wooProductId: wooProduct.id,
+      wooPermalink: wooProduct.permalink ?? null,
+      categoryName: mueble.categoria ?? null,
+      categoryId: wooCategoryId,
+      regularPrice: payload.regular_price ?? null,
+      price2: mueble.precio_2,
+      price3: mueble.precio_3,
+      changedFields: ["name", "status", "regular_price", "category", "description"],
+      payloadSummary,
+      imageSummary: imageSummaryFrom(images, imageSyncStatus, imageSyncMessage),
+      message: existingWooId
+        ? "Producto actualizado en WooCommerce"
+        : "Producto creado en WooCommerce como borrador",
+      syncedAt,
+    });
 
     if (images.length > 0) {
       EdgeRuntime.waitUntil(
@@ -603,8 +932,16 @@ Deno.serve(async (req) => {
           storeUrl,
           credentials,
           productId,
-          wooProduct.id,
           mueble,
+          {
+            jobId,
+            changedBy: adminCheck.user,
+            action,
+            wooProductId: wooProduct.id,
+            wooPermalink: wooProduct.permalink ?? null,
+            categoryId: wooCategoryId,
+            payloadSummary,
+          },
         ),
       );
     }
