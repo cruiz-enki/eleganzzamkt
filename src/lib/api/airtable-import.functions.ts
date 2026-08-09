@@ -4,11 +4,10 @@ import { supabase } from "@/lib/supabase-client";
 import { z } from "zod";
 import { upsertMueble, uploadToDrive } from "./inventory.functions";
 
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/airtable";
 const AIRTABLE_BASE_ID = "appOQZvn0cvA9boUZ";
 const AIRTABLE_TABLE = "Total";
 
-// Nombres de campo en Airtable (la pasarela de Lovable devuelve los campos por nombre).
+// Nombres de campo en Airtable (la API de Airtable devuelve los campos por nombre).
 const F_NOMBRE = "Nombre";
 const F_CATEGORIA = "Categoría";
 const F_PRECIO = "Precio";
@@ -70,12 +69,14 @@ function extractImageUrls(fields: Record<string, any>): string[] {
 type AirtableRecord = { id: string; fields: Record<string, any> };
 
 async function fetchAllAirtableRecords(): Promise<AirtableRecord[]> {
-  const lovableApiKey = process.env["LOVABLE_API_KEY"];
-  const airtableApiKey = process.env["AIRTABLE_API_KEY"];
+  // Token personal de Airtable (Personal Access Token). Se conecta directo a la
+  // API de Airtable, sin depender de la pasarela de Lovable.
+  const airtableToken =
+    process.env["AIRTABLE_API_KEY"] || process.env["AIRTABLE_TOKEN"] || process.env["AIRTABLE_PAT"];
 
-  if (!lovableApiKey || !airtableApiKey) {
+  if (!airtableToken) {
     throw new Error(
-      "El conector de Airtable no está configurado (faltan LOVABLE_API_KEY / AIRTABLE_API_KEY).",
+      "Falta el token de Airtable. Agrega AIRTABLE_API_KEY (un Personal Access Token de Airtable) a las variables de entorno.",
     );
   }
 
@@ -86,15 +87,12 @@ async function fetchAllAirtableRecords(): Promise<AirtableRecord[]> {
     const params = new URLSearchParams({ pageSize: "100" });
     if (offset) params.set("offset", offset);
 
-    const url = `${GATEWAY_URL}/v0/${encodeURIComponent(AIRTABLE_BASE_ID)}/${encodeURIComponent(
-      AIRTABLE_TABLE,
-    )}?${params.toString()}`;
+    const url = `https://api.airtable.com/v0/${encodeURIComponent(
+      AIRTABLE_BASE_ID,
+    )}/${encodeURIComponent(AIRTABLE_TABLE)}?${params.toString()}`;
 
     const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${lovableApiKey}`,
-        "X-Connection-Api-Key": airtableApiKey,
-      },
+      headers: { Authorization: `Bearer ${airtableToken}` },
     });
 
     if (!response.ok) {

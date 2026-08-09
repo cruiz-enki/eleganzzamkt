@@ -17,7 +17,6 @@ import { publishProduct } from "@/lib/api/catalogos.functions";
 import { cleanProductImage } from "@/lib/api/ai.functions";
 import { previewProductWooCommerce, type WooProductPreviewResult } from "@/lib/api/woocommerce";
 import { useWooCommerceSyncQueue } from "@/hooks/use-woocommerce-sync-queue";
-import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
 import { WooCommerceProductHistory } from "@/components/dashboard/WooCommerceProductHistory";
 import { WooCommerceProductPreviewDialog } from "@/components/dashboard/WooCommerceProductPreviewDialog";
 import { ProductImageManager } from "@/components/dashboard/ProductImageManager";
@@ -54,6 +53,8 @@ import {
   ChevronRight,
   LayoutGrid,
   List,
+  Images,
+  Database,
   CheckCircle2,
   Clock,
   Archive,
@@ -112,6 +113,20 @@ function galleryUrl(value: unknown) {
   return typeof url === "string" ? url : "";
 }
 
+// Cuenta las imágenes únicas de un producto (galeria + fotos), evitando
+// contar dos veces la misma imagen. "Tiene galería" = más de 1 imagen.
+function countMuebleImages(record: Mueble): number {
+  const all = [...(record.galeria || []), ...(record.fotos || [])];
+  const seen = new Set<string>();
+  for (const img of all) {
+    const info = inspectImage(img as { id?: unknown; url?: unknown; name?: unknown });
+    if (info.sourceType === "invalid") continue;
+    const key = info.driveId || info.displayUrl;
+    if (key) seen.add(key);
+  }
+  return seen.size;
+}
+
 function textDetail(details: unknown, keys: string[]) {
   if (!details || typeof details !== "object" || Array.isArray(details)) return "";
   const record = details as Record<string, unknown>;
@@ -166,8 +181,11 @@ export function SupabaseInventory() {
   // New States for Filter, Sort and Column Visibility
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: "", direction: "asc" });
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [galleryFilter, setGalleryFilter] = useState<"all" | "with" | "without">("all");
+  const [csvImporterOpen, setCsvImporterOpen] = useState(false);
+  const [airtableImporterOpen, setAirtableImporterOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "discontinued">(
-    "all",
+    "published",
   );
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     new Set(["nombre", "categoria", "precio", "acciones"]),
@@ -427,6 +445,14 @@ export function SupabaseInventory() {
       result = result.filter((r) => r.categoria === categoryFilter);
     }
 
+    // Gallery filter (productos con/sin galería de imágenes)
+    if (galleryFilter !== "all") {
+      result = result.filter((r) => {
+        const hasGallery = countMuebleImages(r) > 1;
+        return galleryFilter === "with" ? hasGallery : !hasGallery;
+      });
+    }
+
     // Status filter (draft/published)
     if (statusFilter !== "all") {
       result = result.filter((r) => {
@@ -453,7 +479,7 @@ export function SupabaseInventory() {
     }
 
     return result;
-  }, [records, searchTerm, categoryFilter, statusFilter, sortConfig]);
+  }, [records, searchTerm, categoryFilter, statusFilter, galleryFilter, sortConfig]);
 
   const lightboxSlides = useMemo<ProductLightboxSlide[]>(() => {
     return processedRecords.map((record) => {
@@ -690,133 +716,84 @@ export function SupabaseInventory() {
     }
   };
 
+  const handleAgruparCategorias = async () => {
+    const loading = toast.loading("Agrupando categorías...");
+    try {
+      const res = await bulkCleanupCategories();
+      toast.dismiss(loading);
+      toast.success(`Se actualizaron ${res.updatedCount} productos`);
+      refetch();
+    } catch (e) {
+      toast.dismiss(loading);
+      toast.error("Error al agrupar categorías");
+    }
+  };
+
+  const handleSyncDrive = async () => {
+    const loading = toast.loading("Sincronizando fotos desde Google Drive...");
+    try {
+      const res = await syncAllDriveGalleries();
+      toast.dismiss(loading);
+      toast.success(`${res.fotosAgregadas} fotos nuevas en ${res.productosActualizados} productos`);
+      refetch();
+    } catch (e: unknown) {
+      toast.dismiss(loading);
+      toast.error(getErrorMessage(e, "Error al sincronizar con Drive"));
+    }
+  };
+
+  const handleDescontinuarLista = async () => {
+    const list = [
+      "Sala American confort",
+      "Comedor capuccino buffete joy y vitrina MM",
+      "Sala Master",
+      "Sala Mastreta",
+      "Sala chat modular",
+      "Sala california",
+      "Sala italia",
+      "Sala africa",
+      "Sala africa modular",
+      "Sala Stacy Modular",
+      "Sala Michelin",
+      "Emma modular sala",
+      "Sala grecia",
+      "Sala maya",
+      "Sala charlotte.",
+      "Sala elda",
+      "Recamara milos",
+      "Sala Tokyo",
+      "Sala amelia",
+      "Sala waldos",
+      "Sala meghan",
+      "Sala tollocan modular",
+      "Sala valencia modular",
+      "Comedor iris",
+      "Sala colombo",
+      "Sala river",
+      "Sala montana esquinera",
+      "sala gina modular",
+      "comedor sky y mesa torino",
+      "comedor DT-2051*B6",
+      "recamara hollywood",
+    ];
+
+    if (confirm(`¿Descontinuar ${list.length} productos específicos de la lista?`)) {
+      const loading = toast.loading("Descontinuando lista de productos...");
+      try {
+        const res = await bulkDiscontinueMuebles({ data: { nombres: list } });
+        toast.dismiss(loading);
+        toast.success(`Se descontinuaron ${res.updatedCount} productos correctamente`);
+        refetch();
+      } catch (e) {
+        toast.dismiss(loading);
+        toast.error("Error al procesar la lista");
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <WooCommerceSyncQueue />
-
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 mr-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2"
-            onClick={async () => {
-              const loading = toast.loading("Agrupando categorías...");
-              try {
-                const res = await bulkCleanupCategories();
-                toast.dismiss(loading);
-                toast.success(`Se actualizaron ${res.updatedCount} productos`);
-                refetch();
-              } catch (e) {
-                toast.dismiss(loading);
-                toast.error("Error al agrupar categorías");
-              }
-            }}
-          >
-            <RefreshCcw className="h-3 w-3" />
-            Agrupar Categorías
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
-            onClick={async () => {
-              const loading = toast.loading("Sincronizando fotos desde Google Drive...");
-              try {
-                const res = await syncAllDriveGalleries();
-                toast.dismiss(loading);
-                toast.success(
-                  `${res.fotosAgregadas} fotos nuevas en ${res.productosActualizados} productos`,
-                );
-                refetch();
-              } catch (e: unknown) {
-                toast.dismiss(loading);
-                toast.error(getErrorMessage(e, "Error al sincronizar con Drive"));
-              }
-            }}
-          >
-            <FolderOpen className="h-3 w-3" />
-            Sincronizar Drive
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200"
-            onClick={async () => {
-              const list = [
-                "Sala American confort",
-                "Comedor capuccino buffete joy y vitrina MM",
-                "Sala Master",
-                "Sala Mastreta",
-                "Sala chat modular",
-                "Sala california",
-                "Sala italia",
-                "Sala africa",
-                "Sala africa modular",
-                "Sala Stacy Modular",
-                "Sala Michelin",
-                "Emma modular sala",
-                "Sala grecia",
-                "Sala maya",
-                "Sala charlotte.",
-                "Sala elda",
-                "Recamara milos",
-                "Sala Tokyo",
-                "Sala amelia",
-                "Sala waldos",
-                "Sala meghan",
-                "Sala tollocan modular",
-                "Sala valencia modular",
-                "Comedor iris",
-                "Sala colombo",
-                "Sala river",
-                "Sala montana esquinera",
-                "sala gina modular",
-                "comedor sky y mesa torino",
-                "comedor DT-2051*B6",
-                "recamara hollywood",
-              ];
-
-              if (confirm(`¿Descontinuar ${list.length} productos específicos de la lista?`)) {
-                const loading = toast.loading("Descontinuando lista de productos...");
-                try {
-                  const res = await bulkDiscontinueMuebles({ data: { nombres: list } });
-                  toast.dismiss(loading);
-                  toast.success(`Se descontinuaron ${res.updatedCount} productos correctamente`);
-                  refetch();
-                } catch (e) {
-                  toast.dismiss(loading);
-                  toast.error("Error al procesar la lista");
-                }
-              }
-            }}
-          >
-            <Archive className="h-3 w-3" />
-            Descontinuar Lista
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
-            onClick={() => handleExport("csv")}
-            disabled={processedRecords.length === 0}
-          >
-            <FileDown className="h-3 w-3" />
-            CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 border-slate-200 text-[10px] font-bold uppercase gap-2 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
-            onClick={() => handleExport("xls")}
-            disabled={processedRecords.length === 0}
-          >
-            <FileDown className="h-3 w-3" />
-            Excel
-          </Button>
-        </div>
-
         <div className="relative min-w-[300px] flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -933,6 +910,47 @@ export function SupabaseInventory() {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Gallery Filter (productos con/sin galería) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-9 border-slate-200",
+                  galleryFilter !== "all" && "bg-violet-50 border-violet-200 text-violet-700",
+                )}
+              >
+                <Images className="h-4 w-4 mr-2" />
+                {galleryFilter === "all"
+                  ? "Galería"
+                  : galleryFilter === "with"
+                    ? "Con galería"
+                    : "Sin galería"}
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[210px]">
+              <DropdownMenuLabel>Filtrar por imágenes</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setGalleryFilter("all")}>
+                Todos los productos
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setGalleryFilter("with")}
+                className="text-violet-600"
+              >
+                Con galería (2+ imágenes)
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setGalleryFilter("without")}
+                className="text-slate-500"
+              >
+                Sin galería (0–1 imagen)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Columns Visibility */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -1015,18 +1033,74 @@ export function SupabaseInventory() {
             Actualizar
           </Button>
 
-          <CSVImporter />
-
-          <AirtableImporter />
+          {/* Herramientas (acciones menos frecuentes) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-9 border-slate-200">
+                <Settings2 className="h-4 w-4 mr-2" />
+                Herramientas
+                <ChevronDown className="h-4 w-4 ml-2 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[220px]">
+              <DropdownMenuLabel>Importar</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setAirtableImporterOpen(true)}>
+                <Database className="h-4 w-4 mr-2" />
+                Importar de Airtable
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setCsvImporterOpen(true)}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Importar CSV
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Exportar</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => handleExport("csv")}
+                disabled={processedRecords.length === 0}
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleExport("xls")}
+                disabled={processedRecords.length === 0}
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Exportar Excel
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Mantenimiento</DropdownMenuLabel>
+              <DropdownMenuItem onClick={handleAgruparCategorias}>
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Agrupar categorías
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSyncDrive}>
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Sincronizar Drive
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDescontinuarLista} className="text-amber-600">
+                <Archive className="h-4 w-4 mr-2" />
+                Descontinuar lista
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button
             size="sm"
-            className="h-9 bg-black text-white hover:bg-black/90"
+            className="h-9 bg-[#1B3566] text-white hover:bg-[#132a52]"
             onClick={handleAdd}
           >
             <Plus className="h-4 w-4 mr-2" />
             Nuevo Producto
           </Button>
+
+          {/* Diálogos de importación (se abren desde el menú Herramientas) */}
+          <CSVImporter open={csvImporterOpen} onOpenChange={setCsvImporterOpen} hideTrigger />
+          <AirtableImporter
+            open={airtableImporterOpen}
+            onOpenChange={setAirtableImporterOpen}
+            hideTrigger
+          />
         </div>
       </div>
 
@@ -1191,6 +1265,16 @@ export function SupabaseInventory() {
                                   className="text-[9px] h-4 px-1 bg-blue-50 text-blue-600 border-blue-200"
                                 >
                                   Woo
+                                </Badge>
+                              )}
+                              {countMuebleImages(record) > 1 && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-[9px] h-4 px-1 bg-violet-50 text-violet-600 border-violet-200 gap-0.5"
+                                  title={`${countMuebleImages(record)} imágenes`}
+                                >
+                                  <Images className="h-2.5 w-2.5" />
+                                  {countMuebleImages(record)}
                                 </Badge>
                               )}
                             </span>
@@ -1418,6 +1502,12 @@ export function SupabaseInventory() {
                                   DISC
                                 </span>
                               )}
+                              {countMuebleImages(record) > 1 && (
+                                <span className="bg-violet-500 text-[8px] text-white px-1 rounded inline-flex items-center gap-0.5">
+                                  <Images className="h-2 w-2" />
+                                  {countMuebleImages(record)}
+                                </span>
+                              )}
                             </h3>
                             <p className="text-[10px] opacity-70 uppercase tracking-wider">
                               {record.categoria}
@@ -1542,7 +1632,7 @@ export function SupabaseInventory() {
                   <div className="p-8 flex-1 overflow-y-auto">
                     <DialogHeader className="mb-8 space-y-4">
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-black text-white hover:bg-black/90 px-3 py-1 rounded-full uppercase text-[10px] tracking-widest border-0">
+                        <Badge className="bg-[#1B3566] text-white hover:bg-[#132a52] px-3 py-1 rounded-full uppercase text-[10px] tracking-widest border-0">
                           Ficha de Supabase
                         </Badge>
                         {selectedRecord.categoria && (
@@ -1913,7 +2003,7 @@ export function SupabaseInventory() {
               </Button>
               <Button
                 type="submit"
-                className="bg-black text-white hover:bg-black/90 px-8"
+                className="bg-[#1B3566] text-white hover:bg-[#132a52] px-8"
                 disabled={upsertMutation.isPending || uploading}
               >
                 {upsertMutation.isPending ? "Guardando..." : "Guardar Producto"}

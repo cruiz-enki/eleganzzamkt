@@ -32,9 +32,24 @@ type ImportResult = {
   message?: string;
 };
 
-export function AirtableImporter() {
+type AirtableImporterProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
+};
+
+export function AirtableImporter({
+  open: openProp,
+  onOpenChange,
+  hideTrigger,
+}: AirtableImporterProps = {}) {
   const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = openProp !== undefined ? openProp : internalOpen;
+  const setOpen = (value: boolean) => {
+    if (onOpenChange) onOpenChange(value);
+    else setInternalOpen(value);
+  };
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -65,10 +80,10 @@ export function AirtableImporter() {
     setFinished(false);
   };
 
-  const handleOpenChange = (open: boolean) => {
+  const handleOpenChange = (next: boolean) => {
     if (isImporting) return; // no cerrar a media importación
-    setIsOpen(open);
-    if (!open) resetState();
+    setOpen(next);
+    if (!next) resetState();
   };
 
   const toggleOne = (id: string) => {
@@ -145,15 +160,17 @@ export function AirtableImporter() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="sm"
-        className="h-9 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
-        onClick={() => setIsOpen(true)}
-      >
-        <Database className="h-4 w-4 mr-2" />
-        Importar de Airtable
-      </Button>
+      {!hideTrigger && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400"
+          onClick={() => setOpen(true)}
+        >
+          <Database className="h-4 w-4 mr-2" />
+          Importar de Airtable
+        </Button>
+      )}
 
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-2xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
@@ -330,7 +347,7 @@ export function AirtableImporter() {
           <DialogFooter className="gap-2 sm:gap-0">
             {finished ? (
               <Button
-                className="bg-black text-white hover:bg-black/90"
+                className="bg-[#1B3566] text-white hover:bg-[#132a52]"
                 onClick={() => handleOpenChange(false)}
               >
                 Cerrar
@@ -345,7 +362,7 @@ export function AirtableImporter() {
                   Cancelar
                 </Button>
                 <Button
-                  className="bg-black text-white hover:bg-black/90"
+                  className="bg-[#1B3566] text-white hover:bg-[#132a52]"
                   onClick={handleImport}
                   disabled={
                     isImporting || isLoading || candidates.length === 0 || selected.size === 0

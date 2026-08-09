@@ -221,7 +221,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (isAllowed && !isRecoveryMode) {
     return (
       <div className="min-h-screen">
-        <div className="fixed right-4 top-4 z-[60] hidden items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm backdrop-blur md:flex dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300">
+        <div className="fixed right-4 bottom-4 z-[60] hidden items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm backdrop-blur md:flex dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300">
           <ShieldCheck className="h-4 w-4 text-emerald-600" />
           <span>{signedEmail}</span>
           <Button variant="ghost" size="sm" className="h-7 px-2" onClick={handleSignOut}>
@@ -234,21 +234,22 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fcfbf8] px-4 py-10 dark:bg-slate-950">
-      <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div className="mb-6 flex items-start gap-3">
-          <div className="rounded-md bg-red-50 p-2 text-red-700 dark:bg-red-950/40 dark:text-red-300">
-            <ShieldCheck className="h-5 w-5" />
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-[#00B5C8]/10 px-4 py-10 dark:from-slate-950 dark:via-slate-950 dark:to-[#1B3566]/40">
+      <div className="w-full max-w-md rounded-2xl border border-slate-200 border-t-4 border-t-[#1B3566] bg-white p-6 shadow-xl dark:border-slate-800 dark:border-t-[#00B5C8] dark:bg-slate-900">
+        <div className="mb-6">
+          <div className="inline-flex rounded-lg bg-white p-2 ring-1 ring-slate-100 dark:ring-slate-700">
+            <img src="/enki-logo.png" alt="Enki Soluciones" className="h-9 w-auto object-contain" />
           </div>
-          <div>
-            <h1 className="font-serif text-2xl font-semibold text-slate-950 dark:text-white">
-              Eleganzza Marketing
-            </h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Acceso privado para cruiz@enkisoluciones.mx.
-            </p>
-          </div>
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-slate-950 dark:text-white">
+            Marketing Hub
+          </h1>
+          <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#1B3566] dark:text-[#00B5C8]">
+            Eleganzza Muebles · por Enki
+          </p>
         </div>
+        <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+          Panel de marketing de Eleganzza Muebles. Acceso privado para cruiz@enkisoluciones.mx.
+        </p>
 
         <div className="space-y-3">
           {isRecoveryMode ? (
@@ -292,7 +293,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
               </div>
 
               <Button
-                className="w-full bg-slate-900 text-white hover:bg-slate-800"
+                className="w-full bg-[#1B3566] text-white hover:bg-[#132a52]"
                 onClick={handleUpdatePassword}
                 disabled={isUpdatingPassword}
               >
@@ -346,7 +347,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
               </div>
 
               <Button
-                className="w-full bg-slate-900 text-white hover:bg-slate-800"
+                className="w-full bg-[#1B3566] text-white hover:bg-[#132a52]"
                 onClick={handlePasswordSignIn}
                 disabled={isSigningIn}
               >

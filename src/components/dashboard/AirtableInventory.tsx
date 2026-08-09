@@ -1,10 +1,26 @@
 import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAirtableData, type AirtableRecord } from "@/lib/api/airtable.functions";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Database, Search, X, Package, Tag, DollarSign, Info, Image as ImageIcon } from "lucide-react";
+import {
+  Database,
+  Search,
+  X,
+  Package,
+  Tag,
+  DollarSign,
+  Info,
+  Image as ImageIcon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,37 +38,37 @@ export function AirtableInventory() {
   const [selectedRecord, setSelectedRecord] = useState<AirtableRecord | null>(null);
 
   const { data: records } = useSuspenseQuery({
-    queryKey: ['airtable-inventory'],
+    queryKey: ["airtable-inventory"],
     queryFn: () => getAirtableData({ data: {} }),
   });
 
   const filteredRecords = (records as AirtableRecord[]).filter((r) =>
-    Object.values(r.fields).some(val =>
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    Object.values(r.fields).some((val) =>
+      String(val).toLowerCase().includes(searchTerm.toLowerCase()),
+    ),
   );
 
   const getPhotos = (record: AirtableRecord) => {
     // Try different common names for attachment fields in Airtable
-    const photoField = record.fields["Fotos"] || 
-                       record.fields["Foto"] || 
-                       record.fields["Imagen"] || 
-                       record.fields["Attachments"] ||
-                       record.fields["Imágenes"];
-    
+    const photoField =
+      record.fields["Fotos"] ||
+      record.fields["Foto"] ||
+      record.fields["Imagen"] ||
+      record.fields["Attachments"] ||
+      record.fields["Imágenes"];
+
     if (Array.isArray(photoField)) return photoField;
-    
+
     // Sometimes it might not be an array if it's a single attachment or a different format
-    if (photoField && typeof photoField === 'object' && 'url' in photoField) {
+    if (photoField && typeof photoField === "object" && "url" in photoField) {
       return [photoField];
     }
-    
+
     return [];
   };
 
   // Debug helper to see field names if needed
   // console.log("Field names:", Object.keys(records[0]?.fields || {}));
-
 
   return (
     <div className="space-y-4">
@@ -76,9 +92,15 @@ export function AirtableInventory() {
         <Table>
           <TableHeader className="bg-slate-50/50 border-b border-slate-100">
             <TableRow className="hover:bg-transparent">
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Producto</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">Categoría</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">Precio</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">
+                Producto
+              </TableHead>
+              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4">
+                Categoría
+              </TableHead>
+              <TableHead className="text-[10px] uppercase font-bold text-slate-400 py-4 text-right">
+                Precio
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -88,42 +110,50 @@ export function AirtableInventory() {
                   No se encontraron muebles que coincidan con tu búsqueda.
                 </TableCell>
               </TableRow>
-            ) : filteredRecords.map((record) => (
-              <TableRow 
-                key={record.id} 
-                className="hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0"
-                onClick={() => setSelectedRecord(record)}
-              >
-                <TableCell className="py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
-                      {(() => {
-                        const photos = getPhotos(record);
-                        const firstPhoto = photos[0];
-                        const url = firstPhoto?.url || firstPhoto?.thumbnails?.small?.url || firstPhoto?.thumbnails?.large?.url;
-                        
-                        if (url) {
-                          return <img src={url} alt="" className="w-full h-full object-cover" />;
-                        }
-                        return <Package className="w-5 h-5 text-slate-400" />;
-                      })()}
-                    </div>
-                    <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
-                      {record.fields["Nombre"]}
-                    </span>
-                  </div>
-                </TableCell>
+            ) : (
+              filteredRecords.map((record) => (
+                <TableRow
+                  key={record.id}
+                  className="hover:bg-slate-50/50 transition-colors cursor-pointer group border-b border-slate-50 last:border-0"
+                  onClick={() => setSelectedRecord(record)}
+                >
+                  <TableCell className="py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shrink-0">
+                        {(() => {
+                          const photos = getPhotos(record);
+                          const firstPhoto = photos[0];
+                          const url =
+                            firstPhoto?.url ||
+                            firstPhoto?.thumbnails?.small?.url ||
+                            firstPhoto?.thumbnails?.large?.url;
 
-                <TableCell className="py-4">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0">
-                    {record.fields["Categoría"] || "Sin categoría"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right py-4 font-semibold text-slate-700">
-                  {record.fields["Precio"] ? currency.format(record.fields["Precio"]) : "—"}
-                </TableCell>
-              </TableRow>
-            ))}
+                          if (url) {
+                            return <img src={url} alt="" className="w-full h-full object-cover" />;
+                          }
+                          return <Package className="w-5 h-5 text-slate-400" />;
+                        })()}
+                      </div>
+                      <span className="font-medium text-slate-700 group-hover:text-black transition-colors">
+                        {record.fields["Nombre"]}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  <TableCell className="py-4">
+                    <Badge
+                      variant="secondary"
+                      className="bg-slate-100 text-slate-600 hover:bg-slate-200 font-normal border-0"
+                    >
+                      {record.fields["Categoría"] || "Sin categoría"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right py-4 font-semibold text-slate-700">
+                    {record.fields["Precio"] ? currency.format(record.fields["Precio"]) : "—"}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -138,20 +168,20 @@ export function AirtableInventory() {
                   <ScrollArea className="h-full">
                     <div className="flex flex-col gap-2 p-2">
                       {getPhotos(selectedRecord).map((photo: any, i: number) => {
-                        const url = photo.url || photo.thumbnails?.large?.url || photo.thumbnails?.full?.url;
+                        const url =
+                          photo.url || photo.thumbnails?.large?.url || photo.thumbnails?.full?.url;
                         if (!url) return null;
                         return (
-                          <img 
-                            key={i} 
-                            src={url} 
-                            alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`} 
+                          <img
+                            key={i}
+                            src={url}
+                            alt={`${selectedRecord.fields["Nombre"]} ${i + 1}`}
                             className="w-full rounded-lg shadow-sm bg-white"
                           />
                         );
                       })}
                     </div>
                   </ScrollArea>
-
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 gap-2">
                     <ImageIcon className="w-12 h-12 opacity-20" />
@@ -165,11 +195,14 @@ export function AirtableInventory() {
                 <div className="p-8 flex-1 overflow-y-auto">
                   <DialogHeader className="mb-8 space-y-4">
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-black text-white hover:bg-black/90 px-3 py-1 rounded-full uppercase text-[10px] tracking-widest border-0">
+                      <Badge className="bg-[#1B3566] text-white hover:bg-[#132a52] px-3 py-1 rounded-full uppercase text-[10px] tracking-widest border-0">
                         Ficha de Producto
                       </Badge>
                       {selectedRecord.fields["Categoría"] && (
-                        <Badge variant="outline" className="border-slate-200 text-slate-500 rounded-full font-normal">
+                        <Badge
+                          variant="outline"
+                          className="border-slate-200 text-slate-500 rounded-full font-normal"
+                        >
                           {selectedRecord.fields["Categoría"]}
                         </Badge>
                       )}
@@ -181,10 +214,14 @@ export function AirtableInventory() {
 
                   <div className="grid gap-8">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">Precio</span>
+                      <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">
+                        Precio
+                      </span>
                       <div className="h-px flex-1 bg-slate-100"></div>
                       <span className="text-2xl font-bold text-slate-900">
-                        {selectedRecord.fields["Precio"] ? currency.format(selectedRecord.fields["Precio"]) : "No disponible"}
+                        {selectedRecord.fields["Precio"]
+                          ? currency.format(selectedRecord.fields["Precio"])
+                          : "No disponible"}
                       </span>
                     </div>
 
@@ -194,11 +231,21 @@ export function AirtableInventory() {
                       </h4>
                       <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
                         {Object.entries(selectedRecord.fields).map(([key, value]) => {
-                          if (["Nombre", "Precio", "Categoría", "Fotos", "Foto", "Imagen"].includes(key)) return null;
+                          if (
+                            ["Nombre", "Precio", "Categoría", "Fotos", "Foto", "Imagen"].includes(
+                              key,
+                            )
+                          )
+                            return null;
                           if (typeof value === "object") return null;
                           return (
-                            <div key={key} className="flex flex-col gap-1 border-b border-slate-200/50 last:border-0 pb-3 last:pb-0">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{key}</span>
+                            <div
+                              key={key}
+                              className="flex flex-col gap-1 border-b border-slate-200/50 last:border-0 pb-3 last:pb-0"
+                            >
+                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                                {key}
+                              </span>
                               <span className="text-sm text-slate-700">{String(value)}</span>
                             </div>
                           );
@@ -209,10 +256,14 @@ export function AirtableInventory() {
                 </div>
 
                 <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex gap-3">
-                  <Button className="flex-1 bg-black text-white hover:bg-black/90 h-12 rounded-xl transition-all shadow-lg shadow-black/5 font-medium">
+                  <Button className="flex-1 bg-[#1B3566] text-white hover:bg-[#132a52] h-12 rounded-xl transition-all shadow-lg shadow-black/5 font-medium">
                     Compartir Ficha
                   </Button>
-                  <Button variant="outline" className="h-12 w-12 rounded-xl border-slate-200 bg-white hover:bg-slate-50" onClick={() => setSelectedRecord(null)}>
+                  <Button
+                    variant="outline"
+                    className="h-12 w-12 rounded-xl border-slate-200 bg-white hover:bg-slate-50"
+                    onClick={() => setSelectedRecord(null)}
+                  >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
