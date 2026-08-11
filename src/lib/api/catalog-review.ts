@@ -267,3 +267,25 @@ export async function addCatalogReviewComment(input: {
     p_mensaje: input.mensaje,
   });
 }
+
+export async function updateCatalogReviewProductFields(input: {
+  token: string;
+  muebleId: string;
+  marca?: string;
+  materiales?: string;
+  colores?: string;
+  medidas?: string;
+  descripcion?: string;
+  reviewerName?: string;
+}) {
+  return callRpc("update_catalog_review_product_fields", {
+    p_token: input.token,
+    p_mueble_id: input.muebleId,
+    p_marca: input.marca ?? null,
+    p_materiales: input.materiales ?? null,
+    p_colores: input.colores ?? null,
+    p_medidas: input.medidas ?? null,
+    p_descripcion: input.descripcion ?? null,
+    p_reviewer_name: input.reviewerName ?? null,
+  });
+}

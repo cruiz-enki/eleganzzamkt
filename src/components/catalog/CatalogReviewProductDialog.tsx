@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BadgeCheck,
@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -23,6 +25,7 @@ import {
   getCatalogReviewProduct,
   setCatalogAssetDecision,
   setCatalogReviewVerification,
+  updateCatalogReviewProductFields,
   type CatalogReviewAsset,
 } from "@/lib/api/catalog-review";
 import { uploadCatalogReviewPhoto } from "@/lib/api/catalog-review.functions";
@@ -67,6 +70,13 @@ export function CatalogReviewProductDialog({
 }) {
   const queryClient = useQueryClient();
   const [comment, setComment] = useState("");
+  const [fields, setFields] = useState({
+    marca: "",
+    materiales: "",
+    colores: "",
+    medidas: "",
+    descripcion: "",
+  });
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["catalog-review-product", token, muebleId],
@@ -137,6 +147,33 @@ export function CatalogReviewProductDialog({
     onError: (e) => toast.error(e instanceof Error ? e.message : "No fue posible subir."),
   });
 
+  useEffect(() => {
+    if (product) {
+      setFields({
+        marca: product.marca ?? "",
+        materiales: product.materiales ?? "",
+        colores: product.colores ?? "",
+        medidas: product.medidas ?? "",
+        descripcion: product.descripcion ?? "",
+      });
+    }
+  }, [product]);
+
+  const saveFields = useMutation({
+    mutationFn: () =>
+      updateCatalogReviewProductFields({
+        token,
+        muebleId: muebleId as string,
+        ...fields,
+        reviewerName,
+      }),
+    onSuccess: async () => {
+      toast.success("Datos guardados. Gracias.");
+      await refresh();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No fue posible guardar."),
+  });
+
   const groups = useMemo(() => {
     const assets = product?.assets ?? [];
     return {
@@ -204,35 +241,69 @@ export function CatalogReviewProductDialog({
                   </Button>
                 </div>
 
-                {/* Ficha técnica */}
-                {product.marca || product.materiales || product.colores || product.medidas ? (
-                  <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 rounded-lg bg-slate-50 p-3 text-sm">
-                    {product.marca ? (
-                      <>
-                        <dt className="text-slate-400">Marca</dt>
-                        <dd className="text-right font-medium text-slate-700">{product.marca}</dd>
-                      </>
-                    ) : null}
-                    {product.medidas ? (
-                      <>
-                        <dt className="text-slate-400">Medidas</dt>
-                        <dd className="text-right font-medium text-slate-700">{product.medidas}</dd>
-                      </>
-                    ) : null}
-                    {product.materiales ? (
-                      <>
-                        <dt className="text-slate-400">Materiales</dt>
-                        <dd className="text-right font-medium text-slate-700">{product.materiales}</dd>
-                      </>
-                    ) : null}
-                    {product.colores ? (
-                      <>
-                        <dt className="text-slate-400">Colores</dt>
-                        <dd className="text-right font-medium text-slate-700">{product.colores}</dd>
-                      </>
-                    ) : null}
-                  </dl>
-                ) : null}
+                {/* Ficha técnica — editable por Eleganzza */}
+                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <SectionTitle icon={Pencil}>Completar datos del producto</SectionTitle>
+                  <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div>
+                      <Label className="text-xs text-slate-500">Marca / proveedor</Label>
+                      <Input
+                        value={fields.marca}
+                        onChange={(e) => setFields({ ...fields, marca: e.target.value })}
+                        placeholder="Ej: Eleganzza"
+                        className="bg-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-slate-500">Medidas</Label>
+                      <Input
+                        value={fields.medidas}
+                        onChange={(e) => setFields({ ...fields, medidas: e.target.value })}
+                        placeholder="Ej: 220 × 90 × 85 cm"
+                        className="bg-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-slate-500">Materiales</Label>
+                      <Input
+                        value={fields.materiales}
+                        onChange={(e) => setFields({ ...fields, materiales: e.target.value })}
+                        placeholder="Ej: Madera, tela chenille"
+                        className="bg-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-slate-500">Colores / variantes</Label>
+                      <Input
+                        value={fields.colores}
+                        onChange={(e) => setFields({ ...fields, colores: e.target.value })}
+                        placeholder="Ej: Gris, beige, café"
+                        className="bg-white"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label className="text-xs text-slate-500">Descripción</Label>
+                      <Textarea
+                        rows={2}
+                        value={fields.descripcion}
+                        onChange={(e) => setFields({ ...fields, descripcion: e.target.value })}
+                        className="bg-white"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    className="mt-3 w-full bg-slate-900 text-white hover:bg-slate-800"
+                    disabled={saveFields.isPending}
+                    onClick={() => saveFields.mutate()}
+                  >
+                    {saveFields.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="mr-2 h-4 w-4" />
+                    )}
+                    Guardar datos
+                  </Button>
+                </div>
 
                 {/* Comparación original vs IA */}
                 {compare ? (
