@@ -75,3 +75,18 @@ Todas **aditivas, idempotentes (`IF NOT EXISTS`) y reversibles**. No borran dato
 - `supabase db push --dry-run` → conecta y valida que aplicarían las 5 migraciones nuevas (las 4 previas ya están registradas).
 - Build / `tsc --noEmit` / ESLint enfocado sobre los archivos nuevos y modificados (ver commit). La lógica del gate de Woo se ejerció por tipos.
 - Pendiente de prueba E2E (requiere migraciones aplicadas + login/token): flujos de portal, aprobación/rechazo, upload y bloqueo.
+
+---
+
+## 9. Segunda iteracion — UI (portal + admin)
+
+- **Correccion importante**: `assets.functions.ts` (server function) se eliminó y se reemplazó por `src/lib/api/traceability.ts` **cliente-side**. Motivo: las server functions corren como `anon` en el servidor y `mueble_assets`/`review_comments`/`campana_*` tienen RLS admin-only; el patron correcto (igual que `catalog-review.ts`) es cliente-side, donde aplica la sesion de Auth del admin.
+- **Portal (`/catalogo/$token`)**: `src/components/catalog/CatalogReviewProductDialog.tsx` + boton "Revisar ficha completa" en cada tarjeta. Fotos por tipo, aprobar/rechazar/solicitar-cambios por imagen, verificar/rechazar producto, comparacion real vs IA, comentarios. Se conserva intacto el flujo de "marcas".
+- **Admin (Fase 9)**: `src/components/dashboard/TrazabilidadPanel.tsx` + nueva vista "Trazabilidad" en el dashboard. Indicadores (total/verificados/por verificar/incompletos/rechazados/con-sin fotos reales/assets pendientes/cambios solicitados), filtros rapidos, lista de productos y drawer de trazabilidad por producto (Datos / Fotos reales / IA / Comentarios / Campañas / Ecommerce) con aprobar/rechazar assets.
+- **Backfill**: `backfillMuebleAssets()` (boton "Vincular imagenes existentes") crea assets `tipo=catalogo, pendiente` desde `galeria`/`fotos` para muebles sin assets. Idempotente.
+- **Verificacion**: `npm run build` pasa limpio. `tsc --noEmit` completo no se pudo correr por saturacion de la maquina (procesos externos); revision de tipos manual + build como gate.
+
+### Pendiente tras esta iteracion
+- Upload de fotos reales desde el portal (Fase 5): requiere una server function que suba a Drive con credenciales del servidor y luego llame a `register_catalog_review_asset`. La RPC ya existe; falta la server function + el boton en el portal.
+- Vinculacion campaña↔producto en la UI de campañas (Fase 7): las tablas puente existen; falta el selector en `CampaignsManager` y usar `canPublishCampaign`.
+- Ampliar el tipo `Mueble` con las columnas nuevas (hoy se accede por cast).

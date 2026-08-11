@@ -22,6 +22,7 @@ import {
 import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
+import { TrazabilidadPanel } from "@/components/dashboard/TrazabilidadPanel";
 import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
@@ -32,7 +33,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Layers } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/api/stats.functions";
 
@@ -54,7 +55,14 @@ export const Route = createFileRoute("/")({
 });
 
 type ViewType =
-  "dashboard" | "productos" | "campañas" | "catalogos" | "marca" | "configuracion" | "ia-generator";
+  | "dashboard"
+  | "productos"
+  | "trazabilidad"
+  | "campañas"
+  | "catalogos"
+  | "marca"
+  | "configuracion"
+  | "ia-generator";
 
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
@@ -111,6 +119,7 @@ function Index() {
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "productos", label: "Productos", icon: Package },
+    { id: "trazabilidad", label: "Trazabilidad", icon: Layers },
     { id: "campañas", label: "Campañas", icon: Megaphone },
     { id: "catalogos", label: "Catálogos", icon: BookOpen },
     { id: "marca", label: "Marca", icon: Palette },
@@ -291,6 +300,14 @@ function Index() {
                 }
               >
                 <SupabaseInventory />
+              </Suspense>
+            </div>
+          )}
+
+          {view === "trazabilidad" && (
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
+                <TrazabilidadPanel />
               </Suspense>
             </div>
           )}
