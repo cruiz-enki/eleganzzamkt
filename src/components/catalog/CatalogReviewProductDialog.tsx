@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BadgeCheck,
@@ -9,6 +9,7 @@ import {
   Pencil,
   Send,
   ShieldCheck,
+  Upload,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -24,8 +25,18 @@ import {
   setCatalogReviewVerification,
   type CatalogReviewAsset,
 } from "@/lib/api/catalog-review";
+import { uploadCatalogReviewPhoto } from "@/lib/api/catalog-review.functions";
 import { getDisplayImageUrl } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1] ?? "");
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
@@ -106,6 +117,24 @@ export function CatalogReviewProductDialog({
       await refresh();
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No fue posible comentar."),
+  });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadMutation = useMutation({
+    mutationFn: async (files: FileList) => {
+      const payload = [];
+      for (const file of Array.from(files).slice(0, 10)) {
+        payload.push({ fileName: file.name, mimeType: file.type, base64: await fileToBase64(file) });
+      }
+      return uploadCatalogReviewPhoto({
+        data: { token, muebleId: muebleId as string, reviewerName, files: payload },
+      });
+    },
+    onSuccess: async (r) => {
+      toast.success(`${r.count} foto(s) subida(s).`);
+      await refresh();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No fue posible subir."),
   });
 
   const groups = useMemo(() => {
@@ -243,6 +272,35 @@ export function CatalogReviewProductDialog({
                     </p>
                   </div>
                 ) : null}
+
+                {/* Subir fotos reales */}
+                <div className="mt-6">
+                  <SectionTitle icon={Upload}>Subir fotos reales</SectionTitle>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files?.length) uploadMutation.mutate(e.target.files);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    className="mt-2 h-12 w-full border-dashed border-slate-300"
+                    disabled={uploadMutation.isPending}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {uploadMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="mr-2 h-4 w-4" />
+                    )}
+                    Tomar / subir fotos reales (JPG, PNG, WEBP)
+                  </Button>
+                </div>
 
                 {/* Comentarios */}
                 <div className="mt-6">
