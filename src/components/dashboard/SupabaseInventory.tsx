@@ -1947,6 +1947,45 @@ export function SupabaseInventory() {
                   />
                 </div>
 
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="marca">Marca / proveedor</Label>
+                    <Input
+                      id="marca"
+                      value={formData.marca || ""}
+                      onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
+                      placeholder="Ej: Eleganzza"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="medidas">Medidas</Label>
+                    <Input
+                      id="medidas"
+                      value={formData.medidas || ""}
+                      onChange={(e) => setFormData({ ...formData, medidas: e.target.value })}
+                      placeholder="Ej: 220 × 90 × 85 cm"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="materiales">Materiales</Label>
+                    <Input
+                      id="materiales"
+                      value={formData.materiales || ""}
+                      onChange={(e) => setFormData({ ...formData, materiales: e.target.value })}
+                      placeholder="Ej: Madera de pino, tela chenille"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="colores">Colores / variantes</Label>
+                    <Input
+                      id="colores"
+                      value={formData.colores || ""}
+                      onChange={(e) => setFormData({ ...formData, colores: e.target.value })}
+                      placeholder="Ej: Gris, beige, café"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid gap-2">
                   <Label>Galería de Imágenes (Múltiples fotos)</Label>
                   <ProductImageManager

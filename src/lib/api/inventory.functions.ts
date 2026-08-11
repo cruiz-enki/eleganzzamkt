@@ -14,6 +14,10 @@ export type Mueble = {
   fotos: any[] | null;
   galeria: any[] | null;
   descripcion: string | null;
+  marca: string | null;
+  materiales: string | null;
+  colores: string | null;
+  medidas: string | null;
   detalles: any | null;
   created_at: string;
 };
@@ -55,6 +59,10 @@ const muebleSchema = z.object({
   fotos: z.array(z.any()).optional().nullable(),
   galeria: z.array(z.any()).optional().nullable(),
   descripcion: z.string().optional().nullable(),
+  marca: z.string().optional().nullable(),
+  materiales: z.string().optional().nullable(),
+  colores: z.string().optional().nullable(),
+  medidas: z.string().optional().nullable(),
   detalles: z.any().optional().nullable(),
 });
 

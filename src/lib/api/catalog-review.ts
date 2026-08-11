@@ -189,6 +189,10 @@ export type CatalogReviewProductDetail = {
   precio: number | null;
   precio_2: number | null;
   precio_3: number | null;
+  marca: string | null;
+  materiales: string | null;
+  colores: string | null;
+  medidas: string | null;
   detalles: unknown;
   fotos: unknown[] | null;
   galeria: unknown[] | null;

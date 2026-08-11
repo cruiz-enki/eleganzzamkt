@@ -204,6 +204,36 @@ export function CatalogReviewProductDialog({
                   </Button>
                 </div>
 
+                {/* Ficha técnica */}
+                {product.marca || product.materiales || product.colores || product.medidas ? (
+                  <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 rounded-lg bg-slate-50 p-3 text-sm">
+                    {product.marca ? (
+                      <>
+                        <dt className="text-slate-400">Marca</dt>
+                        <dd className="text-right font-medium text-slate-700">{product.marca}</dd>
+                      </>
+                    ) : null}
+                    {product.medidas ? (
+                      <>
+                        <dt className="text-slate-400">Medidas</dt>
+                        <dd className="text-right font-medium text-slate-700">{product.medidas}</dd>
+                      </>
+                    ) : null}
+                    {product.materiales ? (
+                      <>
+                        <dt className="text-slate-400">Materiales</dt>
+                        <dd className="text-right font-medium text-slate-700">{product.materiales}</dd>
+                      </>
+                    ) : null}
+                    {product.colores ? (
+                      <>
+                        <dt className="text-slate-400">Colores</dt>
+                        <dd className="text-right font-medium text-slate-700">{product.colores}</dd>
+                      </>
+                    ) : null}
+                  </dl>
+                ) : null}
+
                 {/* Comparación original vs IA */}
                 {compare ? (
                   <div className="mt-6">

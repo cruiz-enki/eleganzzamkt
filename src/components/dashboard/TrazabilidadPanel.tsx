@@ -248,6 +248,10 @@ function MuebleTraceabilityDialog({
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                     <Row k="SKU" v={m.sku ?? "—"} />
                     <Row k="Categoría" v={m.categoria ?? "—"} />
+                    <Row k="Marca" v={m.marca ?? "—"} />
+                    <Row k="Medidas" v={m.medidas ?? "—"} />
+                    <Row k="Materiales" v={m.materiales ?? "—"} />
+                    <Row k="Colores" v={m.colores ?? "—"} />
                     <Row k="Precio" v={m.precio ? currency.format(m.precio) : "—"} />
                     <Row k="Verificación" v={m.estado_verificacion ?? "por_verificar"} />
                     <Row k="Verificado por" v={m.verificado_por ?? "—"} />
