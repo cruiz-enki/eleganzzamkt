@@ -27,7 +27,9 @@ import {
   type ReviewAction,
 } from "@/lib/api/catalog-review";
 import { getFirstDisplayImageUrl } from "@/lib/image-url";
+import { CatalogReviewProductDialog } from "@/components/catalog/CatalogReviewProductDialog";
 import { cn } from "@/lib/utils";
+import { ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/catalogo/$token")({
   head: () => ({
@@ -99,6 +101,7 @@ function PublicCatalogReviewPage() {
   const [markFilter, setMarkFilter] = useState<"all" | "marked" | "pending">("all");
   const [reviewerName, setReviewerName] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<CatalogReviewProduct | null>(null);
+  const [detailProductId, setDetailProductId] = useState<string | null>(null);
   const [selectedAction, setSelectedAction] = useState<ReviewAction>("note");
   const [note, setNote] = useState("");
   const [suggestedPrice, setSuggestedPrice] = useState("");
@@ -325,6 +328,14 @@ function PublicCatalogReviewPage() {
                       </div>
                     ) : null}
 
+                    <Button
+                      className="w-full bg-red-800 text-white hover:bg-red-900"
+                      onClick={() => setDetailProductId(product.id)}
+                    >
+                      <ClipboardCheck className="mr-2 h-4 w-4" />
+                      Revisar ficha completa
+                    </Button>
+
                     <div className="grid grid-cols-2 gap-2">
                       {(Object.keys(actionConfig) as ReviewAction[]).slice(0, 4).map((action) => {
                         const config = actionConfig[action];
@@ -425,6 +436,13 @@ function PublicCatalogReviewPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <CatalogReviewProductDialog
+        token={token}
+        muebleId={detailProductId}
+        reviewerName={reviewerName}
+        onClose={() => setDetailProductId(null)}
+      />
     </main>
   );
 }
