@@ -75,6 +75,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { getFirstDisplayImageUrl, inspectImage } from "@/lib/image-url";
+import { canSyncToWooCommerce, firstError } from "@/lib/domain/editorial-rules";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -346,6 +347,15 @@ export function SupabaseInventory() {
   };
 
   const handleSyncWooCommerce = async (record: Mueble) => {
+    // FASE 8 — validación previa: no sincronizar productos sin datos/imágenes.
+    const gate = canSyncToWooCommerce(record, []);
+    if (!gate.ok) {
+      toast.error(firstError(gate) || "El producto no puede sincronizarse todavía.");
+      return;
+    }
+    const gateWarning = gate.reasons.find((r) => r.level === "warning");
+    if (gateWarning) toast.warning(gateWarning.message);
+
     const wooProductId = record.detalles?.woocommerce?.productId;
     const loading = toast.loading(
       wooProductId
@@ -404,15 +414,39 @@ export function SupabaseInventory() {
   const handleQueueSelectedWooCommerce = async () => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
-    if (!confirm(`¿Agregar ${ids.length} producto(s) a la cola de WooCommerce?`)) return;
+
+    // FASE 8 — filtrar los que no pasan la validación previa.
+    const byId = new Map((records || []).map((r) => [r.id, r]));
+    const eligible: string[] = [];
+    const blocked: string[] = [];
+    for (const id of ids) {
+      const record = byId.get(id);
+      if (record && canSyncToWooCommerce(record, []).ok) eligible.push(id);
+      else blocked.push(id);
+    }
+
+    if (eligible.length === 0) {
+      toast.error("Ninguno de los productos seleccionados puede sincronizarse (faltan datos o imágenes).");
+      return;
+    }
+    if (
+      !confirm(
+        `¿Agregar ${eligible.length} producto(s) a la cola de WooCommerce?` +
+          (blocked.length ? `\n(${blocked.length} se omitirán por datos/imágenes faltantes)` : ""),
+      )
+    )
+      return;
 
     const loading = toast.loading("Agregando productos a la cola...");
     try {
-      for (const id of ids) {
+      for (const id of eligible) {
         await wooSyncQueue.enqueue.mutateAsync(id);
       }
       toast.dismiss(loading);
-      toast.success(`${ids.length} producto(s) agregados a la cola`);
+      toast.success(
+        `${eligible.length} producto(s) agregados a la cola` +
+          (blocked.length ? ` · ${blocked.length} omitidos` : ""),
+      );
       setSelectedIds(new Set());
       await wooSyncQueue.queue.refetch();
     } catch (error) {

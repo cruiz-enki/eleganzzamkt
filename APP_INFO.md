@@ -297,3 +297,53 @@ supabase functions deploy woo-image-proxy --project-ref eqshiiiekxbpsdilckuv --n
 - La anon key de Supabase puede estar en frontend, pero RLS debe proteger los datos.
 - `woo-image-proxy` es publica por diseno para que WooCommerce pueda descargar imagenes; no recibe credenciales.
 
+
+## Trazabilidad de catalogo (actualizacion 2026-08-10)
+
+Rama de trabajo: `feature/trazabilidad`. Objetivo: fuente unica de verdad con el
+vinculo auditable producto -> fotos -> edicion/IA -> aprobacion Eleganzza ->
+campana -> WooCommerce. Cambios aditivos y reversibles; no rompen lo existente.
+
+### Tablas nuevas / ampliadas
+
+- `muebles` (ampliada): `sku`, `estado_verificacion` (incompleto/por_verificar/verificado/rechazado), `verificado_por`, `verificado_at`, `observaciones`, `estado_marketing`, `estado_ecommerce`, `foto_principal_asset_id`. Los datos flexibles (medidas/materiales/colores/disponibilidad) siguen en `detalles` (jsonb).
+- `mueble_assets` (nueva): todas las imagenes/archivos por mueble. `tipo` (catalogo/original/foto_real/editada/ia/ecommerce/campana/otro), `estado_revision` (pendiente/aprobada/rechazada/cambios_solicitados), `es_principal`, `aprobada_por/at`, `notas`, `metadata`, `url`, `drive_file_id`, + campos IA (`ai_validation_status/score/notes`). FK a `muebles`.
+- `review_comments` (nueva): comentarios ligados a `mueble_id` y/o `asset_id` y opcionalmente `review_link_id`.
+- `campana_muebles`, `campana_assets` (nuevas): puentes campana <-> producto <-> asset.
+
+`catalog_review_marks` se conserva intacta (convive con `review_comments`).
+
+### RPCs nuevas del portal (security definer, token-scoped)
+
+- `get_catalog_review_product(token, mueble_id)` - ficha + assets + comentarios.
+- `set_catalog_review_verification(token, mueble_id, estado, ...)`.
+- `set_catalog_asset_decision(token, asset_id, decision, ...)`.
+- `add_catalog_review_comment(token, mueble_id, asset_id, ...)`.
+- `register_catalog_review_asset(token, mueble_id, url/drive_file_id, ...)`.
+- Helpers: `catalog_review_scope_ok`, `catalog_review_link_by_token`.
+
+`anon` solo tiene `execute` sobre estas funciones; las tablas nuevas tienen RLS admin-only.
+
+### Reglas de negocio (fuente unica)
+
+`src/lib/domain/editorial-rules.ts`: `canUseAssetForMarketing`, `canUseForMarketing`,
+`canPublishCampaign`, `canSyncToWooCommerce`. Ya conectado: gate pre-sync WooCommerce
+en `SupabaseInventory` (bloquea sync sin nombre/precio/imagenes; verificacion = advertencia).
+
+### Migraciones nuevas (aplicar con `supabase db push`)
+
+- `20260810120000_muebles_traceability_fields.sql`
+- `20260810120100_mueble_assets.sql`
+- `20260810120200_review_comments.sql`
+- `20260810120300_campana_relations.sql`
+- `20260810120400_catalog_review_portal_rpcs.sql`
+
+### Pendientes de esta fase
+
+- Aplicar las 5 migraciones a produccion.
+- UI: portal de detalle (aprobar/rechazar imagen, subir fotos reales, comparacion IA), panel admin de trazabilidad (Fase 9), vinculacion campana<->producto (Fase 7). Backend/contratos ya listos.
+- Backfill de `galeria`/`fotos` a `mueble_assets`.
+- Endurecer RLS de `muebles` (hoy accesible por `anon`, config heredada).
+- Ampliar el tipo `Mueble` (`inventory.functions.ts`) con las columnas nuevas.
+
+Ver `IMPLEMENTATION_REPORT.md` para el detalle de decisiones y riesgos.

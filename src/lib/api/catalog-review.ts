@@ -149,3 +149,117 @@ export async function submitCatalogReviewMark(input: {
   if (!result.success) throw new Error(result.message || "No fue posible registrar la solicitud");
   return result;
 }
+
+// =====================================================================
+// FASE 3/4/5 — Portal de revisión: assets, verificación, comentarios.
+// Envuelven las RPCs security definer (ver migración 20260810120400).
+// =====================================================================
+
+export type CatalogReviewAsset = {
+  id: string;
+  tipo: string;
+  url: string | null;
+  drive_file_id: string | null;
+  nombre_archivo: string | null;
+  origen: string | null;
+  descripcion: string | null;
+  es_principal: boolean;
+  estado_revision: "pendiente" | "aprobada" | "rechazada" | "cambios_solicitados";
+  aprobada_por: string | null;
+  aprobada_at: string | null;
+  notas: string | null;
+  created_at: string;
+};
+
+export type CatalogReviewComment = {
+  id: string;
+  asset_id: string | null;
+  autor: string | null;
+  mensaje: string;
+  tipo: string;
+  created_at: string;
+};
+
+export type CatalogReviewProductDetail = {
+  id: string;
+  nombre: string;
+  sku: string | null;
+  categoria: string | null;
+  descripcion: string | null;
+  precio: number | null;
+  precio_2: number | null;
+  precio_3: number | null;
+  detalles: unknown;
+  fotos: unknown[] | null;
+  galeria: unknown[] | null;
+  estado_verificacion: "incompleto" | "por_verificar" | "verificado" | "rechazado";
+  verificado_por: string | null;
+  verificado_at: string | null;
+  observaciones: string | null;
+  assets: CatalogReviewAsset[];
+  comments: CatalogReviewComment[];
+};
+
+async function callRpc<T>(fn: string, params: Record<string, unknown>): Promise<T> {
+  const { data, error } = await supabase.rpc(fn, params);
+  if (error) throw new Error(error.message);
+  const result = data as { success: boolean; message?: string } & T;
+  if (!result.success) throw new Error(result.message || "Operación no permitida");
+  return result;
+}
+
+export async function getCatalogReviewProduct(token: string, muebleId: string) {
+  const result = await callRpc<{ product: CatalogReviewProductDetail }>(
+    "get_catalog_review_product",
+    { p_token: token, p_mueble_id: muebleId },
+  );
+  return result.product;
+}
+
+export async function setCatalogReviewVerification(input: {
+  token: string;
+  muebleId: string;
+  estado: "verificado" | "rechazado" | "por_verificar";
+  reviewerName?: string;
+  note?: string;
+}) {
+  return callRpc("set_catalog_review_verification", {
+    p_token: input.token,
+    p_mueble_id: input.muebleId,
+    p_estado: input.estado,
+    p_reviewer_name: input.reviewerName || null,
+    p_note: input.note || null,
+  });
+}
+
+export async function setCatalogAssetDecision(input: {
+  token: string;
+  assetId: string;
+  decision: "aprobada" | "rechazada" | "cambios_solicitados";
+  reviewerName?: string;
+  note?: string;
+}) {
+  return callRpc("set_catalog_asset_decision", {
+    p_token: input.token,
+    p_asset_id: input.assetId,
+    p_decision: input.decision,
+    p_reviewer_name: input.reviewerName || null,
+    p_note: input.note || null,
+  });
+}
+
+export async function addCatalogReviewComment(input: {
+  token: string;
+  muebleId: string;
+  assetId?: string | null;
+  autor?: string;
+  mensaje: string;
+}) {
+  return callRpc("add_catalog_review_comment", {
+    p_token: input.token,
+    p_mueble_id: input.muebleId,
+    p_asset_id: input.assetId ?? null,
+    p_autor: input.autor || null,
+    p_mensaje: input.mensaje,
+  });
+}
