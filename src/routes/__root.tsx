@@ -143,11 +143,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isPublicCatalog = pathname.startsWith("/catalogo/");
+  // Rutas públicas por token: entran sin sesión (portal del cliente).
+  const isPublicPortal =
+    pathname.startsWith("/catalogo/") || pathname.startsWith("/publicaciones/");
 
   return (
     <QueryClientProvider client={queryClient}>
-      {isPublicCatalog ? (
+      {isPublicPortal ? (
         <Outlet />
       ) : (
         <AuthGate>
