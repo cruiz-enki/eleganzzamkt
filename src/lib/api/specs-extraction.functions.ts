@@ -21,7 +21,7 @@ Reglas estrictas:
 - Extrae ÚNICAMENTE lo que esté explícito en el texto. Está PROHIBIDO inventar, deducir o completar.
 - Si un dato no aparece, esa llave vale null. Devolver null es correcto y esperado: es MUCHO mejor null que un dato dudoso.
 - PROHIBIDO devolver frases publicitarias o vagas. Si el texto solo dice cosas como "alta calidad", "tonos neutros", "diseño moderno", "materiales premium", "acabado elegante", devuelve null en ese campo. Solo sirven datos concretos y verificables.
-- "medidas": dimensiones con unidades, tal como vienen (ej: "Diámetro 25 cm", "2.40m x 2.50m", "φ800+500 H1200"). Si hay varias variantes (matrimonial, king), inclúyelas todas separadas por coma.
+- "medidas": dimensiones con NÚMERO y unidad, tal como vienen (ej: "Diámetro 25 cm", "2.40m x 2.50m", "φ800+500 H1200"). Si hay varias variantes con sus dimensiones (matrimonial, king), inclúyelas todas separadas por coma. Un nombre de tamaño suelto sin números ("CAMA KS", "matrimonial", "individual") NO es una medida: eso es null.
 - "materiales": de qué está hecho, con nombre concreto (ej: "Metal, Vidrio", "Microfibra", "Tejido Glasgow"). "Tapizado de alta calidad" NO es un material: eso es null.
 - "colores": color o acabado concreto (ej: "Oro", "Cromo", "Charcoal"). "Tonos neutros" o "colores cálidos" NO son colores: eso es null. Si el color aparece en el NOMBRE del producto (ej: "Eder Marino", "Hotelier Blanco"), sí cuenta.
 - "marca": marca o proveedor solo si el texto lo nombra como tal. Un código de modelo (DMC352-1, SK106PL, Arb-DMW262) NO es marca: devuelve null.
