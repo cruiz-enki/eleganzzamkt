@@ -319,9 +319,12 @@ function PublicacionCard({
           <p className="text-sm text-slate-600 whitespace-pre-line">{publicacion.copy}</p>
         )}
 
-        {publicacion.aprobadaPor && (
-          <p className="text-xs text-emerald-700">Autorizada por {publicacion.aprobadaPor}</p>
-        )}
+        {/* Solo mientras siga aprobada: si despues pidieron cambios, el rastro
+            de la aprobacion anterior confunde. */}
+        {publicacion.aprobadaPor &&
+          (publicacion.estado === "aprobada" || publicacion.estado === "publicada") && (
+            <p className="text-xs text-emerald-700">Autorizada por {publicacion.aprobadaPor}</p>
+          )}
 
         {publicacion.comentarios.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-slate-100">

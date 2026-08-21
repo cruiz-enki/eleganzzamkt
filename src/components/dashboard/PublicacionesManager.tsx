@@ -346,7 +346,7 @@ export function PublicacionesManager() {
                   </span>
                 )}
 
-                {p.aprobada_por && (
+                {p.aprobada_por && (p.estado === "aprobada" || p.estado === "publicada") && (
                   <span className="text-[11px] text-emerald-700">Autorizó {p.aprobada_por}</span>
                 )}
 
