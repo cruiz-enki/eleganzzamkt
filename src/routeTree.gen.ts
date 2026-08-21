@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoTokenRouteImport } from './routes/catalogo.$token'
+import { Route as PublicacionesTokenRouteImport } from './routes/publicaciones.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const CatalogoTokenRoute = CatalogoTokenRouteImport.update({
   path: '/catalogo/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicacionesTokenRoute = PublicacionesTokenRouteImport.update({
+  id: '/publicaciones/$token',
+  path: '/publicaciones/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
+  '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
+  '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
+  '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo/$token'
+  fullPaths: '/' | '/catalogo/$token' | '/publicaciones/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo/$token'
-  id: '__root__' | '/' | '/catalogo/$token'
+  to: '/' | '/catalogo/$token' | '/publicaciones/$token'
+  id: '__root__' | '/' | '/catalogo/$token' | '/publicaciones/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CatalogoTokenRoute: typeof CatalogoTokenRoute
+  PublicacionesTokenRoute: typeof PublicacionesTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/publicaciones/$token': {
+      id: '/publicaciones/$token'
+      path: '/publicaciones/$token'
+      fullPath: '/publicaciones/$token'
+      preLoaderRoute: typeof PublicacionesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CatalogoTokenRoute: CatalogoTokenRoute,
+  PublicacionesTokenRoute: PublicacionesTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Table as TableIcon,
   Package,
+  Send,
   Megaphone,
   Palette,
   Settings,
@@ -27,6 +28,7 @@ import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
 import { CampaignsManager } from "@/components/dashboard/CampaignsManager";
+import { PublicacionesManager } from "@/components/dashboard/PublicacionesManager";
 import { CatalogosManager } from "@/components/dashboard/CatalogosManager";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
@@ -59,6 +61,7 @@ type ViewType =
   | "productos"
   | "trazabilidad"
   | "campañas"
+  | "publicaciones"
   | "catalogos"
   | "marca"
   | "configuracion"
@@ -121,6 +124,7 @@ function Index() {
     { id: "productos", label: "Productos", icon: Package },
     { id: "trazabilidad", label: "Trazabilidad", icon: Layers },
     { id: "campañas", label: "Campañas", icon: Megaphone },
+    { id: "publicaciones", label: "Publicaciones", icon: Send },
     { id: "catalogos", label: "Catálogos", icon: BookOpen },
     { id: "marca", label: "Marca", icon: Palette },
     { id: "ia-generator", label: "IA Generator", icon: SparklesIcon },
@@ -306,7 +310,13 @@ function Index() {
 
           {view === "trazabilidad" && (
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-              <Suspense fallback={<div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>}>
+              <Suspense
+                fallback={
+                  <div className="flex justify-center p-12">
+                    <Loader2 className="animate-spin h-8 w-8 text-slate-300" />
+                  </div>
+                }
+              >
                 <TrazabilidadPanel />
               </Suspense>
             </div>
@@ -352,6 +362,20 @@ function Index() {
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
                 <PromptSettings />
               </div>
+            </div>
+          )}
+
+          {view === "publicaciones" && (
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <Suspense
+                fallback={
+                  <div className="flex justify-center p-12">
+                    <Loader2 className="animate-spin h-8 w-8 text-slate-300" />
+                  </div>
+                }
+              >
+                <PublicacionesManager />
+              </Suspense>
             </div>
           )}
 

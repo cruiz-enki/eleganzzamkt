@@ -265,6 +265,33 @@ export async function createDriveFolder(name: string): Promise<string | null> {
   }
 }
 
+/**
+ * Busca una carpeta por nombre dentro de la raíz y la crea si no existe.
+ * Se usa para agrupar archivos que no son de un producto (p. ej. las
+ * publicaciones de redes), sin ensuciar la raíz de la unidad.
+ */
+export async function findOrCreateFolder(name: string): Promise<string | null> {
+  const rootId = getDriveRootFolderId();
+  try {
+    const params = new URLSearchParams({
+      q: `'${rootId}' in parents and mimeType = 'application/vnd.google-apps.folder' and name = '${name.replace(/'/g, "\\'")}' and trashed = false`,
+      fields: "files(id,name)",
+      pageSize: "1",
+      supportsAllDrives: "true",
+      includeItemsFromAllDrives: "true",
+      corpora: "allDrives",
+    });
+    const response = await driveRequest(`/files?${params.toString()}`, { method: "GET" }, 15000);
+    const data = (await response.json()) as DriveFile;
+    const existing = data.files?.[0]?.id;
+    if (existing) return existing;
+  } catch (error) {
+    console.error(`No se pudo buscar la carpeta ${name}:`, error);
+  }
+
+  return createDriveFolder(name);
+}
+
 export async function uploadBase64ToDrive(input: {
   fileName: string;
   mimeType: string;

@@ -87,7 +87,7 @@ export function CatalogReviewLinksManager() {
 
   const { data: links = [], isLoading: isLoadingLinks } = useQuery({
     queryKey: ["catalog-review-links"],
-    queryFn: getCatalogReviewLinks,
+    queryFn: () => getCatalogReviewLinks("catalogo"),
   });
 
   const { data: marks = [], isLoading: isLoadingMarks } = useQuery({

@@ -20,6 +20,7 @@ export type CatalogReviewProduct = Mueble & {
 export type CatalogReviewLink = {
   id: string;
   token: string;
+  tipo?: "catalogo" | "publicaciones";
   title: string;
   client_name: string | null;
   intro_message: string | null;
@@ -54,6 +55,8 @@ type CatalogReviewRpcResponse =
     };
 
 export type CreateCatalogReviewLinkInput = {
+  /** 'catalogo' (default) o 'publicaciones'. Define qué portal abre el enlace. */
+  tipo?: "catalogo" | "publicaciones";
   title: string;
   clientName?: string;
   introMessage?: string;
@@ -61,10 +64,11 @@ export type CreateCatalogReviewLinkInput = {
   expiresAt?: string | null;
 };
 
-export async function getCatalogReviewLinks() {
+export async function getCatalogReviewLinks(tipo: "catalogo" | "publicaciones" = "catalogo") {
   const { data, error } = await supabase
     .from("catalog_review_links")
     .select("*")
+    .eq("tipo", tipo)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -75,6 +79,7 @@ export async function createCatalogReviewLink(input: CreateCatalogReviewLinkInpu
   const { data, error } = await supabase
     .from("catalog_review_links")
     .insert({
+      tipo: input.tipo ?? "catalogo",
       title: input.title,
       client_name: input.clientName || null,
       intro_message: input.introMessage || null,
