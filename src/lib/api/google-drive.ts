@@ -22,6 +22,43 @@ export function getDriveRootFolderId(): string {
   return process.env["GOOGLE_DRIVE_ROOT_FOLDER_ID"] || DEFAULT_ROOT_FOLDER_ID;
 }
 
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive";
+
+type ServiceAccount = { clientEmail: string; privateKey: string };
+
+/**
+ * Credenciales de la CUENTA DE SERVICIO (método preferido).
+ * Acepta el JSON completo que descarga Google (`GOOGLE_SERVICE_ACCOUNT_JSON`)
+ * o los dos campos por separado. A diferencia del refresh token de OAuth,
+ * estas credenciales no caducan.
+ */
+function getServiceAccount(): ServiceAccount | null {
+  const raw = process.env["GOOGLE_SERVICE_ACCOUNT_JSON"];
+  if (raw && raw.trim()) {
+    try {
+      const parsed = JSON.parse(raw) as { client_email?: string; private_key?: string };
+      if (parsed.client_email && parsed.private_key) {
+        return {
+          clientEmail: parsed.client_email,
+          privateKey: parsed.private_key.replace(/\\n/g, "\n"),
+        };
+      }
+    } catch {
+      throw new Error(
+        "GOOGLE_SERVICE_ACCOUNT_JSON no es un JSON válido. Pega el archivo completo que descargaste de Google.",
+      );
+    }
+  }
+
+  const clientEmail = process.env["GOOGLE_SERVICE_ACCOUNT_EMAIL"];
+  const privateKey = process.env["GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY"];
+  if (clientEmail && privateKey) {
+    return { clientEmail, privateKey: privateKey.replace(/\\n/g, "\n") };
+  }
+
+  return null;
+}
+
 function getGoogleOAuthEnv() {
   const clientId = process.env["GOOGLE_CLIENT_ID"];
   const clientSecret = process.env["GOOGLE_CLIENT_SECRET"];
@@ -34,21 +71,46 @@ function getGoogleOAuthEnv() {
   return { clientId, clientSecret, refreshToken };
 }
 
-async function getDriveAccessToken(): Promise<string> {
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60000) {
-    return cachedToken.accessToken;
-  }
+function base64url(input: string | Buffer): string {
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
 
-  const { clientId, clientSecret, refreshToken } = getGoogleOAuthEnv();
+/**
+ * Firma el JWT que Google pide para intercambiarlo por un access token
+ * (flujo "JWT bearer" de las cuentas de servicio).
+ * El import de node:crypto es dinámico para que no acabe en el bundle del navegador.
+ */
+async function signServiceAccountJwt(account: ServiceAccount): Promise<string> {
+  const { createSign } = await import("node:crypto");
+  const now = Math.floor(Date.now() / 1000);
+
+  const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claims = base64url(
+    JSON.stringify({
+      iss: account.clientEmail,
+      scope: DRIVE_SCOPE,
+      aud: TOKEN_URL,
+      iat: now,
+      exp: now + 3600,
+    }),
+  );
+
+  const signer = createSign("RSA-SHA256");
+  signer.update(`${header}.${claims}`);
+  const signature = base64url(signer.sign(account.privateKey));
+
+  return `${header}.${claims}.${signature}`;
+}
+
+async function requestToken(body: URLSearchParams): Promise<{ token: string; expiresIn: number }> {
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-      grant_type: "refresh_token",
-    }),
+    body,
   });
 
   if (!response.ok) {
@@ -60,10 +122,44 @@ async function getDriveAccessToken(): Promise<string> {
   const json = (await response.json()) as { access_token?: string; expires_in?: number };
   if (!json.access_token) throw new Error("Google no devolvió access_token.");
 
-  cachedToken = {
-    accessToken: json.access_token,
-    expiresAt: Date.now() + (json.expires_in ?? 3600) * 1000,
-  };
+  return { token: json.access_token, expiresIn: json.expires_in ?? 3600 };
+}
+
+/** Qué método de conexión con Drive está configurado hoy. */
+export function getDriveAuthMethod(): "service_account" | "oauth_refresh_token" | "none" {
+  if (getServiceAccount()) return "service_account";
+  if (process.env["GOOGLE_REFRESH_TOKEN"]) return "oauth_refresh_token";
+  return "none";
+}
+
+async function getDriveAccessToken(): Promise<string> {
+  if (cachedToken && cachedToken.expiresAt > Date.now() + 60000) {
+    return cachedToken.accessToken;
+  }
+
+  // 1) Cuenta de servicio si está configurada (no caduca).
+  // 2) Si no, el flujo viejo de OAuth con refresh token.
+  const account = getServiceAccount();
+  const { token, expiresIn } = account
+    ? await requestToken(
+        new URLSearchParams({
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+          assertion: await signServiceAccountJwt(account),
+        }),
+      )
+    : await (async () => {
+        const { clientId, clientSecret, refreshToken } = getGoogleOAuthEnv();
+        return requestToken(
+          new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            refresh_token: refreshToken,
+            grant_type: "refresh_token",
+          }),
+        );
+      })();
+
+  cachedToken = { accessToken: token, expiresAt: Date.now() + expiresIn * 1000 };
   return cachedToken.accessToken;
 }
 
@@ -120,11 +216,31 @@ export async function checkDriveAccess(): Promise<{ ok: boolean; message?: strin
     return { ok: true };
   } catch (error) {
     const raw = error instanceof Error ? error.message : String(error);
+    const method = getDriveAuthMethod();
+
+    if (method === "none") {
+      return {
+        ok: false,
+        message:
+          "No hay credenciales de Google Drive configuradas. Agrega GOOGLE_SERVICE_ACCOUNT_JSON (cuenta de servicio) a las variables de entorno.",
+      };
+    }
     if (raw.includes("invalid_grant") || raw.includes("expired or revoked")) {
       return {
         ok: false,
         message:
-          "El permiso de Google Drive expiró o fue revocado. Hay que generar un GOOGLE_REFRESH_TOKEN nuevo y actualizarlo en las variables de entorno.",
+          method === "service_account"
+            ? "Google rechazó la cuenta de servicio. Revisa que la llave privada esté completa y que la hora del servidor sea correcta."
+            : "El permiso de Google Drive expiró o fue revocado. Conviene cambiar a una cuenta de servicio (GOOGLE_SERVICE_ACCOUNT_JSON), que no caduca.",
+      };
+    }
+    if (raw.includes("404") || raw.includes("notFound")) {
+      return {
+        ok: false,
+        message:
+          method === "service_account"
+            ? "La cuenta de servicio no ve la carpeta de Drive. Compártele la unidad compartida con permiso de Administrador de contenido."
+            : "No se encontró la carpeta raíz de Drive (GOOGLE_DRIVE_ROOT_FOLDER_ID).",
       };
     }
     return { ok: false, message: raw };
