@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createOpenAITextResponse } from "@/lib/api/openai";
 import { z } from "zod";
 

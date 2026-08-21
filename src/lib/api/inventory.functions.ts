@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createDriveFolder, listDriveImages, uploadBase64ToDrive } from "@/lib/api/google-drive";
 import { z } from "zod";
 

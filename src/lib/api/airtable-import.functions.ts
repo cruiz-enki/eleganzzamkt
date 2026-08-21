@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createServerFn } from "@tanstack/react-start";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { z } from "zod";
 import { upsertMueble, uploadToDrive } from "./inventory.functions";
 import { checkDriveAccess } from "./google-drive";

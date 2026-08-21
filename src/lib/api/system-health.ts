@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { driveRequest } from "@/lib/api/google-drive";
 import { fetchWithTimeout } from "@/lib/api/google-drive";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 
 export type SystemHealthStatus = "healthy" | "warning" | "error";
 export type SystemHealthService = "supabase" | "woocommerce" | "google_drive" | "openai";

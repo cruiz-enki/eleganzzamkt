@@ -10,7 +10,7 @@ import { z } from "zod";
  */
 
 export const getCatalogos = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabase } = await import("@/lib/supabase-client");
+  const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
   const { data, error } = await supabase
     .from("catalogos")
     .select("*")
@@ -31,7 +31,7 @@ export const createCatalogo = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { supabase } = await import("@/lib/supabase-client");
+    const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
     const { data: newCatalogo, error } = await supabase
       .from("catalogos")
       .insert([data])
@@ -71,7 +71,7 @@ export const extractProductsFromPDF = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    const { supabase } = await import("@/lib/supabase-client");
+    const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
 
     const fileId = extractDriveId(data.pdfUrl);
     if (!fileId) throw new Error("No se pudo identificar el PDF en Google Drive.");
@@ -151,7 +151,7 @@ export const extractProductsFromPDF = createServerFn({ method: "POST" })
 export const publishProduct = createServerFn({ method: "POST" })
   .inputValidator((data) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
-    const { supabase } = await import("@/lib/supabase-client");
+    const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
 
     const { data: current } = await supabase
       .from("muebles")
