@@ -48,6 +48,7 @@ import {
   ArrowUpDown,
   ChevronDown,
   Eye,
+  Sparkles,
   Settings2,
   ChevronLeft,
   ChevronRight,
@@ -61,6 +62,7 @@ import {
 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import { AirtableImporter } from "./AirtableImporter";
+import { SpecsExtractor } from "./SpecsExtractor";
 import {
   Dialog,
   DialogContent,
@@ -223,6 +225,7 @@ export function SupabaseInventory() {
   const [galleryFilter, setGalleryFilter] = useState<"all" | "with" | "without">("all");
   const [csvImporterOpen, setCsvImporterOpen] = useState(false);
   const [airtableImporterOpen, setAirtableImporterOpen] = useState(false);
+  const [specsExtractorOpen, setSpecsExtractorOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "discontinued">(
     "published",
   );
@@ -1127,6 +1130,12 @@ export function SupabaseInventory() {
                 Importar CSV
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuLabel>Fichas</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setSpecsExtractorOpen(true)}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Completar fichas con IA
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuLabel>Exportar</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => handleExport("csv")}
@@ -1170,6 +1179,11 @@ export function SupabaseInventory() {
 
           {/* Diálogos de importación (se abren desde el menú Herramientas) */}
           <CSVImporter open={csvImporterOpen} onOpenChange={setCsvImporterOpen} hideTrigger />
+          <SpecsExtractor
+            open={specsExtractorOpen}
+            onOpenChange={setSpecsExtractorOpen}
+            hideTrigger
+          />
           <AirtableImporter
             open={airtableImporterOpen}
             onOpenChange={setAirtableImporterOpen}
