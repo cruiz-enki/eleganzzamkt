@@ -165,6 +165,44 @@ function downloadExport(content: string, filename: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
+const ESTADO_VERIFICACION_LABEL: Record<string, string> = {
+  incompleto: "Incompleto",
+  por_verificar: "Por verificar",
+  verificado: "Verificado",
+  rechazado: "Rechazado",
+};
+
+/**
+ * Una fila de la ficha del producto. Los campos vacíos se muestran igual (en
+ * gris, como "Sin dato") en vez de esconderse: así se ve de un vistazo qué
+ * información le falta al mueble.
+ */
+function FichaCampo({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | number | null | undefined;
+}) {
+  const texto = value === null || value === undefined ? "" : String(value).trim();
+  const vacio = texto.length === 0;
+
+  return (
+    <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3 last:border-0 last:pb-0">
+      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+        {label}
+      </span>
+      <span
+        className={
+          vacio ? "text-sm text-slate-400 italic" : "text-sm text-slate-700 whitespace-pre-line"
+        }
+      >
+        {vacio ? "Sin dato" : texto}
+      </span>
+    </div>
+  );
+}
+
 export function SupabaseInventory() {
   const queryClient = useQueryClient();
   const wooSyncQueue = useWooCommerceSyncQueue();
@@ -426,7 +464,9 @@ export function SupabaseInventory() {
     }
 
     if (eligible.length === 0) {
-      toast.error("Ninguno de los productos seleccionados puede sincronizarse (faltan datos o imágenes).");
+      toast.error(
+        "Ninguno de los productos seleccionados puede sincronizarse (faltan datos o imágenes).",
+      );
       return;
     }
     if (
@@ -1732,7 +1772,49 @@ export function SupabaseInventory() {
 
                       <div className="space-y-4">
                         <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                          <Info className="w-3 h-3" /> Descripción y Detalles
+                          <Info className="w-3 h-3" /> Ficha del producto
+                        </h4>
+                        <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
+                          <FichaCampo label="Categoría" value={selectedRecord.categoria} />
+                          <FichaCampo label="SKU" value={selectedRecord.sku} />
+                          <FichaCampo
+                            label="Marca / proveedor"
+                            value={selectedRecord.marca ?? selectedRecord.detalles?.marca}
+                          />
+                          <FichaCampo
+                            label="Medidas"
+                            value={selectedRecord.medidas ?? selectedRecord.detalles?.medidas}
+                          />
+                          <FichaCampo
+                            label="Materiales"
+                            value={selectedRecord.materiales ?? selectedRecord.detalles?.materiales}
+                          />
+                          <FichaCampo
+                            label="Colores / variantes"
+                            value={selectedRecord.colores ?? selectedRecord.detalles?.colores}
+                          />
+                          <FichaCampo label="Descripción" value={selectedRecord.descripcion} />
+                          <FichaCampo
+                            label="Verificación"
+                            value={
+                              ESTADO_VERIFICACION_LABEL[selectedRecord.estado_verificacion ?? ""] ??
+                              selectedRecord.estado_verificacion
+                            }
+                          />
+                          <FichaCampo
+                            label="Fotos en la galería"
+                            value={
+                              Array.isArray(selectedRecord.galeria)
+                                ? selectedRecord.galeria.length
+                                : 0
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                          <Info className="w-3 h-3" /> Integraciones y archivos
                         </h4>
                         <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
                           {selectedRecord.detalles?.google_drive_folder_id && (
@@ -1808,16 +1890,6 @@ export function SupabaseInventory() {
                             </div>
                           )}
                           <WooCommerceProductHistory productId={selectedRecord.id} />
-                          {selectedRecord.descripcion && (
-                            <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                Descripción
-                              </span>
-                              <span className="text-sm text-slate-700">
-                                {selectedRecord.descripcion}
-                              </span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>

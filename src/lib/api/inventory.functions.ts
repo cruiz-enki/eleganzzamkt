@@ -18,6 +18,8 @@ export type Mueble = {
   materiales: string | null;
   colores: string | null;
   medidas: string | null;
+  sku: string | null;
+  estado_verificacion: string | null;
   detalles: any | null;
   created_at: string;
 };
