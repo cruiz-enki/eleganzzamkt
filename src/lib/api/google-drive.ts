@@ -105,6 +105,32 @@ export async function driveRequest(path: string, init: RequestInit = {}, ms = 15
   return response;
 }
 
+/**
+ * Verifica que la conexión con Google Drive funcione (token OAuth vigente y
+ * carpeta raíz accesible). Se usa como chequeo previo a las importaciones para
+ * no crear productos sin imágenes cuando Drive no está disponible.
+ */
+export async function checkDriveAccess(): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await driveRequest(
+      `/files/${getDriveRootFolderId()}?supportsAllDrives=true&fields=id,name`,
+      { method: "GET" },
+      15000,
+    );
+    return { ok: true };
+  } catch (error) {
+    const raw = error instanceof Error ? error.message : String(error);
+    if (raw.includes("invalid_grant") || raw.includes("expired or revoked")) {
+      return {
+        ok: false,
+        message:
+          "El permiso de Google Drive expiró o fue revocado. Hay que generar un GOOGLE_REFRESH_TOKEN nuevo y actualizarlo en las variables de entorno.",
+      };
+    }
+    return { ok: false, message: raw };
+  }
+}
+
 export async function createDriveFolder(name: string): Promise<string | null> {
   try {
     const response = await driveRequest("/files?supportsAllDrives=true", {

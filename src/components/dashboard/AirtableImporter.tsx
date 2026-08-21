@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  checkDriveConnection,
   getAirtableImportCandidates,
+  getAirtableImageRepairCandidates,
   importAirtableMueble,
+  repairAirtableMuebleImages,
   type AirtableCandidate,
+  type AirtableRepairCandidate,
 } from "@/lib/api/airtable-import.functions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,11 +30,22 @@ const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "
 
 type ImportResult = {
   nombre: string;
-  status: "ok" | "error";
-  uploaded?: number;
-  failed?: number;
-  message?: string;
+  status: "ok" | "warn" | "error";
+  uploaded?: number | undefined;
+  failed?: number | undefined;
+  message?: string | undefined;
 };
+
+/** Fila normalizada para pintar las dos listas (nuevos y reparación) igual. */
+type Row = {
+  key: string;
+  nombre: string;
+  categoria: string | null;
+  precio: number | null;
+  imageCount: number;
+};
+
+type Mode = "nuevos" | "reparar";
 
 type AirtableImporterProps = {
   open?: boolean;
@@ -50,27 +65,67 @@ export function AirtableImporter({
     if (onOpenChange) onOpenChange(value);
     else setInternalOpen(value);
   };
+  const [mode, setMode] = useState<Mode>("nuevos");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [results, setResults] = useState<ImportResult[]>([]);
   const [finished, setFinished] = useState(false);
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
+  // Chequeo previo de Google Drive: sin Drive los productos se guardan sin fotos.
+  const { data: drive } = useQuery({
+    queryKey: ["drive-connection"],
+    queryFn: () => checkDriveConnection(),
+    enabled: isOpen,
+    staleTime: 60_000,
+  });
+  const driveDown = drive?.ok === false;
+
+  const nuevosQuery = useQuery({
     queryKey: ["airtable-import-candidates"],
     queryFn: () => getAirtableImportCandidates(),
-    enabled: isOpen,
+    enabled: isOpen && mode === "nuevos",
     staleTime: 0,
   });
 
-  const candidates = useMemo(() => data?.candidates ?? [], [data]);
+  const repararQuery = useQuery({
+    queryKey: ["airtable-repair-candidates"],
+    queryFn: () => getAirtableImageRepairCandidates(),
+    enabled: isOpen && mode === "reparar",
+    staleTime: 0,
+  });
 
-  // Al cargar los candidatos, seleccionarlos todos por defecto.
-  useEffect(() => {
-    if (candidates.length > 0 && !isImporting && !finished) {
-      setSelected(new Set(candidates.map((c) => c.airtableId)));
+  const active = mode === "nuevos" ? nuevosQuery : repararQuery;
+  const { isLoading, isError, error, refetch, isFetching } = active;
+
+  const nuevos = useMemo(() => nuevosQuery.data?.candidates ?? [], [nuevosQuery.data]);
+  const reparables = useMemo(() => repararQuery.data?.candidates ?? [], [repararQuery.data]);
+
+  const rows: Row[] = useMemo(() => {
+    if (mode === "nuevos") {
+      return nuevos.map((c) => ({
+        key: c.airtableId,
+        nombre: c.nombre,
+        categoria: c.categoria,
+        precio: c.precio,
+        imageCount: c.imageUrls.length,
+      }));
     }
-  }, [candidates, isImporting, finished]);
+    return reparables.map((c) => ({
+      key: c.muebleId,
+      nombre: c.nombre,
+      categoria: c.categoria,
+      precio: null,
+      imageCount: c.imageCount,
+    }));
+  }, [mode, nuevos, reparables]);
+
+  // Al cargar la lista, seleccionar todo por defecto.
+  useEffect(() => {
+    if (rows.length > 0 && !isImporting && !finished) {
+      setSelected(new Set(rows.map((r) => r.key)));
+    }
+  }, [rows, isImporting, finished]);
 
   const resetState = () => {
     setSelected(new Set());
@@ -86,6 +141,12 @@ export function AirtableImporter({
     if (!next) resetState();
   };
 
+  const changeMode = (next: Mode) => {
+    if (isImporting || next === mode) return;
+    setMode(next);
+    resetState();
+  };
+
   const toggleOne = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -95,23 +156,41 @@ export function AirtableImporter({
     });
   };
 
-  const allSelected = candidates.length > 0 && selected.size === candidates.length;
+  const allSelected = rows.length > 0 && selected.size === rows.length;
   const toggleAll = () => {
     if (allSelected) setSelected(new Set());
-    else setSelected(new Set(candidates.map((c) => c.airtableId)));
+    else setSelected(new Set(rows.map((r) => r.key)));
   };
 
-  const handleImport = async () => {
-    const toImport = candidates.filter((c) => selected.has(c.airtableId));
-    if (toImport.length === 0) return;
-
+  const runBatch = async (
+    total: number,
+    step: (index: number) => Promise<ImportResult>,
+  ): Promise<ImportResult[]> => {
     setIsImporting(true);
     setFinished(false);
     setResults([]);
-    setProgress({ current: 0, total: toImport.length });
+    setProgress({ current: 0, total });
 
     const collected: ImportResult[] = [];
-    for (let i = 0; i < toImport.length; i++) {
+    for (let i = 0; i < total; i++) {
+      collected.push(await step(i));
+      setProgress({ current: i + 1, total });
+      setResults([...collected]);
+    }
+
+    setIsImporting(false);
+    setFinished(true);
+
+    await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
+    await queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+    return collected;
+  };
+
+  const handleImport = async () => {
+    const toImport = nuevos.filter((c) => selected.has(c.airtableId));
+    if (toImport.length === 0) return;
+
+    const collected = await runBatch(toImport.length, async (i) => {
       const candidate = toImport[i] as AirtableCandidate;
       try {
         const res = await importAirtableMueble({
@@ -126,34 +205,73 @@ export function AirtableImporter({
             imageUrls: candidate.imageUrls,
           },
         });
-        collected.push({
+        return {
+          nombre: candidate.nombre,
+          // Si el producto se creó pero sin imágenes, lo marcamos como aviso
+          // en vez de darlo por bueno.
+          status: res.imagesError ? "warn" : "ok",
+          uploaded: res.uploaded,
+          failed: res.failed,
+          message: res.imagesError ?? undefined,
+        };
+      } catch (err) {
+        return {
+          nombre: candidate.nombre,
+          status: "error",
+          message: err instanceof Error ? err.message : "Error desconocido",
+        };
+      }
+    });
+
+    const okCount = collected.filter((r) => r.status === "ok").length;
+    const warnCount = collected.filter((r) => r.status === "warn").length;
+    const errCount = collected.filter((r) => r.status === "error").length;
+
+    if (errCount === 0 && warnCount === 0) {
+      toast.success(`Se importaron ${okCount} productos con éxito`);
+    } else if (warnCount > 0 && errCount === 0) {
+      toast.warning(`Importados ${okCount + warnCount}, pero ${warnCount} quedaron sin imágenes`);
+    } else {
+      toast.warning(`Importados ${okCount + warnCount}, con ${errCount} errores`);
+    }
+  };
+
+  const handleRepair = async () => {
+    const toRepair = reparables.filter((c) => selected.has(c.muebleId));
+    if (toRepair.length === 0) return;
+
+    const collected = await runBatch(toRepair.length, async (i) => {
+      const candidate = toRepair[i] as AirtableRepairCandidate;
+      try {
+        const res = await repairAirtableMuebleImages({
+          data: {
+            muebleId: candidate.muebleId,
+            airtableId: candidate.airtableId,
+            nombre: candidate.nombre,
+            imageUrls: candidate.imageUrls,
+          },
+        });
+        return {
           nombre: candidate.nombre,
           status: "ok",
           uploaded: res.uploaded,
           failed: res.failed,
-        });
+        };
       } catch (err) {
-        collected.push({
+        return {
           nombre: candidate.nombre,
           status: "error",
           message: err instanceof Error ? err.message : "Error desconocido",
-        });
+        };
       }
-      setProgress({ current: i + 1, total: toImport.length });
-      setResults([...collected]);
-    }
+    });
 
-    setIsImporting(false);
-    setFinished(true);
+    await repararQuery.refetch();
 
     const okCount = collected.filter((r) => r.status === "ok").length;
     const errCount = collected.length - okCount;
-
-    await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
-    await queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-
-    if (errCount === 0) toast.success(`Se importaron ${okCount} productos con éxito`);
-    else toast.warning(`Importados ${okCount}, con ${errCount} errores`);
+    if (errCount === 0) toast.success(`Se recuperaron las fotos de ${okCount} productos`);
+    else toast.warning(`Recuperados ${okCount}, con ${errCount} errores`);
   };
 
   const pct = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0;
@@ -180,10 +298,58 @@ export function AirtableImporter({
               Importar productos desde Airtable
             </DialogTitle>
             <DialogDescription>
-              Se comparan los muebles de tu tabla "Total" en Airtable contra los que ya tienes en
-              Supabase. Solo se muestran los nuevos.
+              {mode === "nuevos"
+                ? 'Se comparan los muebles de tu tabla "Total" en Airtable contra los que ya tienes en Supabase. Solo se muestran los nuevos.'
+                : "Productos que ya están en Supabase pero se quedaron sin ninguna foto, y que sí tienen imágenes en Airtable."}
             </DialogDescription>
           </DialogHeader>
+
+          {/* Selector de modo */}
+          <div className="flex items-center gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-1">
+            <button
+              type="button"
+              onClick={() => changeMode("nuevos")}
+              disabled={isImporting}
+              className={cn(
+                "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                mode === "nuevos"
+                  ? "bg-white dark:bg-slate-900 text-slate-800 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300",
+              )}
+            >
+              Productos nuevos
+            </button>
+            <button
+              type="button"
+              onClick={() => changeMode("reparar")}
+              disabled={isImporting}
+              className={cn(
+                "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
+                mode === "reparar"
+                  ? "bg-white dark:bg-slate-900 text-slate-800 dark:text-white shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300",
+              )}
+            >
+              Recuperar fotos faltantes
+            </button>
+          </div>
+
+          {/* Google Drive caído: sin esto los productos se guardan sin fotos */}
+          {driveDown && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 p-4 rounded-lg flex gap-3">
+              <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+              <div className="text-sm text-red-700 dark:text-red-300">
+                <p className="font-medium">Google Drive no está conectado.</p>
+                <p className="text-xs mt-1 break-words">
+                  {drive?.message ?? "No se pudo acceder a Google Drive."}
+                </p>
+                <p className="text-xs mt-1">
+                  Mientras no se arregle, los productos se guardarían sin ninguna foto, así que la
+                  importación está bloqueada.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Cargando candidatos */}
           {isLoading && (
@@ -207,18 +373,20 @@ export function AirtableImporter({
           )}
 
           {/* Sin novedades */}
-          {!isLoading && !isError && candidates.length === 0 && (
+          {!isLoading && !isError && rows.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
               <CheckCircle2 className="h-10 w-10 text-emerald-400" />
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Todo al día</p>
               <p className="text-xs text-slate-500">
-                No hay productos nuevos en Airtable para importar.
+                {mode === "nuevos"
+                  ? "No hay productos nuevos en Airtable para importar."
+                  : "No hay productos sin fotos que se puedan recuperar desde Airtable."}
               </p>
             </div>
           )}
 
           {/* Lista de candidatos */}
-          {!isLoading && !isError && candidates.length > 0 && !isImporting && !finished && (
+          {!isLoading && !isError && rows.length > 0 && !isImporting && !finished && (
             <>
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
@@ -231,7 +399,7 @@ export function AirtableImporter({
                     htmlFor="select-all-airtable"
                     className="text-slate-600 dark:text-slate-300 cursor-pointer select-none"
                   >
-                    {selected.size} de {candidates.length} seleccionados
+                    {selected.size} de {rows.length} seleccionados
                   </label>
                 </div>
                 <Button
@@ -248,36 +416,33 @@ export function AirtableImporter({
 
               <ScrollArea className="h-72 rounded-lg border border-slate-100 dark:border-slate-800">
                 <div className="divide-y divide-slate-50 dark:divide-slate-800">
-                  {candidates.map((c) => {
-                    const checked = selected.has(c.airtableId);
+                  {rows.map((row) => {
+                    const checked = selected.has(row.key);
                     return (
                       <label
-                        key={c.airtableId}
+                        key={row.key}
                         className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer"
                       >
-                        <Checkbox
-                          checked={checked}
-                          onCheckedChange={() => toggleOne(c.airtableId)}
-                        />
+                        <Checkbox checked={checked} onCheckedChange={() => toggleOne(row.key)} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
-                            {c.nombre}
+                            {row.nombre}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
                             <Badge
                               variant="secondary"
                               className="bg-slate-100 dark:bg-slate-800 text-slate-500 border-0 font-normal text-[10px]"
                             >
-                              {c.categoria ?? "Sin categoría"}
+                              {row.categoria ?? "Sin categoría"}
                             </Badge>
                             <span className="inline-flex items-center gap-1 text-[10px] text-slate-400">
                               <ImageIcon className="h-3 w-3" />
-                              {c.imageUrls.length}
+                              {row.imageCount}
                             </span>
                           </div>
                         </div>
                         <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 shrink-0">
-                          {c.precio ? currency.format(c.precio) : "—"}
+                          {row.precio ? currency.format(row.precio) : "—"}
                         </span>
                       </label>
                     );
@@ -288,9 +453,9 @@ export function AirtableImporter({
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 p-3 rounded-lg flex gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
                 <p className="text-xs text-amber-700 dark:text-amber-300">
-                  Por cada producto se creará una carpeta en Google Drive y se descargarán sus
-                  imágenes de Airtable para guardarlas de forma permanente. Puede tardar unos
-                  segundos por producto.
+                  Se descargan <strong>todas</strong> las imágenes que tenga el mueble en Airtable
+                  (Foto Editada e Imagen Original) y se guardan en su carpeta de Google Drive para
+                  que la liga sea permanente. Puede tardar unos segundos por producto.
                 </p>
               </div>
             </>
@@ -301,7 +466,7 @@ export function AirtableImporter({
             <div className="space-y-4 py-2">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
-                  <span>{isImporting ? "Importando…" : "Importación terminada"}</span>
+                  <span>{isImporting ? "Procesando…" : "Proceso terminado"}</span>
                   <span className="font-medium">
                     {progress.current} / {progress.total}
                   </span>
@@ -316,7 +481,12 @@ export function AirtableImporter({
                       {r.status === "ok" ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                       ) : (
-                        <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+                        <AlertCircle
+                          className={cn(
+                            "h-4 w-4 shrink-0",
+                            r.status === "warn" ? "text-amber-500" : "text-red-500",
+                          )}
+                        />
                       )}
                       <span className="flex-1 min-w-0 truncate text-slate-700 dark:text-slate-200">
                         {r.nombre}
@@ -327,7 +497,12 @@ export function AirtableImporter({
                           {r.failed ? ` · ${r.failed} fallaron` : ""}
                         </span>
                       ) : (
-                        <span className="text-[11px] text-red-500 shrink-0 truncate max-w-[180px]">
+                        <span
+                          className={cn(
+                            "text-[11px] shrink-0 truncate max-w-[180px]",
+                            r.status === "warn" ? "text-amber-600" : "text-red-500",
+                          )}
+                        >
                           {r.message}
                         </span>
                       )}
@@ -363,18 +538,24 @@ export function AirtableImporter({
                 </Button>
                 <Button
                   className="bg-[#1B3566] text-white hover:bg-[#132a52]"
-                  onClick={handleImport}
+                  onClick={mode === "nuevos" ? handleImport : handleRepair}
                   disabled={
-                    isImporting || isLoading || candidates.length === 0 || selected.size === 0
+                    isImporting ||
+                    isLoading ||
+                    driveDown ||
+                    rows.length === 0 ||
+                    selected.size === 0
                   }
                 >
                   {isImporting ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Importando…
+                      Procesando…
                     </>
-                  ) : (
+                  ) : mode === "nuevos" ? (
                     `Importar (${selected.size})`
+                  ) : (
+                    `Recuperar fotos (${selected.size})`
                   )}
                 </Button>
               </>
