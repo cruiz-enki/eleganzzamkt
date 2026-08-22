@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { z } from "zod";
+import { requiereAdmin, requiereEditor, requiereSesion } from "@/lib/api/auth-middleware";
 
 export type Campaign = {
   id: string;
@@ -15,14 +16,18 @@ export type Campaign = {
 };
 
 export const getCampaigns = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
   .handler(async () => {
     const { data, error } = await supabase
-      .from('campanas')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("campanas")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (error) {
-      if (error.code === 'PGRST116' || error.message.includes('relation "campanas" does not exist')) {
+      if (
+        error.code === "PGRST116" ||
+        error.message.includes('relation "campanas" does not exist')
+      ) {
         return [] as Campaign[];
       }
       console.error("Error fetching campaigns:", error);
@@ -44,15 +49,16 @@ const campaignSchema = z.object({
 });
 
 export const upsertCampaign = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => campaignSchema.parse(data))
   .handler(async ({ data }) => {
     const { id, ...updateData } = data;
 
     if (id) {
       const { data: result, error } = await supabase
-        .from('campanas')
+        .from("campanas")
         .update(updateData)
-        .eq('id', id)
+        .eq("id", id)
         .select()
         .single();
 
@@ -61,7 +67,7 @@ export const upsertCampaign = createServerFn({ method: "POST" })
     }
 
     const { data: result, error } = await supabase
-      .from('campanas')
+      .from("campanas")
       .insert([updateData])
       .select()
       .single();
@@ -71,12 +77,10 @@ export const upsertCampaign = createServerFn({ method: "POST" })
   });
 
 export const deleteCampaign = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
-    const { error } = await supabase
-      .from('campanas')
-      .delete()
-      .eq('id', data.id);
+    const { error } = await supabase.from("campanas").delete().eq("id", data.id);
 
     if (error) throw new Error(error.message);
     return { success: true };

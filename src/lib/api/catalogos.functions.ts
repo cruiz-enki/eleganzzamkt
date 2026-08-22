@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createOpenAITextResponse } from "@/lib/api/openai";
 import { downloadDriveFile } from "@/lib/api/google-drive";
 import { z } from "zod";
+import { requiereEditor, requiereSesion } from "@/lib/api/auth-middleware";
 
 /**
  * Nota: Para una implementación real de extracción de muebles desde PDF
@@ -9,18 +10,21 @@ import { z } from "zod";
  * Por ahora, definimos la estructura para manejar los catálogos en Supabase y Drive.
  */
 
-export const getCatalogos = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
-  const { data, error } = await supabase
-    .from("catalogos")
-    .select("*")
-    .order("created_at", { ascending: false });
+export const getCatalogos = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");
+    const { data, error } = await supabase
+      .from("catalogos")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) throw new Error(error.message);
-  return data;
-});
+    if (error) throw new Error(error.message);
+    return data;
+  });
 
 export const createCatalogo = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data) =>
     z
       .object({
@@ -62,6 +66,7 @@ function extractDriveId(url: string): string | null {
 }
 
 export const extractProductsFromPDF = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data) =>
     z
       .object({
@@ -149,6 +154,7 @@ export const extractProductsFromPDF = createServerFn({ method: "POST" })
   });
 
 export const publishProduct = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { supabaseAdmin: supabase } = await import("@/lib/supabase-admin");

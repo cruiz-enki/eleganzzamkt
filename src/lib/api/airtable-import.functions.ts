@@ -4,6 +4,7 @@ import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { z } from "zod";
 import { upsertMueble, uploadToDrive } from "./inventory.functions";
 import { checkDriveAccess } from "./google-drive";
+import { requiereEditor, requiereSesion } from "@/lib/api/auth-middleware";
 
 const AIRTABLE_BASE_ID = "appOQZvn0cvA9boUZ";
 const AIRTABLE_TABLE = "Total";
@@ -229,81 +230,85 @@ export type AirtableCandidate = {
  * Si no lo está, importar crearía productos sin ninguna imagen (en silencio),
  * que es justo lo que pasó en las importaciones del 18 y 21 de agosto.
  */
-export const checkDriveConnection = createServerFn({ method: "GET" }).handler(async () => {
-  return checkDriveAccess();
-});
+export const checkDriveConnection = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    return checkDriveAccess();
+  });
 
 /**
  * Lee toda la tabla "Total" de Airtable, la compara contra los muebles ya existentes
  * (por nombre normalizado) y devuelve solo los candidatos nuevos, sin duplicados.
  * No escribe nada: solo devuelve la lista para que el usuario decida.
  */
-export const getAirtableImportCandidates = createServerFn({ method: "GET" }).handler(async () => {
-  const [records, existing] = await Promise.all([
-    fetchAllAirtableRecords(),
-    supabase.from("muebles").select("nombre"),
-  ]);
+export const getAirtableImportCandidates = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    const [records, existing] = await Promise.all([
+      fetchAllAirtableRecords(),
+      supabase.from("muebles").select("nombre"),
+    ]);
 
-  if (existing.error) throw new Error(existing.error.message);
+    if (existing.error) throw new Error(existing.error.message);
 
-  const existingNames = new Set((existing.data ?? []).map((r) => normalizeName(r.nombre)));
+    const existingNames = new Set((existing.data ?? []).map((r) => normalizeName(r.nombre)));
 
-  const seen = new Set<string>();
-  const candidates: AirtableCandidate[] = [];
-  let skippedExisting = 0;
-  let skippedDuplicate = 0;
-  let skippedJunk = 0;
+    const seen = new Set<string>();
+    const candidates: AirtableCandidate[] = [];
+    let skippedExisting = 0;
+    let skippedDuplicate = 0;
+    let skippedJunk = 0;
 
-  for (const rec of records) {
-    const fields = rec.fields ?? {};
-    const nombre = String(fields[F_NOMBRE] ?? "").trim();
+    for (const rec of records) {
+      const fields = rec.fields ?? {};
+      const nombre = String(fields[F_NOMBRE] ?? "").trim();
 
-    if (isJunkName(nombre)) {
-      skippedJunk++;
-      continue;
+      if (isJunkName(nombre)) {
+        skippedJunk++;
+        continue;
+      }
+
+      const key = normalizeName(nombre);
+      if (existingNames.has(key)) {
+        skippedExisting++;
+        continue;
+      }
+      if (seen.has(key)) {
+        skippedDuplicate++;
+        continue;
+      }
+      seen.add(key);
+
+      candidates.push({
+        airtableId: rec.id,
+        nombre,
+        categoria: mapCategory(fields[F_CATEGORIA]),
+        categoriaOriginal:
+          typeof fields[F_CATEGORIA] === "object" && fields[F_CATEGORIA] !== null
+            ? (fields[F_CATEGORIA].name ?? null)
+            : (fields[F_CATEGORIA] ?? null),
+        precio: typeof fields[F_PRECIO] === "number" ? fields[F_PRECIO] : null,
+        precio_2: typeof fields[F_PRECIO_2] === "number" ? fields[F_PRECIO_2] : null,
+        precio_3: typeof fields[F_PRECIO_3] === "number" ? fields[F_PRECIO_3] : null,
+        descripcion: typeof fields[F_DESCRIPCION] === "string" ? fields[F_DESCRIPCION] : null,
+        imageUrls: extractImageUrls(fields),
+      });
     }
 
-    const key = normalizeName(nombre);
-    if (existingNames.has(key)) {
-      skippedExisting++;
-      continue;
-    }
-    if (seen.has(key)) {
-      skippedDuplicate++;
-      continue;
-    }
-    seen.add(key);
+    candidates.sort(
+      (a, b) =>
+        (a.categoria ?? "").localeCompare(b.categoria ?? "") || a.nombre.localeCompare(b.nombre),
+    );
 
-    candidates.push({
-      airtableId: rec.id,
-      nombre,
-      categoria: mapCategory(fields[F_CATEGORIA]),
-      categoriaOriginal:
-        typeof fields[F_CATEGORIA] === "object" && fields[F_CATEGORIA] !== null
-          ? (fields[F_CATEGORIA].name ?? null)
-          : (fields[F_CATEGORIA] ?? null),
-      precio: typeof fields[F_PRECIO] === "number" ? fields[F_PRECIO] : null,
-      precio_2: typeof fields[F_PRECIO_2] === "number" ? fields[F_PRECIO_2] : null,
-      precio_3: typeof fields[F_PRECIO_3] === "number" ? fields[F_PRECIO_3] : null,
-      descripcion: typeof fields[F_DESCRIPCION] === "string" ? fields[F_DESCRIPCION] : null,
-      imageUrls: extractImageUrls(fields),
-    });
-  }
-
-  candidates.sort(
-    (a, b) =>
-      (a.categoria ?? "").localeCompare(b.categoria ?? "") || a.nombre.localeCompare(b.nombre),
-  );
-
-  return {
-    totalAirtable: records.length,
-    existingCount: existingNames.size,
-    skippedExisting,
-    skippedDuplicate,
-    skippedJunk,
-    candidates,
-  };
-});
+    return {
+      totalAirtable: records.length,
+      existingCount: existingNames.size,
+      skippedExisting,
+      skippedDuplicate,
+      skippedJunk,
+      candidates,
+    };
+  });
 
 const candidateSchema = z.object({
   airtableId: z.string(),
@@ -325,6 +330,7 @@ const candidateSchema = z.object({
  * Se importa de uno en uno para poder mostrar progreso y evitar timeouts.
  */
 export const importAirtableMueble = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => candidateSchema.parse(data))
   .handler(async ({ data }) => {
     // 1. Crear producto + carpeta de Drive
@@ -412,8 +418,9 @@ export type AirtableRepairCandidate = {
  * y, si no lo tiene, por nombre normalizado.
  * No escribe nada: solo devuelve la lista.
  */
-export const getAirtableImageRepairCandidates = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const getAirtableImageRepairCandidates = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
     const [records, existing] = await Promise.all([
       fetchAllAirtableRecords(),
       supabase.from("muebles").select("id, nombre, categoria, fotos, galeria, detalles"),
@@ -469,8 +476,7 @@ export const getAirtableImageRepairCandidates = createServerFn({ method: "GET" }
     candidates.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
     return { sinImagenes, sinCoincidencia, candidates };
-  },
-);
+  });
 
 const repairSchema = z.object({
   muebleId: z.string(),
@@ -485,6 +491,7 @@ const repairSchema = z.object({
  * No toca ningún otro dato del producto.
  */
 export const repairAirtableMuebleImages = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => repairSchema.parse(data))
   .handler(async ({ data }) => {
     // URLs frescas de Airtable (las firmadas caducan en ~2 h)

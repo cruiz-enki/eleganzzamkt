@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requiereSesion } from "@/lib/api/auth-middleware";
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/airtable";
 
@@ -13,6 +14,7 @@ export type AirtableRecord = {
 };
 
 export const getAirtableData = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
   .inputValidator((data) =>
     z
       .object({

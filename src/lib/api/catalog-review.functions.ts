@@ -49,7 +49,8 @@ export const uploadCatalogReviewPhoto = createServerFn({ method: "POST" })
     });
     if (error) throw new Error(error.message);
     const res = rpc as any;
-    if (!res?.success) throw new Error(res?.message || "Este enlace no es válido para subir fotos.");
+    if (!res?.success)
+      throw new Error(res?.message || "Este enlace no es válido para subir fotos.");
 
     const product = res.product;
     let folderId: string | null = product?.detalles?.google_drive_folder_id ?? null;

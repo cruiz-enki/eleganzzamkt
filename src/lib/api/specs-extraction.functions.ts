@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createOpenAITextResponse } from "@/lib/api/openai";
 import { z } from "zod";
+import { requiereEditor, requiereSesion } from "@/lib/api/auth-middleware";
 
 /**
  * Extrae marca / medidas / materiales / colores desde la DESCRIPCIÓN del
@@ -104,6 +105,7 @@ const candidatesSchema = z.object({
 });
 
 export const getSpecsExtractionCandidates = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
   .inputValidator((data: unknown) => candidatesSchema.parse(data ?? {}))
   .handler(async ({ data: opciones }) => {
     const { data, error } = await supabase
@@ -168,6 +170,7 @@ const extractSchema = z.object({
  * Propone los datos de UN producto. NO guarda: solo devuelve lo que encontró.
  */
 export const extractMuebleSpecs = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => extractSchema.parse(data))
   .handler(async ({ data }) => {
     const texto = await createOpenAITextResponse([
@@ -197,6 +200,7 @@ const applySchema = z.object({
  * estén vacíos en la base: nunca pisa un dato capturado a mano.
  */
 export const applyMuebleSpecs = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => applySchema.parse(data))
   .handler(async ({ data }) => {
     const { data: actual, error: readError } = await supabase

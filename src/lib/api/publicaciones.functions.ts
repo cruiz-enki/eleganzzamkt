@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createDriveFolder, findOrCreateFolder, uploadBase64ToDrive } from "@/lib/api/google-drive";
+import { requiereEditor } from "@/lib/api/auth-middleware";
 
 /**
  * Subida de archivos de una publicación a Google Drive.
@@ -61,6 +62,7 @@ async function carpetaDestino(muebleId?: string | null): Promise<string | null> 
 }
 
 export const uploadPublicacionArchivo = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => uploadSchema.parse(data))
   .handler(async ({ data }) => {
     const folderId = await carpetaDestino(data.muebleId ?? null);

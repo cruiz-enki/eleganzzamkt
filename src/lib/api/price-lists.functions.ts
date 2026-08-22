@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createOpenAITextResponse } from "@/lib/api/openai";
+import { requiereEditor } from "@/lib/api/auth-middleware";
 
 /**
  * Lectura de una lista de precios en PDF.
@@ -70,6 +71,7 @@ function parsearFilas(texto: string): FilaExtraida[] {
 }
 
 export const extraerListaDePrecios = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => extraerSchema.parse(data))
   .handler(async ({ data }) => {
     const texto = await createOpenAITextResponse([

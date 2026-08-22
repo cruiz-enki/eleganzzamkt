@@ -204,7 +204,10 @@ export async function getMuebleTraceability(muebleId: string): Promise<MuebleTra
       .select("*")
       .eq("mueble_id", muebleId)
       .order("created_at", { ascending: false }),
-    supabase.from("campana_muebles").select("campana_id, campanas:campana_id(id, nombre)").eq("mueble_id", muebleId),
+    supabase
+      .from("campana_muebles")
+      .select("campana_id, campanas:campana_id(id, nombre)")
+      .eq("mueble_id", muebleId),
   ]);
 
   if (mueble.error) throw new Error(mueble.error.message);

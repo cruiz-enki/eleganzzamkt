@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createDriveFolder, listDriveImages, uploadBase64ToDrive } from "@/lib/api/google-drive";
 import { z } from "zod";
+import { requiereAdmin, requiereEditor, requiereSesion } from "@/lib/api/auth-middleware";
 
 export type Mueble = {
   id: string;
@@ -24,19 +25,21 @@ export type Mueble = {
   created_at: string;
 };
 
-export const getSupabaseInventory = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabase
-    .from("muebles")
-    .select("*")
-    .order("created_at", { ascending: false });
+export const getSupabaseInventory = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    const { data, error } = await supabase
+      .from("muebles")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Error fetching Supabase inventory:", error);
-    throw new Error(error.message);
-  }
+    if (error) {
+      console.error("Error fetching Supabase inventory:", error);
+      throw new Error(error.message);
+    }
 
-  return data as Mueble[];
-});
+    return data as Mueble[];
+  });
 
 const uploadSchema = z.object({
   fileName: z.string(),
@@ -46,6 +49,7 @@ const uploadSchema = z.object({
 });
 
 export const uploadToDrive = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => uploadSchema.parse(data))
   .handler(async ({ data }) => {
     return uploadBase64ToDrive({ ...data, folderId: data.folderId ?? null });
@@ -80,6 +84,7 @@ const normalizeCategory = (cat: string | null | undefined): string | null => {
 };
 
 export const bulkDiscontinueMuebles = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => z.object({ nombres: z.array(z.string()) }).parse(data))
   .handler(async ({ data }) => {
     let updatedCount = 0;
@@ -109,6 +114,7 @@ export const bulkDiscontinueMuebles = createServerFn({ method: "POST" })
   });
 
 export const updateMuebleStatus = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => z.object({ id: z.string(), status: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { data: current } = await supabase
@@ -126,6 +132,7 @@ export const updateMuebleStatus = createServerFn({ method: "POST" })
   });
 
 export const updateMuebleGallery = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) =>
     z.object({ id: z.string(), galeria: z.array(z.any()) }).parse(data),
   )
@@ -156,6 +163,7 @@ export const updateMuebleGallery = createServerFn({ method: "POST" })
   });
 
 export const upsertMueble = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => muebleSchema.parse(data))
   .handler(async ({ data }) => {
     const { id, ...updateData } = data;
@@ -237,6 +245,7 @@ export const upsertMueble = createServerFn({ method: "POST" })
   });
 
 export const deleteMueble = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { error } = await supabase.from("muebles").delete().eq("id", data.id);
@@ -245,26 +254,28 @@ export const deleteMueble = createServerFn({ method: "POST" })
     return { success: true };
   });
 
-export const bulkCleanupCategories = createServerFn({ method: "POST" }).handler(async () => {
-  const { data: muebles, error } = await supabase.from("muebles").select("id, categoria");
+export const bulkCleanupCategories = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
+  .handler(async () => {
+    const { data: muebles, error } = await supabase.from("muebles").select("id, categoria");
 
-  if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
 
-  let updatedCount = 0;
-  for (const mueble of muebles || []) {
-    const normalized = normalizeCategory(mueble.categoria);
-    if (normalized !== mueble.categoria) {
-      const { error: updateError } = await supabase
-        .from("muebles")
-        .update({ categoria: normalized })
-        .eq("id", mueble.id);
+    let updatedCount = 0;
+    for (const mueble of muebles || []) {
+      const normalized = normalizeCategory(mueble.categoria);
+      if (normalized !== mueble.categoria) {
+        const { error: updateError } = await supabase
+          .from("muebles")
+          .update({ categoria: normalized })
+          .eq("id", mueble.id);
 
-      if (!updateError) updatedCount++;
+        if (!updateError) updatedCount++;
+      }
     }
-  }
 
-  return { success: true, updatedCount };
-});
+    return { success: true, updatedCount };
+  });
 
 function driveIdFromUrl(url: unknown): string | null {
   if (typeof url !== "string") return null;
@@ -296,6 +307,7 @@ function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: stri
 }
 
 export const syncDriveGallery = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => z.object({ id: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { data: record, error } = await supabase
@@ -324,36 +336,38 @@ export const syncDriveGallery = createServerFn({ method: "POST" })
     return { success: true, added, total: galeria.length };
   });
 
-export const syncAllDriveGalleries = createServerFn({ method: "POST" }).handler(async () => {
-  const { data: records, error } = await supabase.from("muebles").select("id, galeria, detalles");
+export const syncAllDriveGalleries = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
+  .handler(async () => {
+    const { data: records, error } = await supabase.from("muebles").select("id, galeria, detalles");
 
-  if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
 
-  let productosActualizados = 0;
-  let fotosAgregadas = 0;
+    let productosActualizados = 0;
+    let fotosAgregadas = 0;
 
-  for (const record of records || []) {
-    const folderId = (record as any)?.detalles?.google_drive_folder_id;
-    if (!folderId) continue;
-    try {
-      const driveFiles = await listDriveImages(folderId);
-      const { galeria, added } = mergeGaleria((record as any).galeria || [], driveFiles);
-      const cambio =
-        added > 0 || JSON.stringify(galeria) !== JSON.stringify((record as any).galeria || []);
-      if (cambio) {
-        const { error: updateError } = await supabase
-          .from("muebles")
-          .update({ galeria })
-          .eq("id", (record as any).id);
-        if (!updateError) {
-          productosActualizados++;
-          fotosAgregadas += added;
+    for (const record of records || []) {
+      const folderId = (record as any)?.detalles?.google_drive_folder_id;
+      if (!folderId) continue;
+      try {
+        const driveFiles = await listDriveImages(folderId);
+        const { galeria, added } = mergeGaleria((record as any).galeria || [], driveFiles);
+        const cambio =
+          added > 0 || JSON.stringify(galeria) !== JSON.stringify((record as any).galeria || []);
+        if (cambio) {
+          const { error: updateError } = await supabase
+            .from("muebles")
+            .update({ galeria })
+            .eq("id", (record as any).id);
+          if (!updateError) {
+            productosActualizados++;
+            fotosAgregadas += added;
+          }
         }
+      } catch (e) {
+        console.error(`Sync failed for ${(record as any).id}:`, e);
       }
-    } catch (e) {
-      console.error(`Sync failed for ${(record as any).id}:`, e);
     }
-  }
 
-  return { success: true, productosActualizados, fotosAgregadas };
-});
+    return { success: true, productosActualizados, fotosAgregadas };
+  });

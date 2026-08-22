@@ -2,14 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, KeyRound, Loader2, Trash2, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
-import {
-  getPerfiles,
-  getAccessToken,
-  ROL_LABEL,
-  ROL_DESCRIPCION,
-  type Perfil,
-  type Rol,
-} from "@/lib/api/usuarios";
+import { getPerfiles, ROL_LABEL, ROL_DESCRIPCION, type Perfil, type Rol } from "@/lib/api/usuarios";
 import {
   crearUsuario,
   actualizarUsuario,
@@ -84,15 +77,7 @@ export function UsuariosPanel({ miId }: { miId: string | null }) {
   const refrescar = () => queryClient.invalidateQueries({ queryKey: ["perfiles"] });
 
   const crear = useMutation({
-    mutationFn: async () =>
-      crearUsuario({
-        data: {
-          accessToken: await getAccessToken(),
-          email: email.trim(),
-          nombre: nombre.trim(),
-          rol,
-        },
-      }),
+    mutationFn: () => crearUsuario({ data: { email: email.trim(), nombre: nombre.trim(), rol } }),
     onSuccess: async (res) => {
       setCredencial(res);
       setEmail("");
@@ -106,8 +91,8 @@ export function UsuariosPanel({ miId }: { miId: string | null }) {
   });
 
   const actualizar = useMutation({
-    mutationFn: async (input: { id: string; rol?: Rol; activo?: boolean }) =>
-      actualizarUsuario({ data: { accessToken: await getAccessToken(), ...input } }),
+    mutationFn: (input: { id: string; rol?: Rol; activo?: boolean }) =>
+      actualizarUsuario({ data: input }),
     onSuccess: async () => {
       await refrescar();
       toast.success("Usuario actualizado");
@@ -117,9 +102,7 @@ export function UsuariosPanel({ miId }: { miId: string | null }) {
 
   const reiniciar = useMutation({
     mutationFn: async (perfil: Perfil) => {
-      const res = await reiniciarPassword({
-        data: { accessToken: await getAccessToken(), id: perfil.id },
-      });
+      const res = await reiniciarPassword({ data: { id: perfil.id } });
       return { email: perfil.email, password: res.password };
     },
     onSuccess: (res) => {
@@ -130,8 +113,7 @@ export function UsuariosPanel({ miId }: { miId: string | null }) {
   });
 
   const eliminar = useMutation({
-    mutationFn: async (id: string) =>
-      eliminarUsuario({ data: { accessToken: await getAccessToken(), id } }),
+    mutationFn: (id: string) => eliminarUsuario({ data: { id } }),
     onSuccess: async () => {
       await refrescar();
       toast.success("Cuenta eliminada");
@@ -161,9 +143,7 @@ export function UsuariosPanel({ miId }: { miId: string | null }) {
         </Button>
       </div>
 
-      {credencial && (
-        <PasswordUnaVez email={credencial.email} password={credencial.password} />
-      )}
+      {credencial && <PasswordUnaVez email={credencial.email} password={credencial.password} />}
 
       <div className="grid gap-2 sm:grid-cols-3">
         {ROLES.map((r) => (

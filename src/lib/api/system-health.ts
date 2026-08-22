@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { driveRequest } from "@/lib/api/google-drive";
 import { fetchWithTimeout } from "@/lib/api/google-drive";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
+import { requiereSesion } from "@/lib/api/auth-middleware";
 
 export type SystemHealthStatus = "healthy" | "warning" | "error";
 export type SystemHealthService = "supabase" | "woocommerce" | "google_drive" | "openai";
@@ -219,25 +220,27 @@ async function getWooSyncSignals() {
   return { syncedProducts, lastSyncedAt, imageSyncFailures };
 }
 
-export const getSystemHealth = createServerFn({ method: "GET" }).handler(async () => {
-  const [supabaseHealth, openAIHealth, driveHealth, wooSignals] = await Promise.all([
-    checkSupabase(),
-    checkOpenAI(),
-    checkGoogleDrive(),
-    getWooSyncSignals(),
-  ]);
+export const getSystemHealth = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    const [supabaseHealth, openAIHealth, driveHealth, wooSignals] = await Promise.all([
+      checkSupabase(),
+      checkOpenAI(),
+      checkGoogleDrive(),
+      getWooSyncSignals(),
+    ]);
 
-  if (wooSignals) {
-    supabaseHealth.details = {
-      ...(supabaseHealth.details ?? {}),
-      productosSincronizadosWoo: wooSignals.syncedProducts,
-      ultimaSincronizacionWoo: wooSignals.lastSyncedAt,
-      erroresImagenesWoo: wooSignals.imageSyncFailures,
-    };
-  }
+    if (wooSignals) {
+      supabaseHealth.details = {
+        ...(supabaseHealth.details ?? {}),
+        productosSincronizadosWoo: wooSignals.syncedProducts,
+        ultimaSincronizacionWoo: wooSignals.lastSyncedAt,
+        erroresImagenesWoo: wooSignals.imageSyncFailures,
+      };
+    }
 
-  return {
-    checkedAt: checkedAt(),
-    items: [supabaseHealth, openAIHealth, driveHealth],
-  } satisfies SystemHealthResult;
-});
+    return {
+      checkedAt: checkedAt(),
+      items: [supabaseHealth, openAIHealth, driveHealth],
+    } satisfies SystemHealthResult;
+  });

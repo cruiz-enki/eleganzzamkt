@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { createOpenAITextResponse } from "@/lib/api/openai";
 import { z } from "zod";
+import { requiereEditor } from "@/lib/api/auth-middleware";
 
 const chatSchema = z.object({
   prompt: z.string().min(1),
@@ -9,6 +10,7 @@ const chatSchema = z.object({
 });
 
 export const generateMarketingCopy = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => chatSchema.parse(data))
   .handler(async ({ data }) => {
     return createOpenAITextResponse([
@@ -30,6 +32,7 @@ const cleanupSchema = z.object({
 });
 
 export const cleanProductImage = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => cleanupSchema.parse(data))
   .handler(async ({ data }) => {
     return createOpenAITextResponse([
@@ -47,6 +50,7 @@ export const cleanProductImage = createServerFn({ method: "POST" })
   });
 
 export const generateProductCreative = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) =>
     z
       .object({
@@ -140,6 +144,7 @@ export const generateProductCreative = createServerFn({ method: "POST" })
   });
 
 export const updateAIContent = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) =>
     z
       .object({
@@ -176,6 +181,7 @@ export const updateAIContent = createServerFn({ method: "POST" })
   });
 
 export const deleteAIContent = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) =>
     z
       .object({
@@ -208,6 +214,7 @@ export const deleteAIContent = createServerFn({ method: "POST" })
   });
 
 export const approveAIContent = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) =>
     z
       .object({

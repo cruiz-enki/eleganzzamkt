@@ -1,34 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { requiereAdmin } from "@/lib/api/auth-middleware";
 
 /**
  * Alta y administración de cuentas del equipo.
  *
- * OJO con la seguridad: estas funciones usan la llave de servicio, que se salta
- * las reglas de la base. Y una server function es un endpoint público: cualquiera
- * que conozca la URL puede llamarla. Por eso cada una exige el token de sesión
- * de quien la invoca y verifica CONTRA LA BASE que sea admin. Sin eso,
- * "crear usuario" sería una puerta abierta para dar de alta cuentas.
+ * El candado lo pone `requiereAdmin`: verifica el token de sesión de quien
+ * llama y exige rol admin. Sin eso, "crear usuario" sería una puerta abierta,
+ * porque una server function es un endpoint público que además corre con la
+ * llave de servicio.
  */
-
-/** Verifica el token del navegador y devuelve el perfil si es admin. */
-async function exigirAdmin(accessToken: string) {
-  const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
-  if (error || !data.user) throw new Error("Tu sesión no es válida. Vuelve a entrar.");
-
-  const { data: perfil } = await supabaseAdmin
-    .from("perfiles")
-    .select("id, rol, activo")
-    .eq("id", data.user.id)
-    .single();
-
-  if (!perfil || !perfil.activo || perfil.rol !== "admin") {
-    throw new Error("Solo un administrador puede administrar usuarios.");
-  }
-
-  return perfil as { id: string; rol: string; activo: boolean };
-}
 
 /** Contraseña temporal legible pero no adivinable. */
 function generarPassword(): string {
@@ -41,17 +23,15 @@ function generarPassword(): string {
 const ROLES = ["admin", "editor", "lector"] as const;
 
 const crearSchema = z.object({
-  accessToken: z.string().min(1),
   email: z.string().email(),
   nombre: z.string().optional(),
   rol: z.enum(ROLES),
 });
 
 export const crearUsuario = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => crearSchema.parse(data))
   .handler(async ({ data }) => {
-    await exigirAdmin(data.accessToken);
-
     const email = data.email.trim().toLowerCase();
     const password = generarPassword();
 
@@ -88,7 +68,6 @@ export const crearUsuario = createServerFn({ method: "POST" })
   });
 
 const actualizarSchema = z.object({
-  accessToken: z.string().min(1),
   id: z.string().uuid(),
   rol: z.enum(ROLES).optional(),
   activo: z.boolean().optional(),
@@ -96,9 +75,10 @@ const actualizarSchema = z.object({
 });
 
 export const actualizarUsuario = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => actualizarSchema.parse(data))
-  .handler(async ({ data }) => {
-    const admin = await exigirAdmin(data.accessToken);
+  .handler(async ({ data, context }) => {
+    const admin = context.perfil;
 
     // Nadie se quita a sí mismo el rol o el acceso: así no queda la
     // plataforma sin ningún administrador por un clic distraído.
@@ -120,16 +100,14 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
   });
 
 const passwordSchema = z.object({
-  accessToken: z.string().min(1),
   id: z.string().uuid(),
 });
 
 /** Genera una contraseña nueva cuando alguien pierde la suya. */
 export const reiniciarPassword = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => passwordSchema.parse(data))
   .handler(async ({ data }) => {
-    await exigirAdmin(data.accessToken);
-
     const password = generarPassword();
     const { error } = await supabaseAdmin.auth.admin.updateUserById(data.id, { password });
     if (error) throw new Error(error.message);
@@ -138,9 +116,10 @@ export const reiniciarPassword = createServerFn({ method: "POST" })
   });
 
 export const eliminarUsuario = createServerFn({ method: "POST" })
+  .middleware([requiereAdmin])
   .inputValidator((data: unknown) => passwordSchema.parse(data))
-  .handler(async ({ data }) => {
-    const admin = await exigirAdmin(data.accessToken);
+  .handler(async ({ data, context }) => {
+    const admin = context.perfil;
     if (admin.id === data.id) throw new Error("No puedes eliminar tu propia cuenta.");
 
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.id);

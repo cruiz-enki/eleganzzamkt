@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin as supabase } from "@/lib/supabase-admin";
 import { z } from "zod";
 import { upsertMueble, uploadToDrive } from "./inventory.functions";
+import { requiereEditor } from "@/lib/api/auth-middleware";
 
 const muebleSchema = z.object({
   nombre: z.string(),
@@ -15,6 +16,7 @@ const muebleSchema = z.object({
 });
 
 export const importCSVInventory = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
   .inputValidator((data: unknown) => z.array(muebleSchema).parse(data))
   .handler(async ({ data }) => {
     const results = [];
@@ -26,9 +28,14 @@ export const importCSVInventory = createServerFn({ method: "POST" })
       try {
         // 1. Crear el producto y su carpeta en Drive usando upsertMueble
         const savedProduct = await upsertMueble({ data: item });
-        
+
         // 2. Si tiene una foto externa en el CSV, descargarla y subirla a su nueva carpeta de Drive
-        if (item.fotos && item.fotos.length > 0 && item.fotos[0].url && item.fotos[0].url.startsWith('http')) {
+        if (
+          item.fotos &&
+          item.fotos.length > 0 &&
+          item.fotos[0].url &&
+          item.fotos[0].url.startsWith("http")
+        ) {
           const imageUrl = item.fotos[0].url;
           const folderId = savedProduct.detalles?.google_drive_folder_id;
 
@@ -38,26 +45,26 @@ export const importCSVInventory = createServerFn({ method: "POST" })
               const imageRes = await fetch(imageUrl);
               if (imageRes.ok) {
                 const arrayBuffer = await imageRes.arrayBuffer();
-                const base64 = Buffer.from(arrayBuffer).toString('base64');
-                const contentType = imageRes.headers.get('content-type') || 'image/jpeg';
-                const extension = contentType.split('/')[1] || 'jpg';
-                
+                const base64 = Buffer.from(arrayBuffer).toString("base64");
+                const contentType = imageRes.headers.get("content-type") || "image/jpeg";
+                const extension = contentType.split("/")[1] || "jpg";
+
                 // Subir a Drive
                 const uploaded = await uploadToDrive({
                   data: {
-                    fileName: `${savedProduct.nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_import.${extension}`,
+                    fileName: `${savedProduct.nombre.replace(/[^a-z0-9]/gi, "_").toLowerCase()}_import.${extension}`,
                     mimeType: contentType,
                     base64,
                     folderId,
-                  }
+                  },
                 });
 
                 // Actualizar el producto con la nueva URL de Drive
                 const finalProduct = await upsertMueble({
                   data: {
                     ...savedProduct,
-                    fotos: [uploaded]
-                  }
+                    fotos: [uploaded],
+                  },
                 });
                 results.push(finalProduct);
                 continue;
@@ -68,7 +75,7 @@ export const importCSVInventory = createServerFn({ method: "POST" })
             }
           }
         }
-        
+
         results.push(savedProduct);
       } catch (error: any) {
         console.error(`Error importing item ${item.nombre}:`, error);
@@ -76,9 +83,9 @@ export const importCSVInventory = createServerFn({ method: "POST" })
       }
     }
 
-    return { 
-      success: errors.length === 0, 
-      count: results.length, 
-      errors: errors.length > 0 ? errors : null 
+    return {
+      success: errors.length === 0,
+      count: results.length,
+      errors: errors.length > 0 ? errors : null,
     };
   });
