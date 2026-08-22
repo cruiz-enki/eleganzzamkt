@@ -29,7 +29,7 @@ import {
   type CatalogReviewAsset,
 } from "@/lib/api/catalog-review";
 import { uploadCatalogReviewPhoto } from "@/lib/api/catalog-review.functions";
-import { getDisplayImageUrl } from "@/lib/image-url";
+import { getDisplayImageUrl, uniqueImages } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
 
 function fileToBase64(file: File): Promise<string> {
@@ -120,7 +120,12 @@ export function CatalogReviewProductDialog({
 
   const commentMutation = useMutation({
     mutationFn: () =>
-      addCatalogReviewComment({ token, muebleId: muebleId as string, autor: reviewerName, mensaje: comment }),
+      addCatalogReviewComment({
+        token,
+        muebleId: muebleId as string,
+        autor: reviewerName,
+        mensaje: comment,
+      }),
     onSuccess: async () => {
       toast.success("Comentario enviado.");
       setComment("");
@@ -134,7 +139,11 @@ export function CatalogReviewProductDialog({
     mutationFn: async (files: FileList) => {
       const payload = [];
       for (const file of Array.from(files).slice(0, 10)) {
-        payload.push({ fileName: file.name, mimeType: file.type, base64: await fileToBase64(file) });
+        payload.push({
+          fileName: file.name,
+          mimeType: file.type,
+          base64: await fileToBase64(file),
+        });
       }
       return uploadCatalogReviewPhoto({
         data: { token, muebleId: muebleId as string, reviewerName, files: payload },
@@ -185,7 +194,9 @@ export function CatalogReviewProductDialog({
 
   const legacyImages = useMemo(() => {
     if (!product) return [] as string[];
-    const raw = [...(product.galeria ?? []), ...(product.fotos ?? [])];
+    // `fotos` es la portada, o sea una copia de galeria[0]: sin filtrar, la
+    // misma imagen se mostraba dos veces.
+    const raw = uniqueImages([...(product.galeria ?? []), ...(product.fotos ?? [])]);
     return raw.map((x) => getDisplayImageUrl(x as never)).filter(Boolean);
   }, [product]);
 
@@ -210,7 +221,9 @@ export function CatalogReviewProductDialog({
               <>
                 <DialogHeader className="text-left">
                   <div className="flex flex-wrap items-center gap-2">
-                    {product.categoria ? <Badge variant="secondary">{product.categoria}</Badge> : null}
+                    {product.categoria ? (
+                      <Badge variant="secondary">{product.categoria}</Badge>
+                    ) : null}
                     {product.sku ? (
                       <span className="text-xs font-mono text-slate-400">{product.sku}</span>
                     ) : null}
@@ -284,10 +297,10 @@ export function CatalogReviewProductDialog({
                     <div className="sm:col-span-2">
                       <Label className="text-xs text-slate-500">Descripción</Label>
                       <Textarea
-                        rows={2}
+                        rows={6}
                         value={fields.descripcion}
                         onChange={(e) => setFields({ ...fields, descripcion: e.target.value })}
-                        className="bg-white"
+                        className="min-h-[9rem] bg-white text-base leading-7"
                       />
                     </div>
                   </div>
@@ -414,7 +427,8 @@ export function CatalogReviewProductDialog({
                         <div key={c.id} className="rounded-md bg-slate-50 px-3 py-2 text-sm">
                           <p className="text-slate-700">{c.mensaje}</p>
                           <p className="mt-0.5 text-[11px] text-slate-400">
-                            {c.autor || "Eleganzza"} · {new Date(c.created_at).toLocaleString("es-MX")}
+                            {c.autor || "Eleganzza"} ·{" "}
+                            {new Date(c.created_at).toLocaleString("es-MX")}
                           </p>
                         </div>
                       ))
@@ -458,7 +472,11 @@ function VerificationBadge({ estado }: { estado: string }) {
     incompleto: { label: "Incompleto", cls: "bg-slate-100 text-slate-600 border-slate-200" },
   };
   const v = map[estado] ?? map["por_verificar"];
-  return <Badge variant="outline" className={cn("border", v!.cls)}>{v!.label}</Badge>;
+  return (
+    <Badge variant="outline" className={cn("border", v!.cls)}>
+      {v!.label}
+    </Badge>
+  );
 }
 
 function SectionTitle({ icon: Icon, children }: { icon: typeof Check; children: ReactNode }) {
@@ -489,7 +507,10 @@ function AssetGroup({
         {assets.map((asset) => {
           const badge = assetStateBadge[asset.estado_revision] ?? assetStateBadge["pendiente"];
           return (
-            <div key={asset.id} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+            <div
+              key={asset.id}
+              className="overflow-hidden rounded-lg border border-slate-200 bg-white"
+            >
               <div className="relative aspect-square bg-slate-100">
                 <img src={assetImageUrl(asset)} alt="" className="h-full w-full object-cover" />
                 <Badge variant="outline" className={cn("absolute left-2 top-2 border", badge!.cls)}>

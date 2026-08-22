@@ -76,7 +76,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { getFirstDisplayImageUrl, inspectImage } from "@/lib/image-url";
+import { getFirstDisplayImageUrl, inspectImage, uniqueImages } from "@/lib/image-url";
 import { canSyncToWooCommerce, firstError } from "@/lib/domain/editorial-rules";
 import Masonry from "react-layout-masonry";
 import Lightbox from "yet-another-react-lightbox";
@@ -120,18 +120,7 @@ function galleryUrl(value: unknown) {
 // `fotos` casi siempre es la portada, o sea una copia de galeria[0]: si se
 // concatenan sin filtrar, la misma imagen aparece dos veces en el visor.
 function uniqueMuebleImages(record: Pick<Mueble, "galeria" | "fotos">): unknown[] {
-  const all = [...(record.galeria || []), ...(record.fotos || [])];
-  const seen = new Set<string>();
-  const unicas: unknown[] = [];
-  for (const img of all) {
-    const info = inspectImage(img as { id?: unknown; url?: unknown; name?: unknown });
-    if (info.sourceType === "invalid") continue;
-    const key = info.driveId || info.displayUrl;
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    unicas.push(img);
-  }
-  return unicas;
+  return uniqueImages([...(record.galeria || []), ...(record.fotos || [])]);
 }
 
 // "Tiene galería" = más de 1 imagen.

@@ -137,3 +137,30 @@ export function getFirstDisplayImageUrl(images: unknown[] | null | undefined) {
 
   return "";
 }
+
+/**
+ * Quita imágenes repetidas de una lista, comparando por id de Drive (o por la
+ * URL que se muestra, si no hay id).
+ *
+ * Hace falta porque un mueble guarda sus fotos en dos campos: `galeria` (todas)
+ * y `fotos` (la portada, que es una copia de la primera). Al juntarlos para
+ * mostrarlos, la misma imagen salía dos veces. Vive aquí para que el panel y el
+ * portal del cliente usen exactamente el mismo criterio.
+ */
+export function uniqueImages<T>(images: T[] | null | undefined): T[] {
+  if (!Array.isArray(images)) return [];
+
+  const seen = new Set<string>();
+  const unicas: T[] = [];
+
+  for (const image of images) {
+    const info = inspectImage(image as ImageLike);
+    if (info.sourceType === "invalid") continue;
+    const key = info.driveId || info.displayUrl;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unicas.push(image);
+  }
+
+  return unicas;
+}

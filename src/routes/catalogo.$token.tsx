@@ -314,7 +314,7 @@ function PublicCatalogReviewPage() {
                         {product.precio ? currency.format(product.precio) : "Sin precio"}
                       </p>
                       {product.descripcion ? (
-                        <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-500">
+                        <p className="mt-2 line-clamp-6 whitespace-pre-line text-base leading-7 text-slate-600">
                           {product.descripcion}
                         </p>
                       ) : null}
