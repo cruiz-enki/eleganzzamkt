@@ -209,7 +209,11 @@ export function SupabaseInventory() {
   const queryClient = useQueryClient();
   const wooSyncQueue = useWooCommerceSyncQueue();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRecord, setSelectedRecord] = useState<Mueble | null>(null);
+  // Guardamos el ID del producto abierto, no una copia del objeto: si guardamos
+  // el objeto, la ficha se queda mostrando los datos viejos cuando algo
+  // actualiza el producto (p. ej. al completar fichas con IA), y parece que no
+  // se guardo nada.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [wooPreviewRecord, setWooPreviewRecord] = useState<Mueble | null>(null);
   const [wooPreview, setWooPreview] = useState<WooProductPreviewResult | null>(null);
   const [wooPreviewLoading, setWooPreviewLoading] = useState(false);
@@ -250,6 +254,13 @@ export function SupabaseInventory() {
     queryKey: ["supabase-inventory"],
     queryFn: () => getSupabaseInventory(),
   });
+
+  // El producto abierto se resuelve siempre contra la lista fresca.
+  const selectedRecord = useMemo(
+    () => (selectedId ? ((records ?? []).find((r) => r.id === selectedId) ?? null) : null),
+    [selectedId, records],
+  );
+  const setSelectedRecord = (record: Mueble | null) => setSelectedId(record?.id ?? null);
 
   const upsertMutation = useMutation({
     mutationFn: async (data: Partial<Mueble>) => {
