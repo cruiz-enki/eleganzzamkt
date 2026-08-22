@@ -29,6 +29,7 @@ import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
 import { CampaignsManager } from "@/components/dashboard/CampaignsManager";
 import { PublicacionesManager } from "@/components/dashboard/PublicacionesManager";
+import { BrandPanel } from "@/components/dashboard/BrandPanel";
 import { CatalogosManager } from "@/components/dashboard/CatalogosManager";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
@@ -409,96 +410,17 @@ function Index() {
 
           {view === "marca" && (
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm min-h-[600px]">
-              <div className="max-w-4xl mx-auto space-y-12">
-                <section>
-                  <h3 className="text-2xl font-serif font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                    <Palette className="h-6 w-6 text-red-600" />
-                    Identidad Visual
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                        Logotipo Principal
-                      </p>
-                      <div className="aspect-video bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center p-8 border border-slate-200 dark:border-slate-700 shadow-inner group relative overflow-hidden">
-                        <img
-                          src="https://eqshiiiekxbpsdilckuv.supabase.co/storage/v1/object/public/muebles/eleganzzacolor.png"
-                          alt="Eleganzza Logo"
-                          className="max-h-full object-contain relative z-10"
-                          onError={(e) => {
-                            // Intento de fallback si la URL de Supabase falla
-                            const target = e.target as HTMLImageElement;
-                            if (!target.src.includes("placeholder")) {
-                              target.src =
-                                "https://placehold.co/600x400/000000/FFFFFF?text=Eleganzza+Muebles";
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                        Paleta de Colores
-                      </p>
-                      <div className="grid grid-cols-1 gap-3">
-                        <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                          <div className="w-12 h-12 rounded-md bg-[#A31D1D] shadow-sm" />
-                          <div>
-                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                              Rojo Eleganzza
-                            </p>
-                            <p className="text-xs font-mono text-slate-500">#A31D1D</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                          <div className="w-12 h-12 rounded-md bg-black shadow-sm" />
-                          <div>
-                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                              Negro Profundo
-                            </p>
-                            <p className="text-xs font-mono text-slate-500">#000000</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                          <div className="w-12 h-12 rounded-md bg-white border border-slate-200 shadow-sm" />
-                          <div>
-                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                              Blanco Puro
-                            </p>
-                            <p className="text-xs font-mono text-slate-500">#FFFFFF</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="pt-8 border-t border-slate-100 dark:border-slate-800">
-                  <h3 className="text-xl font-serif font-semibold text-slate-900 dark:text-white mb-6">
-                    Tipografía de Marca
-                  </h3>
-                  <div className="space-y-6">
-                    <div>
-                      <p className="text-xs text-slate-400 mb-2 font-bold uppercase">
-                        Heading / Serif
-                      </p>
-                      <p className="text-4xl font-serif text-slate-800 dark:text-slate-100">
-                        Diseño, Calidad y Atención
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-400 mb-2 font-bold uppercase">Body / Sans</p>
-                      <p className="text-lg text-slate-600 dark:text-slate-400">
-                        La elegancia no es destacar, sino ser recordado. Nuestros muebles definen
-                        espacios con distinción.
-                      </p>
-                    </div>
-                  </div>
-                </section>
+              <div className="max-w-5xl mx-auto mb-8">
+                <h3 className="text-2xl font-serif font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Palette className="h-6 w-6 text-[#c73a2a]" />
+                  Design System de Eleganzza
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Colores, tipografía, voz y fundamentos de la marca. Es la referencia para
+                  cualquier arte, publicación o pantalla que se haga para Eleganzza.
+                </p>
               </div>
+              <BrandPanel />
             </div>
           )}
 
