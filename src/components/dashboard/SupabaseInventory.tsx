@@ -63,6 +63,7 @@ import {
 import { CSVImporter } from "./CSVImporter";
 import { AirtableImporter } from "./AirtableImporter";
 import { MueblePublicaciones } from "./MueblePublicaciones";
+import { PriceReconciler } from "./PriceReconciler";
 import { SpecsExtractor } from "./SpecsExtractor";
 import {
   Dialog,
@@ -230,6 +231,7 @@ export function SupabaseInventory() {
   const [csvImporterOpen, setCsvImporterOpen] = useState(false);
   const [airtableImporterOpen, setAirtableImporterOpen] = useState(false);
   const [specsExtractorOpen, setSpecsExtractorOpen] = useState(false);
+  const [priceReconcilerOpen, setPriceReconcilerOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "draft" | "published" | "discontinued">(
     "published",
   );
@@ -1146,6 +1148,10 @@ export function SupabaseInventory() {
                 <Sparkles className="h-4 w-4 mr-2" />
                 Completar fichas con IA
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setPriceReconcilerOpen(true)}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Cargar lista de precios
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Exportar</DropdownMenuLabel>
               <DropdownMenuItem
@@ -1190,6 +1196,11 @@ export function SupabaseInventory() {
 
           {/* Diálogos de importación (se abren desde el menú Herramientas) */}
           <CSVImporter open={csvImporterOpen} onOpenChange={setCsvImporterOpen} hideTrigger />
+          <PriceReconciler
+            open={priceReconcilerOpen}
+            onOpenChange={setPriceReconcilerOpen}
+            hideTrigger
+          />
           <SpecsExtractor
             open={specsExtractorOpen}
             onOpenChange={setSpecsExtractorOpen}
