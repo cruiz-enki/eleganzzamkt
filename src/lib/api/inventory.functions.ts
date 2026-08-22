@@ -279,14 +279,20 @@ function mergeGaleria(existing: any[], driveFiles: Array<{ id: string; url: stri
     // Normalizamos a un formato de imagen que sí carga en el navegador
     return { ...item, id, url: `https://lh3.googleusercontent.com/d/${id}=w1000` };
   });
+  // La galería puede traer la misma imagen repetida (p. ej. si una importación
+  // se corrió dos veces). Se limpia aquí para no arrastrar el duplicado.
   const known = new Set<string>();
+  const sinDuplicados: any[] = [];
   for (const item of current) {
-    if (item?.id) known.add(String(item.id));
-    const fromUrl = driveIdFromUrl(item?.url);
-    if (fromUrl) known.add(fromUrl);
+    const claves = [item?.id ? String(item.id) : null, driveIdFromUrl(item?.url)].filter(
+      Boolean,
+    ) as string[];
+    if (claves.some((clave) => known.has(clave))) continue;
+    for (const clave of claves) known.add(clave);
+    sinDuplicados.push(item);
   }
   const nuevos = driveFiles.filter((f) => !known.has(f.id));
-  return { galeria: [...current, ...nuevos], added: nuevos.length };
+  return { galeria: [...sinDuplicados, ...nuevos], added: nuevos.length };
 }
 
 export const syncDriveGallery = createServerFn({ method: "POST" })

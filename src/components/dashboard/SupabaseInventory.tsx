@@ -116,18 +116,27 @@ function galleryUrl(value: unknown) {
   return typeof url === "string" ? url : "";
 }
 
-// Cuenta las imágenes únicas de un producto (galeria + fotos), evitando
-// contar dos veces la misma imagen. "Tiene galería" = más de 1 imagen.
-function countMuebleImages(record: Mueble): number {
+// Imágenes únicas de un producto (galeria + fotos), sin repetir la misma foto.
+// `fotos` casi siempre es la portada, o sea una copia de galeria[0]: si se
+// concatenan sin filtrar, la misma imagen aparece dos veces en el visor.
+function uniqueMuebleImages(record: Pick<Mueble, "galeria" | "fotos">): unknown[] {
   const all = [...(record.galeria || []), ...(record.fotos || [])];
   const seen = new Set<string>();
+  const unicas: unknown[] = [];
   for (const img of all) {
     const info = inspectImage(img as { id?: unknown; url?: unknown; name?: unknown });
     if (info.sourceType === "invalid") continue;
     const key = info.driveId || info.displayUrl;
-    if (key) seen.add(key);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unicas.push(img);
   }
-  return seen.size;
+  return unicas;
+}
+
+// "Tiene galería" = más de 1 imagen.
+function countMuebleImages(record: Mueble): number {
+  return uniqueMuebleImages(record).length;
 }
 
 function textDetail(details: unknown, keys: string[]) {
@@ -1680,10 +1689,7 @@ export function SupabaseInventory() {
                   <ScrollArea className="h-full">
                     <div className="p-3">
                       <ProductImageManager
-                        images={[
-                          ...(selectedRecord.galeria || []),
-                          ...(selectedRecord.fotos || []),
-                        ]}
+                        images={uniqueMuebleImages(selectedRecord) as typeof selectedRecord.galeria}
                         productName={selectedRecord.nombre}
                         isBusy={galleryMutation.isPending}
                         onAnalyze={handleAnalyzeImage}
