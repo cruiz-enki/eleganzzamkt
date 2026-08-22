@@ -9,9 +9,8 @@ import { supabase } from "@/lib/supabase-client";
 import { getMiPerfil, permisos, type Perfil } from "@/lib/api/usuarios";
 import { PerfilProvider } from "@/lib/perfil-context";
 
-// El correo del dueño se conserva solo para prellenar el formulario.
-// Quién entra lo decide la tabla `perfiles`, no esta constante.
-const ALLOWED_EMAIL = "cruiz@enkisoluciones.mx";
+// Quién entra lo decide la tabla `perfiles`: el formulario acepta cualquier
+// correo y, ya con sesión, se valida que exista un perfil activo.
 const PRODUCTION_APP_URL = "https://eleganzzamkt.enkidad.com";
 
 function normalizeEmail(value?: string | null) {
@@ -57,7 +56,7 @@ function isPasswordRecoveryRedirect() {
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [email, setEmail] = useState(ALLOWED_EMAIL);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -139,11 +138,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const handlePasswordSignIn = async () => {
     const normalizedEmail = normalizeEmail(email);
 
-    if (normalizedEmail !== ALLOWED_EMAIL) {
-      toast.error("Solo cruiz@enkisoluciones.mx puede acceder a esta aplicación");
-      return;
-    }
-
     if (!password) {
       toast.error("Ingresa tu contraseña");
       return;
@@ -177,11 +171,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   const handleSendRecoveryEmail = async () => {
     const normalizedEmail = normalizeEmail(email);
-
-    if (normalizedEmail !== ALLOWED_EMAIL) {
-      toast.error("Solo cruiz@enkisoluciones.mx puede acceder a esta aplicación");
-      return;
-    }
 
     setIsSendingRecovery(true);
     try {
@@ -307,7 +296,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
           </p>
         </div>
         <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
-          Panel de marketing de Eleganzza Muebles. Acceso privado para cruiz@enkisoluciones.mx.
+          Panel de marketing de Eleganzza Muebles. Entra con la cuenta que te dieron.
         </p>
 
         <div className="space-y-3">
