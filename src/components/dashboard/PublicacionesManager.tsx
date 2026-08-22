@@ -20,6 +20,7 @@ import {
   deletePublicacion,
   setPublicacionEstado,
   getPublicacionComentarios,
+  getMueblesParaSelector,
   CANALES,
   ESTADO_LABEL,
   type Publicacion,
@@ -80,6 +81,7 @@ function leerBase64(file: File): Promise<string> {
 type Borrador = {
   id?: string;
   titulo: string;
+  muebleId: string;
   copy: string;
   canal: string;
   fechaProgramada: string;
@@ -89,6 +91,7 @@ type Borrador = {
 
 const BORRADOR_VACIO: Borrador = {
   titulo: "",
+  muebleId: "",
   copy: "",
   canal: "",
   fechaProgramada: "",
@@ -109,6 +112,13 @@ export function PublicacionesManager() {
   const { data: publicaciones = [], isLoading } = useQuery({
     queryKey: ["publicaciones"],
     queryFn: getPublicaciones,
+  });
+
+  const { data: muebles = [] } = useQuery({
+    queryKey: ["muebles-selector"],
+    queryFn: getMueblesParaSelector,
+    enabled: editorAbierto,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: enlaces = [] } = useQuery({
@@ -134,6 +144,7 @@ export function PublicacionesManager() {
         copy: borrador.copy.trim() || null,
         canal: borrador.canal || null,
         fechaProgramada: borrador.fechaProgramada || null,
+        muebleId: borrador.muebleId || null,
         notas: borrador.notas.trim() || null,
         archivos: borrador.archivos,
       }),
@@ -193,7 +204,12 @@ export function PublicacionesManager() {
         if (!file) continue;
         const base64 = await leerBase64(file);
         const subido = await uploadPublicacionArchivo({
-          data: { fileName: file.name, mimeType: file.type || "image/jpeg", base64 },
+          data: {
+            fileName: file.name,
+            mimeType: file.type || "image/jpeg",
+            base64,
+            muebleId: borrador.muebleId || null,
+          },
         });
         subidos.push(subido);
       }
@@ -213,6 +229,7 @@ export function PublicacionesManager() {
         ? {
             id: publicacion.id,
             titulo: publicacion.titulo,
+            muebleId: publicacion.mueble_id ?? "",
             copy: publicacion.copy ?? "",
             canal: publicacion.canal ?? "",
             fechaProgramada: publicacion.fecha_programada ?? "",
@@ -415,6 +432,28 @@ export function PublicacionesManager() {
                 onChange={(e) => setBorrador({ ...borrador, titulo: e.target.value })}
                 placeholder="Ej: Post Sala Boston — oferta de agosto"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="mueble">Mueble del que habla (opcional)</Label>
+              <select
+                id="mueble"
+                value={borrador.muebleId}
+                onChange={(e) => setBorrador({ ...borrador, muebleId: e.target.value })}
+                className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-transparent text-sm"
+              >
+                <option value="">Ninguno</option>
+                {muebles.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.nombre}
+                    {m.categoria ? ` — ${m.categoria}` : ""}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] text-slate-400">
+                Si eliges uno, la publicación aparece en su ficha y los archivos se guardan en la
+                carpeta de Drive de ese mueble.
+              </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

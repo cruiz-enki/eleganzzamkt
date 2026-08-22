@@ -247,14 +247,17 @@ export async function checkDriveAccess(): Promise<{ ok: boolean; message?: strin
   }
 }
 
-export async function createDriveFolder(name: string): Promise<string | null> {
+export async function createDriveFolder(
+  name: string,
+  parentId?: string | null,
+): Promise<string | null> {
   try {
     const response = await driveRequest("/files?supportsAllDrives=true", {
       method: "POST",
       body: JSON.stringify({
         name,
         mimeType: "application/vnd.google-apps.folder",
-        parents: [getDriveRootFolderId()],
+        parents: [parentId || getDriveRootFolderId()],
       }),
     });
     const data = (await response.json()) as DriveFile;
@@ -270,8 +273,11 @@ export async function createDriveFolder(name: string): Promise<string | null> {
  * Se usa para agrupar archivos que no son de un producto (p. ej. las
  * publicaciones de redes), sin ensuciar la raíz de la unidad.
  */
-export async function findOrCreateFolder(name: string): Promise<string | null> {
-  const rootId = getDriveRootFolderId();
+export async function findOrCreateFolder(
+  name: string,
+  parentId?: string | null,
+): Promise<string | null> {
+  const rootId = parentId || getDriveRootFolderId();
   try {
     const params = new URLSearchParams({
       q: `'${rootId}' in parents and mimeType = 'application/vnd.google-apps.folder' and name = '${name.replace(/'/g, "\\'")}' and trashed = false`,
@@ -289,7 +295,7 @@ export async function findOrCreateFolder(name: string): Promise<string | null> {
     console.error(`No se pudo buscar la carpeta ${name}:`, error);
   }
 
-  return createDriveFolder(name);
+  return createDriveFolder(name, parentId);
 }
 
 export async function uploadBase64ToDrive(input: {

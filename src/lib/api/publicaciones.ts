@@ -35,6 +35,7 @@ export type Publicacion = {
   canal: string | null;
   fecha_programada: string | null;
   campana_id: string | null;
+  mueble_id: string | null;
   archivos: PublicacionArchivo[];
   estado: PublicacionEstado;
   aprobada_por: string | null;
@@ -84,6 +85,7 @@ export type UpsertPublicacionInput = {
   canal?: string | null;
   fechaProgramada?: string | null;
   campanaId?: string | null;
+  muebleId?: string | null;
   archivos?: PublicacionArchivo[];
   notas?: string | null;
 };
@@ -95,6 +97,7 @@ export async function upsertPublicacion(input: UpsertPublicacionInput) {
     canal: input.canal ?? null,
     fecha_programada: input.fechaProgramada || null,
     campana_id: input.campanaId || null,
+    mueble_id: input.muebleId || null,
     archivos: input.archivos ?? [],
     notas: input.notas ?? null,
   };
@@ -123,4 +126,27 @@ export async function setPublicacionEstado(id: string, estado: PublicacionEstado
   const { error } = await supabase.from("publicaciones").update({ estado }).eq("id", id);
   if (error) throw new Error(error.message);
   return { success: true };
+}
+
+/** Publicaciones ligadas a un mueble, para la pestaña de su ficha. */
+export async function getPublicacionesDeMueble(muebleId: string) {
+  const { data, error } = await supabase
+    .from("publicaciones")
+    .select("*")
+    .eq("mueble_id", muebleId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Publicacion[];
+}
+
+/** Lista ligera de muebles para el selector del editor de publicaciones. */
+export async function getMueblesParaSelector() {
+  const { data, error } = await supabase
+    .from("muebles")
+    .select("id, nombre, categoria")
+    .order("nombre");
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Array<{ id: string; nombre: string; categoria: string | null }>;
 }

@@ -62,6 +62,7 @@ import {
 } from "lucide-react";
 import { CSVImporter } from "./CSVImporter";
 import { AirtableImporter } from "./AirtableImporter";
+import { MueblePublicaciones } from "./MueblePublicaciones";
 import { SpecsExtractor } from "./SpecsExtractor";
 import {
   Dialog,
@@ -71,6 +72,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -1779,128 +1781,150 @@ export function SupabaseInventory() {
                           )}
                       </div>
 
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                          <Info className="w-3 h-3" /> Ficha del producto
-                        </h4>
-                        <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
-                          <FichaCampo label="Categoría" value={selectedRecord.categoria} />
-                          <FichaCampo label="SKU" value={selectedRecord.sku} />
-                          <FichaCampo
-                            label="Marca / proveedor"
-                            value={selectedRecord.marca ?? selectedRecord.detalles?.marca}
-                          />
-                          <FichaCampo
-                            label="Medidas"
-                            value={selectedRecord.medidas ?? selectedRecord.detalles?.medidas}
-                          />
-                          <FichaCampo
-                            label="Materiales"
-                            value={selectedRecord.materiales ?? selectedRecord.detalles?.materiales}
-                          />
-                          <FichaCampo
-                            label="Colores / variantes"
-                            value={selectedRecord.colores ?? selectedRecord.detalles?.colores}
-                          />
-                          <FichaCampo label="Descripción" value={selectedRecord.descripcion} />
-                          <FichaCampo
-                            label="Verificación"
-                            value={
-                              ESTADO_VERIFICACION_LABEL[selectedRecord.estado_verificacion ?? ""] ??
-                              selectedRecord.estado_verificacion
-                            }
-                          />
-                          <FichaCampo
-                            label="Fotos en la galería"
-                            value={
-                              Array.isArray(selectedRecord.galeria)
-                                ? selectedRecord.galeria.length
-                                : 0
-                            }
-                          />
-                        </div>
-                      </div>
+                      <Tabs defaultValue="ficha" className="w-full">
+                        <TabsList className="mb-2">
+                          <TabsTrigger value="ficha">Ficha</TabsTrigger>
+                          <TabsTrigger value="publicaciones">Publicaciones</TabsTrigger>
+                          <TabsTrigger value="integraciones">Integraciones</TabsTrigger>
+                        </TabsList>
 
-                      <div className="space-y-4">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                          <Info className="w-3 h-3" /> Integraciones y archivos
-                        </h4>
-                        <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
-                          {selectedRecord.detalles?.google_drive_folder_id && (
-                            <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                Google Drive
-                              </span>
-                              <a
-                                href={`https://drive.google.com/drive/folders/${selectedRecord.detalles.google_drive_folder_id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-blue-600 hover:underline flex items-center gap-2 font-medium"
-                              >
-                                <FolderOpen className="w-4 h-4" />
-                                Abrir carpeta de activos
-                              </a>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="mt-2 h-8 w-fit text-[10px] font-bold uppercase gap-2"
-                                onClick={async () => {
-                                  const loading = toast.loading("Buscando fotos en la carpeta...");
-                                  try {
-                                    const res = await syncDriveGallery({
-                                      data: { id: selectedRecord.id },
-                                    });
-                                    toast.dismiss(loading);
-                                    if (res.added === 0)
-                                      toast.info("No hay fotos nuevas en la carpeta");
-                                    else toast.success(`Se enlazaron ${res.added} fotos nuevas`);
-                                    refetch();
-                                    setSelectedRecord(null);
-                                  } catch (e: unknown) {
-                                    toast.dismiss(loading);
-                                    toast.error(
-                                      getErrorMessage(e, "Error al sincronizar con Drive"),
-                                    );
-                                  }
-                                }}
-                              >
-                                <RefreshCcw className="w-3 h-3" />
-                                Enlazar fotos de la carpeta
-                              </Button>
+                        <TabsContent value="ficha">
+                          <div className="space-y-4">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <Info className="w-3 h-3" /> Ficha del producto
+                            </h4>
+                            <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
+                              <FichaCampo label="Categoría" value={selectedRecord.categoria} />
+                              <FichaCampo label="SKU" value={selectedRecord.sku} />
+                              <FichaCampo
+                                label="Marca / proveedor"
+                                value={selectedRecord.marca ?? selectedRecord.detalles?.marca}
+                              />
+                              <FichaCampo
+                                label="Medidas"
+                                value={selectedRecord.medidas ?? selectedRecord.detalles?.medidas}
+                              />
+                              <FichaCampo
+                                label="Materiales"
+                                value={
+                                  selectedRecord.materiales ?? selectedRecord.detalles?.materiales
+                                }
+                              />
+                              <FichaCampo
+                                label="Colores / variantes"
+                                value={selectedRecord.colores ?? selectedRecord.detalles?.colores}
+                              />
+                              <FichaCampo label="Descripción" value={selectedRecord.descripcion} />
+                              <FichaCampo
+                                label="Verificación"
+                                value={
+                                  ESTADO_VERIFICACION_LABEL[
+                                    selectedRecord.estado_verificacion ?? ""
+                                  ] ?? selectedRecord.estado_verificacion
+                                }
+                              />
+                              <FichaCampo
+                                label="Fotos en la galería"
+                                value={
+                                  Array.isArray(selectedRecord.galeria)
+                                    ? selectedRecord.galeria.length
+                                    : 0
+                                }
+                              />
                             </div>
-                          )}
-                          {selectedRecord.detalles?.woocommerce?.productId && (
-                            <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                WooCommerce
-                              </span>
-                              {selectedRecord.detalles.woocommerce.permalink ? (
-                                <a
-                                  href={selectedRecord.detalles.woocommerce.permalink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-sm text-blue-600 hover:underline font-medium"
-                                >
-                                  Ver producto sincronizado
-                                </a>
-                              ) : (
-                                <span className="text-sm text-slate-700">
-                                  ID #{selectedRecord.detalles.woocommerce.productId}
-                                </span>
+                          </div>
+                        </TabsContent>
+
+                        <TabsContent value="publicaciones">
+                          <MueblePublicaciones muebleId={selectedRecord.id} />
+                        </TabsContent>
+
+                        <TabsContent value="integraciones">
+                          <div className="space-y-4">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <Info className="w-3 h-3" /> Integraciones y archivos
+                            </h4>
+                            <div className="bg-slate-50 rounded-2xl p-6 space-y-4 border border-slate-100">
+                              {selectedRecord.detalles?.google_drive_folder_id && (
+                                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                                    Google Drive
+                                  </span>
+                                  <a
+                                    href={`https://drive.google.com/drive/folders/${selectedRecord.detalles.google_drive_folder_id}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 hover:underline flex items-center gap-2 font-medium"
+                                  >
+                                    <FolderOpen className="w-4 h-4" />
+                                    Abrir carpeta de activos
+                                  </a>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2 h-8 w-fit text-[10px] font-bold uppercase gap-2"
+                                    onClick={async () => {
+                                      const loading = toast.loading(
+                                        "Buscando fotos en la carpeta...",
+                                      );
+                                      try {
+                                        const res = await syncDriveGallery({
+                                          data: { id: selectedRecord.id },
+                                        });
+                                        toast.dismiss(loading);
+                                        if (res.added === 0)
+                                          toast.info("No hay fotos nuevas en la carpeta");
+                                        else
+                                          toast.success(`Se enlazaron ${res.added} fotos nuevas`);
+                                        refetch();
+                                        setSelectedRecord(null);
+                                      } catch (e: unknown) {
+                                        toast.dismiss(loading);
+                                        toast.error(
+                                          getErrorMessage(e, "Error al sincronizar con Drive"),
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    <RefreshCcw className="w-3 h-3" />
+                                    Enlazar fotos de la carpeta
+                                  </Button>
+                                </div>
                               )}
-                              {selectedRecord.detalles.woocommerce.lastSyncedAt && (
-                                <span className="text-xs text-slate-400">
-                                  Última sincronización:{" "}
-                                  {new Date(
-                                    selectedRecord.detalles.woocommerce.lastSyncedAt,
-                                  ).toLocaleString()}
-                                </span>
+                              {selectedRecord.detalles?.woocommerce?.productId && (
+                                <div className="flex flex-col gap-1 border-b border-slate-200/50 pb-3">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                                    WooCommerce
+                                  </span>
+                                  {selectedRecord.detalles.woocommerce.permalink ? (
+                                    <a
+                                      href={selectedRecord.detalles.woocommerce.permalink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-blue-600 hover:underline font-medium"
+                                    >
+                                      Ver producto sincronizado
+                                    </a>
+                                  ) : (
+                                    <span className="text-sm text-slate-700">
+                                      ID #{selectedRecord.detalles.woocommerce.productId}
+                                    </span>
+                                  )}
+                                  {selectedRecord.detalles.woocommerce.lastSyncedAt && (
+                                    <span className="text-xs text-slate-400">
+                                      Última sincronización:{" "}
+                                      {new Date(
+                                        selectedRecord.detalles.woocommerce.lastSyncedAt,
+                                      ).toLocaleString()}
+                                    </span>
+                                  )}
+                                </div>
                               )}
+                              <WooCommerceProductHistory productId={selectedRecord.id} />
                             </div>
-                          )}
-                          <WooCommerceProductHistory productId={selectedRecord.id} />
-                        </div>
-                      </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </div>
 
