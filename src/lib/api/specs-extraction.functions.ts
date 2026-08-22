@@ -94,51 +94,68 @@ export type SpecsCandidate = {
  * Toma en cuenta lo que ya vive en `detalles` (catálogo viejo) para no
  * proponer algo que en realidad ya se conoce.
  */
-export const getSpecsExtractionCandidates = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabase
-    .from("muebles")
-    .select("id, nombre, categoria, descripcion, marca, medidas, materiales, colores, detalles")
-    .order("nombre");
-
-  if (error) throw new Error(error.message);
-
-  const candidates: SpecsCandidate[] = [];
-  let sinDescripcion = 0;
-  let yaCompletos = 0;
-
-  for (const row of data ?? []) {
-    const descripcion = (row.descripcion ?? "").trim();
-    if (!descripcion) {
-      sinDescripcion++;
-      continue;
-    }
-
-    const detalles = (row.detalles ?? {}) as any;
-    const actuales = {
-      marca: (row.marca ?? detalles.marca ?? null) || null,
-      medidas: (row.medidas ?? detalles.medidas ?? null) || null,
-      materiales: (row.materiales ?? detalles.materiales ?? null) || null,
-      colores: (row.colores ?? detalles.colores ?? null) || null,
-    } as Record<SpecField, string | null>;
-
-    const faltantes = SPEC_FIELDS.filter((f) => !actuales[f]);
-    if (faltantes.length === 0) {
-      yaCompletos++;
-      continue;
-    }
-
-    candidates.push({
-      id: row.id,
-      nombre: row.nombre,
-      categoria: row.categoria ?? null,
-      descripcion,
-      actuales,
-      faltantes,
-    });
-  }
-
-  return { total: (data ?? []).length, sinDescripcion, yaCompletos, candidates };
+const candidatesSchema = z.object({
+  /**
+   * Volver a mandar a la IA los productos que ya pasaron por ella.
+   * Por defecto NO: si la IA ya leyó esa descripción y no encontró medidas,
+   * volver a preguntarle dará lo mismo y solo gasta llamadas a OpenAI.
+   */
+  incluirProcesados: z.boolean().optional().default(false),
 });
+
+export const getSpecsExtractionCandidates = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => candidatesSchema.parse(data ?? {}))
+  .handler(async ({ data: opciones }) => {
+    const { data, error } = await supabase
+      .from("muebles")
+      .select("id, nombre, categoria, descripcion, marca, medidas, materiales, colores, detalles")
+      .order("nombre");
+
+    if (error) throw new Error(error.message);
+
+    const candidates: SpecsCandidate[] = [];
+    let sinDescripcion = 0;
+    let yaCompletos = 0;
+    let yaProcesados = 0;
+
+    for (const row of data ?? []) {
+      const descripcion = (row.descripcion ?? "").trim();
+      if (!descripcion) {
+        sinDescripcion++;
+        continue;
+      }
+
+      const detalles = (row.detalles ?? {}) as any;
+
+      if (detalles.specs_extracted_at) {
+        yaProcesados++;
+        if (!opciones.incluirProcesados) continue;
+      }
+      const actuales = {
+        marca: (row.marca ?? detalles.marca ?? null) || null,
+        medidas: (row.medidas ?? detalles.medidas ?? null) || null,
+        materiales: (row.materiales ?? detalles.materiales ?? null) || null,
+        colores: (row.colores ?? detalles.colores ?? null) || null,
+      } as Record<SpecField, string | null>;
+
+      const faltantes = SPEC_FIELDS.filter((f) => !actuales[f]);
+      if (faltantes.length === 0) {
+        yaCompletos++;
+        continue;
+      }
+
+      candidates.push({
+        id: row.id,
+        nombre: row.nombre,
+        categoria: row.categoria ?? null,
+        descripcion,
+        actuales,
+        faltantes,
+      });
+    }
+
+    return { total: (data ?? []).length, sinDescripcion, yaCompletos, yaProcesados, candidates };
+  });
 
 const extractSchema = z.object({
   id: z.string(),

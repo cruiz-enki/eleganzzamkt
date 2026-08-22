@@ -66,10 +66,11 @@ export function SpecsExtractor({
   const [progreso, setProgreso] = useState({ current: 0, total: 0 });
   const [errores, setErrores] = useState<string[]>([]);
   const [guardadas, setGuardadas] = useState(0);
+  const [incluirProcesados, setIncluirProcesados] = useState(false);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ["specs-extraction-candidates"],
-    queryFn: () => getSpecsExtractionCandidates(),
+    queryKey: ["specs-extraction-candidates", incluirProcesados],
+    queryFn: () => getSpecsExtractionCandidates({ data: { incluirProcesados } }),
     enabled: isOpen,
     staleTime: 0,
   });
@@ -233,9 +234,12 @@ export function SpecsExtractor({
                     No hay nada que completar
                   </p>
                   <p className="text-xs text-slate-500">
-                    {data?.sinDescripcion
-                      ? `${data.sinDescripcion} productos no tienen descripción de dónde extraer.`
+                    {data?.yaProcesados
+                      ? `Ya se procesaron ${data.yaProcesados} productos con IA.`
                       : "Todas las fichas están completas."}
+                    {data?.sinDescripcion
+                      ? ` Otros ${data.sinDescripcion} no tienen descripción de dónde extraer.`
+                      : ""}
                   </p>
                 </div>
               ) : (
@@ -305,6 +309,24 @@ export function SpecsExtractor({
                       ))}
                     </div>
                   </ScrollArea>
+
+                  {(data?.yaProcesados ?? 0) > 0 && (
+                    <label className="flex items-start gap-2 rounded-lg border border-slate-100 dark:border-slate-800 p-3 cursor-pointer">
+                      <Checkbox
+                        className="mt-0.5"
+                        checked={incluirProcesados}
+                        onCheckedChange={() => setIncluirProcesados((v) => !v)}
+                      />
+                      <span className="text-xs text-slate-600 dark:text-slate-300">
+                        Volver a procesar los {data?.yaProcesados} productos que ya pasaron por la
+                        IA.
+                        <span className="block text-slate-400">
+                          Normalmente no hace falta: si la descripción no cambió, la IA va a
+                          responder lo mismo y solo se gastan llamadas.
+                        </span>
+                      </span>
+                    </label>
+                  )}
 
                   <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 p-3 rounded-lg flex gap-3">
                     <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
