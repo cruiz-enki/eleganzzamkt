@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase-client";
+import { getMiPerfil, permisos, type Perfil } from "@/lib/api/usuarios";
+import { PerfilProvider } from "@/lib/perfil-context";
 
+// El correo del dueño se conserva solo para prellenar el formulario.
+// Quién entra lo decide la tabla `perfiles`, no esta constante.
 const ALLOWED_EMAIL = "cruiz@enkisoluciones.mx";
 const PRODUCTION_APP_URL = "https://eleganzzamkt.enkidad.com";
 
@@ -15,7 +19,7 @@ function normalizeEmail(value?: string | null) {
 }
 
 function isAllowedSession(session: Session | null) {
-  return normalizeEmail(session?.user.email) === ALLOWED_EMAIL;
+  return Boolean(session?.user);
 }
 
 function getAuthRedirectUrl() {
@@ -62,6 +66,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [isSendingRecovery, setIsSendingRecovery] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isRecoveryMode, setIsRecoveryMode] = useState(isPasswordRecoveryRedirect);
+  const [perfil, setPerfil] = useState<Perfil | null>(null);
+  const [cargandoPerfil, setCargandoPerfil] = useState(false);
+  const [sinAcceso, setSinAcceso] = useState<string | null>(null);
 
   const isAllowed = useMemo(() => isAllowedSession(session), [session]);
   const signedEmail = normalizeEmail(session?.user.email);
@@ -94,14 +101,40 @@ export function AuthGate({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Con sesión válida se busca el perfil: es lo que dice si esta persona tiene
+  // acceso y con qué rol. Sin perfil activo, no se entra.
   useEffect(() => {
-    if (!session || isAllowed) return;
+    if (!session) {
+      setPerfil(null);
+      setSinAcceso(null);
+      return;
+    }
 
-    supabase.auth.signOut().finally(() => {
-      setSession(null);
-      toast.error("Esta aplicación solo está habilitada para cruiz@enkisoluciones.mx");
-    });
-  }, [isAllowed, session]);
+    let mounted = true;
+    setCargandoPerfil(true);
+
+    getMiPerfil()
+      .then((p) => {
+        if (!mounted) return;
+        if (!p) {
+          setSinAcceso("Tu cuenta todavía no tiene acceso a esta plataforma.");
+          setPerfil(null);
+        } else if (!p.activo) {
+          setSinAcceso("Tu acceso está desactivado. Pídele a un administrador que lo habilite.");
+          setPerfil(null);
+        } else {
+          setPerfil(p);
+          setSinAcceso(null);
+        }
+      })
+      .finally(() => {
+        if (mounted) setCargandoPerfil(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [session]);
 
   const handlePasswordSignIn = async () => {
     const normalizedEmail = normalizeEmail(email);
@@ -218,18 +251,44 @@ export function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (isAllowed && !isRecoveryMode) {
+  if (session && cargandoPerfil && !isRecoveryMode) {
     return (
-      <div className="min-h-screen">
-        <div className="fixed right-4 bottom-4 z-[60] hidden items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm backdrop-blur md:flex dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" />
-          <span>{signedEmail}</span>
-          <Button variant="ghost" size="sm" className="h-7 px-2" onClick={handleSignOut}>
-            <LogOut className="h-3.5 w-3.5" />
+      <div className="flex min-h-screen items-center justify-center text-sm text-slate-500">
+        Validando acceso
+      </div>
+    );
+  }
+
+  if (session && sinAcceso && !isRecoveryMode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-xl dark:border-slate-800 dark:bg-slate-900">
+          <ShieldCheck className="mx-auto h-8 w-8 text-slate-300" />
+          <p className="mt-3 text-sm font-medium text-slate-800 dark:text-slate-200">{sinAcceso}</p>
+          <p className="mt-1 text-xs text-slate-500">{signedEmail}</p>
+          <Button variant="outline" className="mt-4" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Salir
           </Button>
         </div>
-        {children}
       </div>
+    );
+  }
+
+  if (isAllowed && perfil && !isRecoveryMode) {
+    return (
+      <PerfilProvider value={{ perfil, permisos: permisos(perfil.rol) }}>
+        <div className="min-h-screen">
+          <div className="fixed right-4 bottom-4 z-[60] hidden items-center gap-2 rounded-md border border-slate-200 bg-white/90 px-3 py-2 text-xs text-slate-600 shadow-sm backdrop-blur md:flex dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-300">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <span>{signedEmail}</span>
+            <Button variant="ghost" size="sm" className="h-7 px-2" onClick={handleSignOut}>
+              <LogOut className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+          {children}
+        </div>
+      </PerfilProvider>
     );
   }
 

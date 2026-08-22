@@ -19,6 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { notificarAlEquipo } from "@/lib/api/notificaciones";
 
 const currency = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -151,6 +152,12 @@ export function PriceReconciler({
     try {
       const res = await aplicarPrecios(items);
       setResultado({ aplicados: res.aplicados, errores: res.errores.length });
+      await notificarAlEquipo({
+        tipo: "proceso",
+        titulo: `Se aplicaron ${res.aplicados} precios`,
+        mensaje: `Desde la lista ${archivo ?? ""}`.trim(),
+        seccion: "productos",
+      });
       await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
       await queryClient.invalidateQueries({ queryKey: ["muebles-para-precios"] });
       if (res.errores.length === 0) toast.success(`Se aplicaron ${res.aplicados} precios`);

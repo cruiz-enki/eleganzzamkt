@@ -79,6 +79,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { notificarAlEquipo } from "@/lib/api/notificaciones";
 import { getFirstDisplayImageUrl, inspectImage, uniqueImages } from "@/lib/image-url";
 import { canSyncToWooCommerce, firstError } from "@/lib/domain/editorial-rules";
 import Masonry from "react-layout-masonry";
@@ -437,6 +438,15 @@ export function SupabaseInventory() {
       const errorMessage =
         error instanceof Error ? error.message : "Error al sincronizar WooCommerce";
       toast.error(errorMessage);
+      // Una sincronización que falla en silencio es justo lo que nadie se
+      // entera hasta que el producto no aparece en la tienda.
+      void notificarAlEquipo({
+        tipo: "falla_tecnica",
+        titulo: `Falló la sincronización con WooCommerce de ${record.nombre}`,
+        mensaje: errorMessage,
+        seccion: "productos",
+        referenciaId: record.id,
+      });
     }
   };
 

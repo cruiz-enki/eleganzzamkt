@@ -24,6 +24,7 @@ import {
 import { Sparkles, Loader2, CheckCircle2, AlertCircle, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { notificarAlEquipo } from "@/lib/api/notificaciones";
 
 const ETIQUETA: Record<SpecField, string> = {
   marca: "Marca",
@@ -171,6 +172,12 @@ export function SpecsExtractor({
 
     setGuardadas(ok);
     setFase("listo");
+    await notificarAlEquipo({
+      tipo: "proceso",
+      titulo: `Se completaron ${ok} fichas con IA`,
+      mensaje: "Marca, medidas, materiales y colores extraídos de la descripción.",
+      seccion: "productos",
+    });
     await queryClient.invalidateQueries({ queryKey: ["supabase-inventory"] });
     toast.success(`Se completaron las fichas de ${ok} productos`);
   };

@@ -10,6 +10,7 @@ import {
   Table as TableIcon,
   Package,
   Send,
+  Users,
   Megaphone,
   Palette,
   Settings,
@@ -30,6 +31,9 @@ import { PromptSettings } from "@/components/dashboard/PromptSettings";
 import { CampaignsManager } from "@/components/dashboard/CampaignsManager";
 import { PublicacionesManager } from "@/components/dashboard/PublicacionesManager";
 import { BrandPanel } from "@/components/dashboard/BrandPanel";
+import { UsuariosPanel } from "@/components/dashboard/UsuariosPanel";
+import { NotificacionesBell } from "@/components/dashboard/NotificacionesBell";
+import { usePerfil } from "@/lib/perfil-context";
 import { CatalogosManager } from "@/components/dashboard/CatalogosManager";
 import { generateMarketingCopy, cleanProductImage } from "@/lib/api/ai.functions";
 import { toast } from "sonner";
@@ -66,10 +70,13 @@ type ViewType =
   | "catalogos"
   | "marca"
   | "configuracion"
+  | "usuarios"
   | "ia-generator";
 
 function Index() {
   const [view, setView] = useState<ViewType>("dashboard");
+  const { perfil, permisos: puede } = usePerfil();
+  const miPerfilId = perfil?.id ?? null;
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("enki-sidebar-open") !== "false";
@@ -130,6 +137,9 @@ function Index() {
     { id: "marca", label: "Marca", icon: Palette },
     { id: "ia-generator", label: "IA Generator", icon: SparklesIcon },
     { id: "configuracion", label: "Configuración", icon: Settings },
+    // Usuarios solo para administradores: el menú lo esconde y, además, la
+    // base rechaza cualquier cambio que intente alguien sin el rol.
+    ...(puede.esAdmin ? [{ id: "usuarios" as const, label: "Usuarios", icon: Users }] : []),
   ] as const;
 
   return (
@@ -266,18 +276,34 @@ function Index() {
                 Eleganzza Marketing Hub
               </p>
             </div>
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-              title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-            >
-              {isDarkMode ? (
-                <Sun className="h-4 w-4 text-[#F5A623]" />
-              ) : (
-                <Moon className="h-4 w-4 text-[#1B3566]" />
-              )}
-              <span className="hidden sm:inline">{isDarkMode ? "Modo Claro" : "Modo Oscuro"}</span>
-            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <NotificacionesBell
+                onIr={(seccion) => {
+                  const destinos: Record<string, ViewType> = {
+                    productos: "productos",
+                    publicaciones: "publicaciones",
+                    campanas: "campañas",
+                    catalogos: "catalogos",
+                  };
+                  const destino = destinos[seccion];
+                  if (destino) setView(destino);
+                }}
+              />
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+              >
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4 text-[#F5A623]" />
+                ) : (
+                  <Moon className="h-4 w-4 text-[#1B3566]" />
+                )}
+                <span className="hidden sm:inline">
+                  {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+                </span>
+              </button>
+            </div>
           </header>
 
           {view === "dashboard" && <DashboardView setView={setView} />}
@@ -405,6 +431,12 @@ function Index() {
               >
                 <CatalogosManager />
               </Suspense>
+            </div>
+          )}
+
+          {view === "usuarios" && puede.esAdmin && (
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <UsuariosPanel miId={miPerfilId} />
             </div>
           )}
 

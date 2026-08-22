@@ -25,6 +25,7 @@ import {
 import { Database, Loader2, CheckCircle2, AlertCircle, ImageIcon, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { notificarAlEquipo } from "@/lib/api/notificaciones";
 
 const currency = new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" });
 
@@ -226,6 +227,25 @@ export function AirtableImporter({
     const okCount = collected.filter((r) => r.status === "ok").length;
     const warnCount = collected.filter((r) => r.status === "warn").length;
     const errCount = collected.filter((r) => r.status === "error").length;
+
+    await notificarAlEquipo({
+      tipo: "proceso",
+      titulo: `Importación de Airtable terminada: ${okCount + warnCount} productos`,
+      mensaje:
+        warnCount > 0 || errCount > 0
+          ? `${warnCount} quedaron sin imágenes y ${errCount} fallaron.`
+          : "Todos entraron con sus imágenes.",
+      seccion: "productos",
+    });
+
+    if (warnCount > 0) {
+      await notificarAlEquipo({
+        tipo: "falla_tecnica",
+        titulo: "Hay productos que se importaron sin imágenes",
+        mensaje: "Suele ser la conexión con Google Drive. Revísala antes de seguir importando.",
+        seccion: "productos",
+      });
+    }
 
     if (errCount === 0 && warnCount === 0) {
       toast.success(`Se importaron ${okCount} productos con éxito`);
