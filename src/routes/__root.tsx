@@ -151,7 +151,9 @@ function RootComponent() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   // Rutas públicas por token: entran sin sesión (portal del cliente).
   const isPublicPortal =
-    pathname.startsWith("/catalogo/") || pathname.startsWith("/publicaciones/");
+    pathname.startsWith("/catalogo/") ||
+    pathname.startsWith("/publicaciones/") ||
+    pathname.startsWith("/brand-discovery");
 
   return (
     <QueryClientProvider client={queryClient}>

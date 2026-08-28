@@ -1,0 +1,1805 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>Descubrimiento de Marca Eleganzza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap">
+
+<style>
+/* ===========================================================
+   Eleganzza Design System · tokens
+   Fuente: /Eleganzza Design System (tokens/colors, typography,
+   spacing, fonts + components/components.css)
+   Sistema de un solo tema: la marca vive sobre crema cálido,
+   nunca sobre blanco puro ni gris.
+   =========================================================== */
+:root{
+  /* paleta de marca */
+  --color-maroon-900:#3f0d06;
+  --color-maroon-700:#6e1508;
+  --color-red-600:#c73a2a;
+  --color-red-500:#da4a38;
+  --color-red-400:#e8705d;
+  --color-blush-200:#f5b8ae;
+  --color-blush-100:#fbe2dd;
+  --color-cream-50:#fdfbf7;
+  --color-cream-100:#f8f1e7;
+  --color-sand-200:#efe2d1;
+  --color-sand-300:#e2cfb4;
+  --color-taupe-400:#b39d86;
+  --color-taupe-500:#8a7361;
+  --color-espresso-700:#4a3428;
+  --color-espresso-900:#2a1c14;
+  --color-gold-400:#c9a25f;
+  --color-gold-600:#a67c3d;
+  --color-success-600:#4d7a52;
+  --color-success-100:#e3ecdf;
+  --color-warning-600:#b9822c;
+  --color-warning-100:#f7ead2;
+  --color-danger-600:#b3261e;
+  --color-danger-100:#f6dedc;
+
+  --bg-page:var(--color-cream-50);
+  --bg-surface:#ffffff;
+  --bg-surface-alt:var(--color-cream-100);
+  --bg-sunken:var(--color-sand-200);
+  --text-primary:var(--color-espresso-900);
+  --text-secondary:var(--color-taupe-500);
+  --text-on-brand:#ffffff;
+  --border-subtle:var(--color-sand-300);
+  --border-strong:var(--color-taupe-400);
+  --brand-primary:var(--color-red-600);
+  --brand-primary-hover:var(--color-maroon-700);
+  --brand-primary-active:var(--color-maroon-900);
+  --brand-secondary:var(--color-gold-400);
+  --focus-ring:var(--color-gold-600);
+
+  /* tipografía */
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Nunito Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --tracking-wider:0.08em;
+
+  /* forma */
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:16px;
+  --radius-pill:999px;
+  --shadow-sm:0 1px 2px rgba(58,20,10,.08);
+  --shadow-md:0 4px 14px rgba(58,20,10,.12);
+  --ease-standard:cubic-bezier(.4,0,.2,1);
+  --duration-fast:120ms;
+  --duration-base:200ms;
+  --duration-slow:340ms;
+
+  /* alias usados por esta página */
+  --ground:var(--bg-page);
+  --surface:var(--bg-surface);
+  --surface-2:var(--bg-surface-alt);
+  --ink:var(--text-primary);
+  --ink-mid:var(--text-secondary);
+  --ink-soft:var(--color-taupe-400);
+  --rule:var(--border-subtle);
+  --rule-soft:var(--color-sand-200);
+  --accent:var(--brand-primary);
+  --accent-ink:var(--brand-primary-hover);
+  --gold:var(--color-gold-600);
+  --on-accent:var(--text-on-brand);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg-page);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:16px;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{text-wrap:balance;margin:0;font-family:var(--font-display);font-weight:400}
+a{color:var(--brand-primary);text-decoration:none}
+a:hover{color:var(--brand-primary-hover);text-decoration:underline}
+
+/* ---------- estructura ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.col{max-width:720px}
+
+/* ---------- encabezado ---------- */
+.masthead{border-bottom:1px solid var(--border-subtle);padding:56px 0 40px;background:var(--bg-surface)}
+.eyebrow{
+  font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  color:var(--text-secondary);font-weight:700;margin:0 0 28px;
+}
+.eyebrow b{color:var(--brand-primary);font-weight:800}
+.brandlogo{display:block;width:min(340px,72vw);height:auto;margin:0 0 26px}
+.wordmark{
+  font-family:var(--font-display);font-weight:400;font-style:italic;
+  font-size:clamp(32px,5.4vw,48px);line-height:1.15;
+  color:var(--color-espresso-700);margin:0 0 10px;
+}
+.masthead .sub{font-size:17px;color:var(--text-secondary);margin:0 0 34px;max-width:52ch}
+.metaline{
+  display:flex;flex-wrap:wrap;gap:14px 34px;
+  border-top:1px solid var(--border-subtle);padding-top:20px;
+  font-size:15px;color:var(--text-primary);
+}
+.metaline span b{
+  display:block;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  color:var(--text-secondary);font-weight:700;margin-bottom:2px;
+}
+
+/* ---------- barra fija ---------- */
+.bar{
+  position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb,var(--bg-page) 90%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-subtle);
+}
+.bar-in{display:flex;align-items:center;gap:16px;height:56px}
+.bar-title{
+  font-family:var(--font-display);font-size:16px;color:var(--text-primary);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;
+}
+.bar-title i{font-style:italic;color:var(--text-secondary)}
+.toggle{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--brand-primary-hover);
+  white-space:nowrap;background:transparent;
+  border:1px solid var(--border-strong);border-radius:var(--radius-pill);
+  height:36px;padding:0 16px;
+  transition:background var(--duration-base) var(--ease-standard),border-color var(--duration-base) var(--ease-standard);
+}
+.toggle:hover{background:var(--bg-surface-alt);border-color:var(--brand-primary)}
+.toggle:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.toggle .dot{width:9px;height:9px;border-radius:50%;border:1.5px solid currentColor}
+body.only-req .toggle .dot{background:var(--brand-primary);border-color:var(--brand-primary)}
+body.only-req .q[data-p="rec"],body.only-req .q[data-p="opt"]{display:none}
+
+/* ---------- texto corrido ---------- */
+.intro{padding:52px 0 12px}
+.lede{font-size:19px;line-height:1.65;color:var(--color-espresso-700);margin:0 0 28px}
+.lede strong{color:var(--text-primary);font-weight:700}
+p{margin:0 0 18px}
+
+.rules{list-style:none;margin:0 0 32px;padding:0;display:grid;gap:16px}
+.rules li{display:grid;grid-template-columns:30px 1fr;gap:14px;align-items:start}
+.rules .n{font-family:var(--font-display);font-size:26px;line-height:1;color:var(--gold)}
+
+.key{
+  background:var(--bg-surface);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);
+  padding:22px 24px;margin:0 0 30px;display:grid;gap:12px;
+}
+.key-row{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:baseline;font-size:15px}
+.key-row .m{font-size:13px;text-align:center;line-height:1}
+.m-req{color:var(--brand-primary)}
+.m-rec{color:var(--gold)}
+.m-opt{color:var(--border-strong)}
+
+.callout{
+  background:var(--bg-surface-alt);border:1px solid var(--border-subtle);
+  border-left:3px solid var(--brand-primary);
+  border-radius:var(--radius-md);
+  padding:16px 20px;margin:0 0 18px;font-size:15.5px;color:var(--color-espresso-700);
+}
+.callout strong{color:var(--text-primary);font-weight:700}
+.intro .callout:last-of-type{margin-bottom:30px}
+
+/* ---------- secciones ---------- */
+.section{border-top:1px solid var(--border-subtle);padding:56px 0 12px;scroll-margin-top:64px}
+.shead{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px}
+@media(min-width:900px){
+  .section{display:grid;grid-template-columns:118px minmax(0,720px);gap:44px;align-items:start}
+  .shead{grid-column:1/-1;display:grid;grid-template-columns:118px minmax(0,720px);gap:44px;align-items:baseline;margin-bottom:26px}
+  .sbody{grid-column:2}
+}
+.snum{
+  font-family:var(--font-display);font-weight:400;
+  font-size:clamp(38px,6vw,58px);line-height:.9;
+  color:var(--gold);font-variant-numeric:tabular-nums;
+}
+.stitle{font-family:var(--font-display);font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--text-primary)}
+.stime{
+  font-size:11.5px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  color:var(--text-secondary);font-weight:700;margin-top:8px;
+}
+.snote{font-family:var(--font-display);font-style:italic;font-size:18px;color:var(--color-espresso-700);margin:0 0 24px}
+
+/* ---------- preguntas ---------- */
+.q{padding:24px 0;border-bottom:1px solid var(--color-sand-200)}
+.q:last-child{border-bottom:0}
+.qh{display:grid;grid-template-columns:auto auto 1fr;gap:0 10px;align-items:baseline}
+.qid{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+.qm{font-size:11px;line-height:1}
+.qt{font-size:17.5px;font-weight:700;line-height:1.45;margin:0;color:var(--text-primary)}
+.qt em{font-style:italic;font-weight:400;color:var(--text-secondary)}
+.qhelp{font-family:var(--font-display);font-style:italic;color:var(--color-espresso-700);font-size:16px;margin:8px 0 0;line-height:1.5}
+.qbody{margin-top:14px}
+
+/* afordancias */
+.lines{display:grid;gap:13px;margin-top:14px}
+.lines i{display:block;height:1px;background:var(--border-subtle)}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.opt{
+  border:1px solid var(--border-subtle);border-radius:var(--radius-pill);
+  padding:6px 14px;font-size:14.5px;color:var(--text-primary);background:var(--bg-surface-alt);
+}
+.blank{display:inline-block;min-width:82px;border-bottom:1px solid var(--border-strong)}
+.field{display:grid;gap:6px;margin:14px 0 0}
+.field label{font-size:13px;font-weight:700;color:var(--text-primary)}
+.field .box{border:1px solid var(--border-subtle);background:var(--bg-surface);height:46px;border-radius:var(--radius-md)}
+.field .box.tall{height:96px}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:620px){.grid2{grid-template-columns:1fr 1fr}}
+
+.scroller{
+  overflow-x:auto;margin-top:16px;background:var(--bg-surface);
+  border:1px solid var(--border-subtle);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);
+}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:420px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--color-sand-200);vertical-align:middle}
+th{
+  font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  color:var(--text-secondary);font-weight:800;background:var(--bg-surface-alt);
+  border-bottom:1px solid var(--border-subtle);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;color:var(--text-secondary);width:1%;white-space:nowrap;font-weight:700}
+td.fill{color:var(--border-subtle);letter-spacing:.1em}
+tfoot td{font-weight:800;background:var(--bg-surface-alt);border-top:1px solid var(--border-subtle)}
+
+/* escalas */
+.scale{display:grid;gap:10px;margin-top:16px}
+.srow{display:grid;gap:6px;padding:12px 0;border-bottom:1px solid var(--color-sand-200)}
+.srow:last-child{border-bottom:0}
+.slabels{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--text-secondary)}
+.slabels b{font-weight:700;color:var(--text-primary)}
+.track{display:flex;align-items:center;height:22px}
+.track i{flex:1;height:1px;background:var(--border-subtle)}
+.track u{width:10px;height:10px;border:1px solid var(--border-strong);border-radius:50%;flex:none;text-decoration:none;background:var(--bg-surface)}
+
+.months{
+  display:grid;grid-template-columns:repeat(12,1fr);
+  border:1px solid var(--border-subtle);border-radius:var(--radius-md);
+  overflow:hidden;margin-top:16px;font-variant-numeric:tabular-nums;background:var(--bg-surface);
+}
+.months div{
+  text-align:center;padding:10px 0 0;font-size:13px;font-weight:800;
+  border-right:1px solid var(--color-sand-200);color:var(--text-secondary);
+}
+.months div:last-child{border-right:0}
+.months div span{display:block;height:18px;margin-top:8px;border-top:1px solid var(--color-sand-200)}
+
+.rank{display:grid;gap:10px;margin-top:16px}
+.rank div{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:center;font-size:15px}
+.rank i{display:block;height:36px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface)}
+
+.pairs{
+  display:grid;margin-top:16px;background:var(--bg-surface);
+  border:1px solid var(--border-subtle);border-radius:var(--radius-lg);
+  overflow:hidden;box-shadow:var(--shadow-sm);
+}
+.pair{
+  display:grid;grid-template-columns:1fr 44px 1fr;align-items:center;gap:10px;
+  padding:12px 16px;font-size:15px;border-bottom:1px solid var(--color-sand-200);
+}
+.pair:last-child{border-bottom:0}
+.pair span:nth-child(2){text-align:center;font-family:var(--font-display);font-style:italic;color:var(--text-secondary);font-size:15px}
+.pair span:last-child{text-align:right}
+@media(max-width:560px){
+  .pair{grid-template-columns:1fr;text-align:left;gap:4px}
+  .pair span:nth-child(2),.pair span:last-child{text-align:left}
+}
+
+.confid{
+  background:var(--color-danger-100);border:1px solid var(--color-danger-600);
+  border-radius:var(--radius-md);padding:18px 20px;margin:0 0 26px;
+  font-size:15.5px;color:var(--color-espresso-700);
+}
+.confid b{
+  color:var(--color-danger-600);display:block;font-size:11.5px;
+  letter-spacing:var(--tracking-wider);text-transform:uppercase;margin-bottom:6px;font-weight:800;
+}
+
+/* ---------- cierre ---------- */
+.close{border-top:1px solid var(--border-subtle);margin-top:60px;padding:56px 0 90px;background:var(--bg-surface)}
+.thanks{font-family:var(--font-display);font-size:clamp(24px,4vw,34px);line-height:1.25;margin:0 0 18px;color:var(--text-primary)}
+.thanks em{font-style:italic;color:var(--brand-primary)}
+.sig{
+  font-size:11.5px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  color:var(--text-secondary);font-weight:700;margin-top:34px;
+  border-top:1px solid var(--border-subtle);padding-top:20px;
+}
+.phases{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.phases span{
+  font-size:12.5px;border:1px solid var(--border-subtle);border-radius:var(--radius-pill);
+  padding:5px 12px;color:var(--text-secondary);background:var(--bg-surface-alt);
+}
+.phases span.now{
+  border-color:transparent;background:var(--color-blush-100);
+  color:var(--brand-primary-hover);font-weight:800;
+}
+
+@media print{
+  .bar{display:none}
+  body{background:#fff;font-size:11pt}
+  .section{page-break-inside:auto}
+  .q{page-break-inside:avoid}
+}
+</style>
+
+<div class="bar">
+  <div class="wrap bar-in">
+    <div class="bar-title" id="barTitle">Eleganzza <i>· Descubrimiento de marca</i></div>
+    <button class="toggle" id="filterBtn" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span> Solo obligatorias
+    </button>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap col">
+    <p class="eyebrow">Fase <b>1</b> de 9 · Brand Discovery</p>
+    <img class="brandlogo" alt="Eleganzza muebles · Elegancia, Calidad y Confort" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlQAAAEACAYAAAB1b+hVAAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nOy9Xcwtybnf9Xuqutd6P/bXjGc843N8zkw+CIkmntmICKIg4bnkzr5DiUQyEYJwASIIBZEbzgEkEoHCMcpVkNCZgBQkrnzuEDc4QRFBCMV2MqAQktjH9vF4Pvfe78daq7uqHi6equrqfte7bZ/tY/t493/r3au7urq7urq669//56mnRFVZsWLFihUrVqxY8buH+1kXYMWKFStWrFix4vc7VkK1YsWKFStWrFjxjFgJ1YoVK1asWLFixTNiJVQrVqxYsWLFihXPiJVQrVixYsWKFStWPCNWQrVixYoVK1asWPGMWAnVihUrVqxYsWLFM2IlVCtWrFixYsWKFc+IlVCtWLFixYoVK1Y8I1ZCtWLFihUrVqxY8YxYCdWKFStWrFixYsUzYiVUK1asWLFixYoVz4iVUK1YsWLFihUrVjwjVkK1YsWKFStWrFjxjFgJ1YoVK1asWLFixTNiJVQrVqxYsWLFihXPiJVQrVixYsWKFStWPCNWQrVixYoVK1asWPGMWAnVihUrVqxYsWLFM2IlVCtWrFixYsWKFc+IlVCtWLFixYoVK1Y8I1ZCtWLFihUrVqxY8YxYCdWKFStWrFixYsUzYiVUK1asWLFixYoVz4iVUK1YsWLFihUrVjwjVkK1YsWKFStWrFjxjFgJ1YoVK1asWLFixTNiJVQrVqxYsWLFihXPiJVQrVixYsWKFStWPCO6n3UBVqz4WeLvvfPWr7sk77iR17oTfzSP3LKvpcs3EB4B6KggIAKIIMIjhK/fenLhaz9ueW8rS4HesiLwEOXBU3Z9CMe353O+Drx2Y2NoMjV/6ZB4fHXgOox8+ij8zX/97/7Td8ou3/zTf+JtnNr5JJ831X0fSpT75aTSFGB28T9k2Sc5tv0bYPcKYaqfJqveOJ5+XTXvs4BTQQEVbav6oaKzenRJUAHF8tk5Zndqft+Ort+eX+1Yj0C/nq/vq3/iN7/xrb/1J//gA+9594UH3ZdOtz0PTrb43kFU8EItjCraH21Z3wa+9ZRyPYKntu9H2m4/ekuOY3n9PxKUt5+y7aEqD1BF83VLuWblAehbt53ztvQwJpLXbwSX3v1Tv/nNr/xuirziFwui+rtquitW/ELg777zlvoDyEHpNm7Wg8virS+z3n2xXUAQ0pgmUoXgNjfZwPK4i80/WvptiGonKPuNeT0pkn6MY8oi29js1y0yRL1x3PE6cBVGrkPkkycjl1f63/zzv3L3K3fPN18Tx2sEvUHC3Ag4kGgEZEakjiy7Soha9mW/XhcXIIuOMZOgPrlZPllcyOiS5QFaWjM6q8wuOVAYfZoOQu60G7gkdd/o0tFO+gaJyvWqfn7u2bUkte1JwQkaFO15/GgfXv/O/3P9lTvn8udevNdz1nnOu57NaWd2iZRPmBSUOaHSW367RTl/CANRBzgBVZjIi637H7Nh/xhsZ173tpIGY1GFTLneWY3q7fst76G2F64QhoSeOWKn/CvvfuPHfVJX/AJiVahWPLf4O++8+Y5XMXFkSAy7NFNEpCEmUjtyqcs1r0iznMUPERBFZOqMyXnKezmFNB2vYMG/ZEEWpGs6poKkE6mIjUqWgFA+x8XI1fI8y/WwUIW6ZiUrcKZK3X4sAVwAiaUjgxh4eHkd37l7zmsa1XZJN3eXmClNKXY95pzqyCz1lnw3rlHmSQselvqarWKbXBXPFKnCUh8nbwnN6xP/0Jpef5veWeK8HJUXxok0qegkoqXpnqq0x1JbD1ZASYKqMuzG+4K8HQMPwe6BCHYvB7XjdQIxHztZfd+mbgKWfyTXwoJ83Cav9QIhTWku76fNydSI4FQ5OTno7Fj1w39J8mpZFNc1HiyLMqWQJjUO7MNHm3tTl6fjTcslfSqDAniQM4cq/J133nz7X333m19jxXONlVCteG6RlIei4PcJTSDJXrbijBWpqnWgApoVDymdGDQdtqINqVJAcs+bmBOnSohK3phy/psqC5SOVW6kV0TNx9ZpXbDrgYlECdaZHjnH/FcyCcvIneitOEKmAFywXqf31sn1Pa+HnX55EzuSRlwSJCZUqCRlZgXL9XFMBazLYbZD3pLTNnNJSliu39zTx2PbQPp8TxvVwmVCdZQ8QTbxUfPku2i8oqnv0klrc9KinFjakkgs7mFbVgXve04SPBkOD/uetyDfg2Qkl5iJxaAzkx+4icC1KAnDfEvNu9zBLdIa5qV1u843x3RDsSrqnFWFHqngsr8tiM/qcNkcdEa0NG+bEaRl+W5sm1ZqLgVN5Z4JehXRu44Eb8OPb8Jf8YuFlVCteG4R4aFL9iKVqEZCJL/MG6XJeMaiQ5FmoXR8Qu0tMw8jDal2IgrmZ5X3a1UUVWXWozUKVdUtBDR3bK1eI60PTwRpFYBQGeGcKB2DGmn40XAzX+0SEzgnnKrnoEYmr/fxNe3lNTc4tl0HIcCoxGxxc43FTJdk4ajchNVhaHrBFsOR69jMWMtTrmS+TfSYb12+nyFanq4oVJOfVCVbqqQYG3VSs4KZ14vylFpPqaeT36JW1aqRnJgSj/YHkurD633ipfsbROFUPd1SWWwxpCOJR+q82XSUgMVjh5h/hMyIIoVUtTVWNjSLS4VquX3UGwSpPIQpX9uMAKYFSdMjylveVo7b7l/ImqqgCaI3NXDF842VUK14fqE8pBAoNSJSlaisEIhq7rjmRhrVYqpru0BBUkN+8q+ZtmTBC0onY8exDqOlSTUXzd5NeiZOmBpV99N8vtKxJayziExl+zFwo0v9YYcQO8+AMsQ4lVshodnsM6kjLt48bEqKu+FodvzEy1TrFHOdybwmW5L1w0hUPZ4qabRCzlSkellGhDXESZVabiPz7nKLRRrxY1K95tRQzNldoUNQhZTXNV+jOFAHGkFF8X2HADEoCX2gqoSgSCcMMdKlfCw3yWe1DeW0eomLtn1r/TylHlHMvyuriQrgsQ+MaHTsWJ3OD3GzDLMnTmQy0bUZct1WX7HFztX02Oavx5kKUtrqdL9o/pNWSVsJ1YqVUK14PvG//Nk3X/cq9xma92OaTHXlpWrEherTUj/LsyrUmqDKCCKZZ7yZv2xq0tvPX/OTuUHhrMOT2ltbp9qsg11DNfelfE35a1yOiRC34UfkXjNFq1xXFuX65LhUGwboPMSkxKQIilMjTredPOqis5ZpfakiLGjTj38Ry+todxc5IltM8LkFRHQqX/mVKaXDoaIkoM9nK5pM4cB1FKDQbJ81uflVKY0iJNkXyiED7F162PeOUZUYlV68kZk0kaj5rZsTEn0KVVrel9ugYkRenZiDeqnKBLip3Ws5qVsQmdnBmnzapk3kfJ59kZ4/WCqZz/vPiFTzTN4gUSV/TshW0unQKq/dXhMrnheshGrFc4mkvO6xd6Tbma2vdU8xskKT0JhotHjE2Itb8ou6kKX64i95G2mqfjULzHpgyQpBtaPMTQxklaz1JxFAU1uWqdMtnYM0TsdEbu0A5TbS8KNzksXxbKRdLw5BGIbE9p4n1n7zSC+4OPGM2urtudv0GbnSo0ap43lvS09TO5j5b82FDDoRU+Bymmvvrwgb6U2lsnAaWThUUqZRCcWLI+a02KQLnpSXbT0RW4IhVk5SJtiqaND7nbfC9uLwKkhkLsAUUpCJ97xunnJvbmlD2tRPacv22CikTKqmx2K2Z72GZv/lKLw2e3kOK0s7xkDV8ixH51UiRePZVslVOWYpq87LXE5Xtu8SnHniRvmf/4033/7X/ofVMf15xkqoVjyXUHhbkphfkXcwaiUzrTtT8auQbG4p3Ki+jNW+xKe0nKGcpXZNjSrQjjabf/7OlIGZ+aV2MNKQrindSEd+25cOsumfyvqtxOknBBHB9T0hRQ4kDkNAo5IS7IZIUiWJmUrEOyTMe/KUfVlac92MWD0NOjcQHQtP8aOQqBv5i7NSbhAOV8lRIbpF2Wx961pCLiJs/ClOTNOKRJImUv5FwElP1EQk4sovSmEiSkJI0BLFTBrqfffw4vk533n8iNMTX83Zo7NyO+dRTYhzRha9Ay+kcfhhtXu84mZ1lX3DCtlIIL4hPznNSJxM6uyiws2E3WxpLrVKwFVpukmSZma+lhhVotSYWRvFqi43vmwzMU+ndfO1BHpnI2N7QUVf/2FVt+IXGyuhWvFcQksQSy8mJxTJoTEtFfI0WwecczWhOo0vGZKCOD/tuDxIA2mONythPZ+fFyblWFf5+NaXT0P6JZv5JFon55KC6Kxzm/kXZZLX2Cun87XlrNvst7v/AI0RjRGS/WqKdPdfYLy+xO+vOckdd1JTXGZuK7GoKrPLzX3egqDMs9xWlXMsyGN7mjnxfdoBm5wtSapbc13IJm/PozmtceT1edAHtz1HNJE0oppQTUaqfI9qQFPMv4EkjhQH2nYFICrTCEGsvjrfM1yPfPj4iiDKD54MfO5Ozy4qpw4Qh/MelQ7pOlzXQ9eBCPHJY/Aecd5IlvOI94Qnj44QqFY5aiWhphIl+3wJiHckKT5fgvrKmqr/4BQ2TJGuNlRQSClONd0QVsDaXimHWL0cuUl2qBRvFn32ASOzD6P6WMDkU8miOrKZ0qswroTqucdKqFY8l0jKwxwLEcRZnB0a7hNTfcEuudAytpQTxyyYZv51/hZCtVh2vq/7Vx+rHOyqmgtzWunYbXnax/kecZ47v/pH2H33W5x+9pfR62uuv/VPEBfz9RyHiJudk4Y4bV76rK07Qbp+6shUISU0JSNTzbK//4DhUc/4/jVjVNKQSAp3TzZMIQRMOrDRjQ58q/oIk4a36AGr2sBTlp/mAfQUHFNeJk/y+s/le+WyObMQTb89RcRVEtW9+JKR3xghJWR7YocsKpEmIxOaTN1RRdOIxoDGEU3ByHrsLT0FUgwkFZSUyZgVuqNHcJCEfUxEUba9QIITcUQRfL/Bb07Ae/z5HeTkBNlsYbNh/P73kK5Dun72W+qTlKbl9j5UxaepvJTAOZwo2gl4RxILjVAIVc0vZZfi+K/2PJRT5ZsSx6GS1LqjCN3mlOHqcSZMpYytAlyeayGGoVGsGr69ULNUU9OcmnIqSOftPpHVMBFT+Ozb4O0jLWjFc4SVUK14LuFsKgpksNFUk5Jgv85P645pOcaBvtvaQWYEat5BqCjbzZ1KmuxjWOtvjKMpBCjbs/sgwmH3mM3p3fxCV/qTcw7Xj9ic3qtpm7O74D3DxSecvPgq4jxx3OO3Z3Tndzj//B/i9DOvMnz8AXEYOP+VP4g8uWJ48oh+e5rNGrnzbmwY/vQMTZEUE/2DF9AYSDHS3buPhkAKge7+A1IY0RDoHryQ1alQVSqNAel6/P0H7K4vcSL0LsdAcjDErBComYaq34+Dru+RzRbXdUjfI95Pyl2t4qzIhMAMcnQRENL1Vb4hU4dfR7aFMedqVYojx4rJ7r/3luYsZpNsT3C+w52c4roeUWX7hbcQ703t8R5JKQfPTPVPzs9JFxfQedhsSJcXZv4bDuj+mjjskRRx42Akatjjwmj3Z3+NJFOx0mEPQArRVCU11c8nIaAWVy2PmOylM4Wq3xh53WxwXY9/8SXoN6Z2Omdldw7Jf7hCEHNaDs1AJs9GGBPj5eMpT/4L454UI/2LLzAeru2+bnpc3zPur6ZzOgdi93v3+EN7Ju5+pprm9k8+oj+5m8mqQyTvl9e77iR/5Nj6uLvMz6vL91YgKWHcN6RZiONhTqZyWwjjYRFHLDeDOM5FrbwhRVAP7ulTO614DrASqhXPJQLc7wMggjpnwTyLEiEzFkR1+1bouu2Up5iApF1vlx1KwrmuqjyIIE7ocx6cVMXi5M6L82M5z+ndly2PuGl/hBf/uX8Rvz3BbU+g84jvqid0f/c+3ek5XO/Q3Y7xe9/NHV+wzqicu/4ZcXGnp3TOG3HKBKl/+RXiboeGke4zL6HjSAoj/cuvVBOfRlOldBzRcYCTE+T7v434jk8/ecRuF4gJxlAUmWLcIZsfHeo7/Mkp/vwcd3JCd+cebrvBnZyiwwEaIkj7h966TdMRVa4KiUvqdSNbRfzk42wKs7rpP/8rRoxiylP6JNydO/W+geBefXXGs9tjus+9At/5Lrz6WdKjR/D4FGJEhz0yHPCnW/TqEvY7JIxwdUG6eEK6uoA7d+H6Ch0PUMx+CXzfVf8sl4SIMowJnOJUSAja9cjJKd3JKf1LL+Ne+Axy9x4pRTav/yHCB99HvJkDxXszC25PcF2P63q7D+KIn36MeG9mwnxh/Z178/uiSndyBt6xufsC4j0nL7/C4fIRJy9+lsPlIzMrZiIlzrN7/CGn918mabL2rhZY9/T+Z+08xfdpcoAyU+f2jOL7lFKkL+uqNU2cx3fbqZ0kRbptbo9Zbc3priuRXIUy8hLMvw+0zJ0IUgYVAEEJGwukuuL5xUqofkz85Re7d4B3fsbF+HnAu3/lk/Duj5r5L7/YPcSiCb8NfPXH2fcnjd/6M28+7FRIDjRm85NMhAqophuXv3Rd/t7t/XZyRm5I1PRbzHbCZnNmh3MteWnXm+VC6qQoA4VENUqBc2zvf4Yw7PCbE+vgz+6gqrjTM8z/pDO/kmEghkS83uFPztjeV5w4YhhJ40h/9x4pZHL04DPZvyl3Ls6xuXuflBLd3fv48ztZafhM9dfx9+6jeX/pN/g7d4mXF0i/IQ47xHuGqz1OYCtCTIkxJFJSEmnyUSH3ezFB1+PvPcCfn9PdvcvJr74OMU6mpwzNQTJnEeTtph1djhdPbnT2czLGnIjFuQK2+fyvggj+9MyIhu9w9+5WZasQcFOmXCVfeI+cnuby5J979+DJE+S1X4HtBuk9cn6GeJCrK7i6hIsLy+w9pGjH9x45PUOGwTr6EM0NSTX/FqVNuLfZcHV1yQlm8tuHxNlpR+c9Xb/Fn57j7z6wNrPd4k5OkfM708dAUaIk++WphbqQs/NMcnLoC9/hOvuLFxfNh4DtP15d0N+7D5sOf36GO9lysn0F1/Vs7744MzGH/TUn915CVdnceZADbxaSzIwsT8ugSTlcfpLNzwpaTM9GqL0z86GoMOwvcwOyfcOwt/yLc4g4huEaVSWlYG1UBO87G8lJqgMJ1Nkk2ZGIKnz1z3zhwZf/1j84Opn2il98rITqx8frwBd/1oX4OcDXnrZxQaDeBu43m2+fof6ngKT6QEeZ4t54MxeYyWAyFThxOHF4Gx+FE8Fntan1lTGTRVGnpnTvN1mByiqQa4hTIU/e021OzCbWKlFumd/RnZwjztHfuW8ko+vMROl9djY2/xySosOAhEh3dk68usaLoDHhNhsjYJutqVsC7uTUzE++/HXmZ5N9bWybnY+iXNy5W/2muhdeREPAnZ0b4bh8wvlrfwD+z7+PBgijzmckEUHzdDyazPSmQNjt8cNA//Ir9C+/ShpGtq9+jv6FF60+KvHlKHmaT98zka14eTH3h4HGmXl5mJveV3rYmwLY9fW0LpOL8leJ0829FycB7t6p/lP0PZwphBE2PRJPECeIg/T4ESmA9uY8rsMhd+TOlCQZa8wx73s0KPvrkU+uD2wSBJ9IUTnxHbvdnrPTO+A8m8+8jMSAP7+LvPo52G7Be9xmg2xO0MOufhQ431lbUkXUphVw4szOdX4PyWY/V81xQhoOiPO4foPb9LDpUSJue2Ik2vtaz4qQwojvt7kqlW5zSjhcm4kSZ9ebSddEG6WSSMn3U4tptfr3aSZmtryB2mY1RZzrbFnTLF1Twneb7OfWTYMGiI3pWCCPulSwkasjaMdD1ilonlushGrF7xW+ws8p8UyBh2NU3KhEsWlSSEVEKn5UhURlbSr/QiFNrpKppy9P6lKrNM19VZrRVTdGWjV5i1+R76yD9+Y8TOerqiDFEf7sHLm6Il1cGNkqIw4xP6DZ+Tpv5KyM+uq6TNh6pC+/PfS95el7pN/U/fEO8Vv8dms8ZtjjfG+cEcELjGka5adFHcojszQknFPzz0oJjYHw5DHd3bukcSSNA26znUyeVdnAblpKEw9akClE8Hfv1XTZbJ6t8cxGDurElxp/rxskarYu2fco+x95D8mb4zqA96TrazQEdBhIh4E0DJmAOsLFFToOjFdXWV1JiDq8M3PfMEQex8Amwg/GyK/28Hh34IXTrRHkrideXdLdM1Iu/QY2Wwuj4C3SujqrU1FFz85hs7WpgmJAQkBPT209xCltewqazPzZb/JxjPgBOL+x9ipiUV5zXQjgfMfsBir0Z/dmJj5V6E7Os2mOmbLoN6cQMyHKAwA02UAMFUsXTeA3qCSSRFQ8KtH+UjTNtEimgpEtNT+xqCl/YHWoxBz30/wBcWIBaw+KOkjd6kf1PGMlVCueO6TEgzQqHuiFoj8ZcdJMmNQtzID2wo+aLCyBs+7AKXnUl6laWkIPKPZCLrGhMoqpK3MJIH9dA2Xkm5lUsg8Jzpyo/fTruhIuwUiI6zrSOOI2G9I4oIeDdSrZeTul7PCsCefNP0ZtvhIrT0rmwFxGx6nWvkVDnMI/ZD8TUUXDiGBqnY5hciB3kjvfROc6Nl1H72NWV8wPJWoOPVFiUDU+a+HigvHxY1y/IXrP+OEPSLsru6ZMGvvPvmLEqu7LnEgttrnz87pNx3FhLjz+O43kZLpRS/WqTS+EqM2SzXPVvJvJn43cM582m9MwwDAgSYlPnlhVD8NEylWI19cWKypmUpqDYKYh0m+2CI6Ut7k0mVI717ERR+c6u8dxtHux36Exmo9WKIRbq7mMQk7sZHW04swcao3HyAuNuU0k+y05O4fzth4D4rt6DGtXNjjBXJZMhUwpVbLUmuPK2NDiH0eyEZIVZbBB+c3LpkLFdoCfXSut9XcauVcj1lNCWglRi6JpbdWRVbaUiCkQEgQURh4CX2XFc4mVUK147qDo6zEIXpTgp/nREpkpFTtKDe1cXtou99G5k8GRkqJEIzfF5Ic51SbNAR8DSGoVqqw0RWcqD0y+Un5SrZZpZd0FI0+y3ZBiwKeIPz+3jkqEcPEYQh4RNg42min7C6UYzNwESB66TzQTjqSsOHRd9l0KpqCEgIyDqVRd/s0mwKKeVZOmCOnyisd/738nhQTOc4mpgJve2zSDipkfJ29fUgioKuOjT4lXVxy++9tsX3mV7Suv4HKspGJaHX7w/brev/zZo+RqSZhMpVqaBue/IkJ68mSmbgngmn1RJb7/fbpf+VX0+hrZbpHNlvTJx7a83aLDaHVUiHRnZlI2G/TqCrxHvUcvnqCqxCePLRxCjOjlFRpGnEK43psa9egxgpAGG5WoIWZiZYQ9RSMgGpUQFZeED+OIU0HF7k3nHHEMuT6sHnW/I11fEb7z23Sf/5VqKstObWiK5ngfgo2ILCpVjEbWQ25LZdBAjkdmj0zK7QFT4ByQRoq/oFXN9KFSqkpcR4ohi3/2YIrzpBBs8EIun+aRhpod16u5LqYazqOsC5j6WchVDfMxhftIKTamPwu2Ws2BmYal4mdIjquW3xsxQYhKCOC7pTq54nnCSqhWPHcYrvX1DqkvRZQ8EbJNP6NCDkSZ8vxrFlNHSKRkUaZdJk9OHFGj+Vs5G9LtnC0P4wHnzL9J8u84HnDem0Nv/q2mvEIailPwEcf0/cUj+jt36c/v0N+5y+HJp9x9/Q+jF0/MFyx3/Cpw9f3fpu9PGB59Uoe6d9tT4ngwH6/Tc1BIKZiZpt+ab0kmCRoCbnti4QG2J+CENAy4kxPS/kD38svoGEjXV7izc9zZGRoC1//o/0Zi5GTbM4REuLB5+8aYcp9twTwnNc/Uj3h9jet8Jbf7732XdNgTPvkY6fsaUmH67dl/59u4rqd/6eXJB0rmpEkExpLeEK1lHksrx5hImnzwg2yKzSbOlAjf/W2L4XTxxMhSHXmGEYYwmqLY9TBaaAkZx6wSDTVkQ9pd2+/FpRGJpIRPHzE8+jSTrJDrZkd4fGGkKwU05klrorI524LmuFhqo/y20bET5WIIfP7eOU6EznvSfm+EZBxsBqSLJxbdfLsxM2MeZJB2V+juGnd6jo4D4h26u7Z7vT2BYCM6dRzRMJgPVGrDaIQ62XF/fpdhd4k62D54if3jj6kjPat/uXLy4CVQ5frTjxu1KVdqoyLRpCnK5vQOKYf2SHEkhcBme0qKcSKqMdBvTnNokEhK+S8GvOssyGomViklvPMWykLN5DdpVybgtcUoCCFBlHWS5OcYK6Fa8dwhJmUYIlvnuCNljjGbuNaJvTCLhUYVHNHiJimEFJBYHNChxK0q5EqcObOP41DNHicn5wzDExBnac1IKHGOFAInd+9V5epwdWFKTxg5vf9CHTV2uHjMyf0XiDlW0eHJJ4jzPPpH/8B8rQoRCwHGEVQZ9ldcfPB9Tu/cY39hsYKofmIfUXySTl58mTh8QjoM2WF9ix4GNi+9hNueEJ48QTYb0m5nzsUxIr/9LfOl2mxw2a8qfPopw0cfoLs9guO6TG8CPxhSeuXT3cC9kx7nhJQr2wE4R9jt0KR02544jPSnW+LumnQ4sH3xRVI2UaXGJ02cY/vK5wiffDxz4A8ffkAhSJtf+uWmEy69oTL8k//PlkXY/PLni1ZC+MEPaEdy+vsvmGKz2+Hu3oUQ8PfuW3yqszPc2Rnu9AzZbMwnyTm7/u3GiOkwZOVqqD5n6fIyOzNDyv5Q6fqaOB7QMaC7PWkciDnuV7zemfqiav5U2ZRcVJzOd4x5RJogdCrsQyB64TIo904c4+GAqNINW9xwwIVA+vAD2G7R732H/pc+TzrsSPs98eIxJKV78UUzFx8OpGFPOhzo791Duo64uyburoi760yIXqxmuP2jT1CB0xc+Qwhm+gyHPVcf/ICzV15FUA5XV8RhIAwDmzv3ePToHzMe9py9aGESUlaYipKUGtUpNQrTrvs0q1XmfO58x/7ycWPuM0VZ3IURrTQnT6q7OsKvBloVm6ZnjKO1Va/CLOMAACAASURBVE2V+GlD5hSQKOyGyJiUtNPVh+o5xkqofrL4NvDuz7oQPyV87WddgN8tUuJh9TEp/k4AWcqv6oRmwpT3E+zFKthw8qJwpJSqYiWSJ0rOZEs1sdtdZuUj5bOomWxEqolkd/F4Uk8y4VGU3aNPmPx74NF3/lkzunDxm5fPX/klrt//HVz2RRHg8Qfvm89XNieqJnwe9p6GAZGPzMwoeV63ZKOmhk8+sWt3HhkGJKscOg74O3dJl5fmSJ0DWaYr83cyRcQIzrbzhJTeV+WVYkDRWqfmD6QayhrhMCICYX8g7A8gQvyd79OdbPEn20o8/ekJIOy+9U8B6O8/sOlSHn06qUtAePSoUaAmpapMJDx+9BHho49qHRaSWf7iJ59WZ393dQXi0P3BRvod9oQPPsSdnua/M9zpKelwMJJ1GtDra9z9+6SLC2TTQ78hPnoMp1vSbk+8uCCQiPsdcb+3Tj1GawNjtNhfQyAdbDqaOIzWmadE1/WcnJwhCNePDlwfAp8OA++nEUlw0vk8OtVMyykEot1QUrowh/MYUecYvvedPFrOzL5pv2P86ENTm9I0xdDw6Sfmg5dJzXB1jd9uuHz/+6aoYT5Um7NTrj/50EaVdp2RQ1Uef/uf4bcnxBizspRVoxCQvufRd/7Z9LDq7OcGFOg2jXkuJXy/qUSqkCzVhO96dldPsjne8jrnKOFCSugQ85qCGKK1vezjWJ7d8q5oxydofs5SYsVzjJVQ/WTxrb/ySfj1n3UhVvxQ3I9JOetcNjlMnsTmW9Q4ZddUQ1pM4VKWI+ZoPQ8muTBRNOcoHVyrmCx/l+YNsI5JU6Lb9BZQs+9zJ5joz09x4rj49j81P5scy2fcHej6ziJqO/vyds6ZH1MIRlwGc24XJccX8tnZ/qpSyvZ/t9kYUek3jd+NItuNjU4bRpxz+M5I2knXoaqcdT5fY9GDpkqpPjM5orxk8yAYeQ3hmm63x296nHfE66tKQrs7d9i//30jBymhMbG5Y+YqtynmrGgEMgQzZ4pYSIntNjtPu1qX8WD+PtuzE+IY6E9PwQnKE1JSzj77MnK9t+CjZ+cWTX63yybQa9ydO6T9DtnvkO0J6dNPLfTBYUAvLXq7XlyakzwQnzwhXF+TYuTq/ffp75wzXF8R93tSioyPLyoV1Wi9txNPl+9ZCjYB9fV+5A4dQ1JOnUcRnM/m6KzYxHEkDoORkXv3jMhst+iTR1UJks4b0fZGvjU7plfH7ZhJUDanFTXJ9Z4wDHb8FCf6kQmLOE8MI1xapPQUIzFGuLo2tTaaauRyeyn7ll+Xzas1Zpoq4XCYP3H7nbUZ56uKp6qEMDZPLDSPvX0INc+dSGo3No/mFOgzt0w8Qi+O6zHiHavJ7znGSqhWPHdIyTqf2DiWFhIF804eltG250RHm8ypjPRakCNTw+ZpCfJkxrpkFU9djofRvoR31okEyZ2HCPF6X5cl/5bOIIzm6CvFV4RJgUGzU3gwc2SS0dJTnpKHRrkpyxcXptpk+2iJW6SP07wMOf/1aCO7YlS23syn5p3e+MmU6tGmDgtE8SIETaQ0VAXQeKkQrnZVyCv3a395OTmW910dvTYeBrq+N4IpMOwOs/oqy6rKk8cXuK5jiAnfdXSbDSLC/vFjiyK+3cLFJW5rZtJiLk0ff4w7PcWfnhKuvk//4AHh4gJ/dkYaBuLhgHQd4+UFMQRSGLn8nd9BszIXh4EUA2G3y2ap3G5irt9s8ttuT3LAVlNJAR6nwKtseD+Mo4j0VWPN12YKqqWNjx8bYbp4YqZKJrJiQV5lIjAcT0OEsMvK2kGrb9y4O1Dmvauj6HTaXkfw5c+XGlYjt/P5/bf/Uk7XJk0kNuRoUnORUK/bftNivf43LedVlXrASpwWL4JZvji11/s3c614XrASqhXPJXyRn8y9YkLTj0urT+mRPAvCUzUX1Wzda0hCu4NOxwYzeUk9ZmvjWCy3qzc6kNxhFRLkJPd7qZq5UtJKFoTWB8yO0xIxQQghNKazuc8YR46DCGEY8NutRUp3jijw8W7PSedBIVZTjB03xYjzQgoJhw0UWPZbxfwaVRFRUirlpJbXWZQJu+ZUu0AjTCHRu8HMf7kOxnCo51FVnJPpPtW+064txYiq5mjvNpLSjSP+MGQSAn67oc+BTV2/4XB5webuXcb9jv78DuGwZ/fBB2xffJH9Rx/hNr3le/wInCNmpUrHwOHxk3xxQhpHc5eqvkBTPK/NZosmxfuO8TBw2AVihMsU+MfpwGe6zaOEvhwF9kAfRsakxBDou47DMOC9KZHDcKDruqkdtWpMIUO59ak2y7ekqYLz2ZyeCVxSzeY3zVM9tU07LZ4VFsSHGaGRYqqXmeDZyspNWs7gtMmQ73fZNt80/VboTMmuxCu/PzqxeGsrnm+shGrFc4fy8g81TtTNd/BMIFqkz8lOS3RaYjVlOUaOZh2HzrPIYpd6zOYlX3w22pg7UoojNjFuktzxoLVvUqwHiplYTKqOTEQiE6uxTArMlGfq4wrlYCJaWADPTtXiTDlhTImzTceHl9eAndemn7H9FBskgEI8Uuna1Ikwzacm82xHf8vyoDAkrQRsXm6ro+u4UMRybW1ypHtJNt1KisFMrikhw4CK2MTO48jheoei+H7D/uIJ/pOP8Zst4/U1u3/8/5o5+He+Z2bF0m6chc6Ih4O1yWHEd96csVWJYTKbtY1SEDQlTk5OQc2E/ORiT0zKkxB51fUMznGIkTE79gTf4dLIYQyMMRJjos9EMaRE0pDPMv+QmJOnBdmiXkZTa/Z/Kgpk3WlSd1PQWf7SFmY3LitZpXHPiNNtBKh9kI9sW5x1WpbFCW7knzbNnk0AFUIm8UthdcXzhZVQrXj+kN+d1o/r0RfukhTVV63O0yc0xGr6nF9+5B75bd/ayw5oylOJRXPsJeHTm7vNc4ngshQmiCk+iw6o0Q2MvDQEUUQpwUAnUlPCC2glPJIroDim997XOik8QpE6J9/yYvTGQulbdSKN/OiojsTLnX6Eg+xTwivVTCVYcFefEi7HEDvs9nm6mBwnzAnjMOKGgX47Ml5LJg3CcH1dTYsWF2pOrmOI5gw9K6cuGhKTykchzaYcupz14xRhSLDNO+QRlfthIKZITKYYpWyCS2j1qNb5iY5WVZsqInnXiWSltjEu0PKexWnmGVqO8yMSphvypjXZZr+S0O4j832PPF+3EqycEDTZR8LRK17xvGAlVCueO5Qv7F4cSU0ZkVkvfXNZFumx+LJMB2wsDGZCsk0LhnPkWDeIVdu7NOUSdDbLypRn6iOmTnZaLyY/jYkkU69Rj9MwxUp8AJ/tom1fNNuF+X5Cnk3lxK77MEZzW0IRB6HpwGfny+EAjqESKL2ZvigIzLu7uk/S2zq6ifW222OaNjtPncy5PX7Q1GQsyh5V0UuqSBDGISBi7aWMxtQShytpo4wUgm8Fb8ujTHVfVDXfdWxPTwkxIS5xeXXgECP7lIgKnxJ5iQ0+O6QPIdKJBacPoyLOlELvJ1PnIcVZhc5m05nVj+Jbkx3pJgkpZr1MRuWW9nmMBClYfF2dtz9Ea6t1Lu9nAeQqMdIq3QrLr4VURtZSnk/LW44Zk+JLoN18Q7VZnh7eiZApZor2OFTn9bfi+cNKqFY8dyjKS0iJmBLl3Wq4SXpimjqMqs6065kQTYQK5j3MnCxN6tfNPNYf6OJ8TE7zpSjLz/xyqPJJL9POKTMKzZ7wtS8rnUZj7jpGa9ouIi1MhWVBmu2pTGWTVbAy1UxCOen9pKSliSm1pGcmFsyu68blHi/wIrmWeXFBJc3GEjQE78hxit9YbPyz6nXn/4pSZ/ltb8mNKSSQOBHJwqWExhQpDTHNh5W24M2y5CjkSZVhjFxUQhUJKL0KQYSo0+CLpEoI1uZtiiUbJGAl1bxs6967OsJyWRcpm20Fpg+HpvJKcy7tuHLGert1fmFz3tMkaXX6ro9UJlW13A1pcr48Gwvyk/OkNOVPebobRCplc07Mx68SLPt68c5RfK203uPSiJSoZjJVvdlOVzxfWAnVip80vgI8/KW3/oW3fucbf/9ohj/1b/+77wBvYzG73v0platiDBGvwpiEIWTlAACbuqOoTpXM5PVpub5abxKqpRpyg1BNeavzdPMObkcbmjqjUz9TSEiLxQdxMb3MVJds0qgRypHmxd90gk+BNP/HpE1/qIVKWAeflN3VgdOuR73wZD/w8e5A541QRVX6hUJVrvNGv9oUaiJW83JpW7ftLsfS2jW9/ZpnZCxOxKcULqab+/hiayvZZH5jwhEippnUlDYz+bktiBT11A3xMlKjSZHO6kHEhvCPqjYFdoovf7w78Ev37piSEs0nKybNAxbKaD+r+9i0rZTizQJgjuYpTo08Lslqm7c8ValpY/kUzt24kTev1iqpIT7TQbSpLM0PXgzTcvnfedd8WDQfI+SnUKZ2F6vNbkpzfvKPinmeQgU6b3dDMcI6pkQqPpkrnlushGrFTxoPgS9u79y9NcPpCy++BrzG72Fw0K//V3/8a5qApA/1Wu+rAgf7Uv+T/5I1e+vXcwyboKQgDDszgYx7IQ5CuBLSXiykNXOC0xIe22j/KaARpj5Ym2VqJ1He/drkmadPPkPlONVPd86HKkonOXu3F+WgVQhmu07lm5GJGXmrU9M2F3LTwGFqWLJfZ87pfef57sUlL51v80g9mepvyU5aorMgVC3huMG4OL7fdPk3GdQPI5EpaWN6WkDmwkoj7kxHb3ZLmkcglhNnktbQ0dk1zsp+5PRJYUwJr8rl7mBqqyZibiMqcDEG+nPPLpgTvCYlxkSMirqipuiMzJbrmV1KPr8TselVmH8EFKWzfoDk9rlUuCa1StF0nHiUfUWbUXVSyipTvWcmrjlhIlJNK5WmDHmUYSlwya+ZYdX9lZkqppLwpwl/AtuN0p/Yx8TmVHGdQmdl+mUA8SDwf/2lP6ZsLF0E5Ey+jZNviYOHf+kfvn30wlf8QmAlVCt+X+If/uabbxN5WyMPifpQI6+lT1M2JWEvRlVbvtbJzaK8U8essiTr1oqDuu8y2elt1/5FJYwwDsJ4BXLtkWsPNxSpaR3ALTvwQraafraoDL72tIs8R8jWLMRDq/IUspGvo/SKtR/KvjvzPedoOYqy7NznClJha3O1yq6p76bXioh1xElh0zmLqZR7wNJfxuGI5NN22GkqwQ8jQTP3s7r/8b1mFtem/O3+rlH8pi1zNnWE21l6GxvSzac0ymIH6BRVH7E5hFtCc5R25LAYKsIuBILCkBJDSoyZVF2kxLmSI/hPu7quYxzCjFgv66Seu/hQ5XIXQjJzNxSqibuS5Hqym5VT6iTJzbbbXm2lNNIQWtGGYNqxY57o23LPFScVGp8oZYzFR6r9oJhMfgrgIJ6O+DOlO4Nuo3S91aOjuT9qcz27kCmxs0qRPpd1nEzjmngNp68hwt//tTeUPOWme8Ehnm/j5evi+Rqer//xP//Nr924KSt+32AlVCt+X+C9v/HmlzXxNpG300V6K89XanOHJTKJygQqAZc6IyKERUeVhDpzPKDZXFCEBgXSYP4/SQFJ+HNIp4n44ki8EvRKkJ1YvMDSWUJVrRySyVJ+YS9MfJU0pamsrdpVv/jr+pyk1WtpFKujLhyZXN7mH3QL97Pe49ix5ntn52pbTglisEjlhxBJycx8CIyqUzBVTTb9Tnu+o4Wbk5wp7dbsN/Zbuqod3Weh0pS8Nk3LjSPfTFsGglxsd4vzVuWxyp061wDztpY/1FOpKU2EgIoQEfyJ5zKOXKdAQOmAQcwclZKaEhgTKaRM5qa6cS6T1SbuZVE5YSpHKUZb99I+VCzqdBFK4Fg1MlNbmzalhSBNVL6t1/LRoKXOSj5lGsQnYvUkYuE6UEJKVSGt+znQU0XOFX9u5lBxdpwUxHzsRJHNdH90sAOkzj6eJJ+vXHO91g7ksU438U5mzQ7Shwkcr4njNZx8CYFv/pU/jrvr/jaer4vja2/8hW9+dVltK35+sRKqFT+XeO+vv/k6ypd10C+T+KJGI0uasK+/TKA0gSTQqMhV8zovQctpXm7B3v7T3PEgxVWkvNjLIYI2/jNGgnykhi3QEyX1Cg9ArwV2AtfT6UNUes/kk5WPYQ7Bc7LkF3aelPepBK29hnZsdqtCtddQLpwmHz8CsdDFelGGfpTx4HUnC9JZJvINKRFsxNdbY0qZUOkUlbsp1+w4TSFv8/M9fj06u57ZrnIs/1O53JQgT9leCnObozXmn1PbUlOetlpruWR+i59a9Q3xKohZ9XIIId+Dw35kI0IMdjNrHCyZzGJzUt4Qg5bM5ZF0krceJUuL67rRrtr05pyzkX+F5Ok8q2J+TZXwplQ/hGo+MUfyel2ZfIVYRjXmdncGnCqcKVjYNFyyoL9OAT89+yLAQc3El88hAIOdN3n74LEPqaw4dlq3V8UtNPV6V+ykAuLySRxoSF/E80V1/Pv/8L/8Ajh+SzbyNYSvvvHvffNby2pc8fODlVCt+LnBe3/tzYc43iHpl1Feyz5Qk+qUjEgpwJM0vcz3U3r7TqashzytBVq/Xl3IL1+fMxfFK6sm1VqTjEhB4yej0KXmJX6qyKmS7kK8gnhhZT6kqUNsValpPU8Fgpb3ahU/bh0s1JK+ZU9b+kjhJklp05bbyyEXJKP6rSy2PQ02+iuRxgjOFAJTBVweVak1PICOCQ0TI7ydWE2/N8jP8joW+VJbX3Xx+MXUUzWbq9lmSVCPENbJvnrkoAtmXBZnPlKNf1m7e20XufGY0UrzvHuRx4fAxfWB4JSgise+J3oRQkqcY/ZGxdTDGLNT+g3GOYfALIZTDfVQ0tHajutlLsj78vjtiL8lljMWtNnqsuSRiZlElYGilTrl48fsVN+qzgDJgb8v+FNwfVO/+VnVYtMT8AoeoCvPA+iQyaRv2LGAG/L+XXmWFIkNsSrX3/j6y8cKTtGTEqdM4YGrUzIZw1NwfEkTXxLHb7z3177wDZy8S+Krb/yHK7n6ecNKqFb8TPHeX33zdVS/TOIvqvIah6ZH3Gc1Y2R6a+Y/2U0+S0t+oYArJCp3HEr+0kzzr93iryTZiTx5y+PKecwyZZ2Y2jG6NM3FV7ieJPAe/D2Qu0LcwXihpN3igpvLa014ZeDUceI1rcc2DlWrZOSFhR95VRLQyQfmaWgiGVg4idt63Kf1xapGflUJSXl8GG+ocBoTCc0RwRenacog7TXNiNFNEnasPJqmvEfzPeU6CjltVZQZmWoaXDvqceqlpeZr40m2+W8QROamP2EuSpZ9UjafhhgZUySiRFFGzFF9h3LubISaKyQolJESE6kt/5X+u61qvwhfXlSkJUl1cvwmuEZy0hvbmKUtl8t3Ti1PIUY6Xy/5tTleWS9lVsCdQn/XiFR9LpIRKFee76xQaR4YWLiVDzlNGlI75uejFLRcVyZWuIZ0Dvndg6DdYlRkBDfqRLRD+xWGOcj3WRk8ERDeAv0NOZHfeO+/+MI3EN5F5Ktv/Mcrufp5wEqoVvxM8Ogbv8WH/9t/+w5X+mvFdFffoFeZ9SSmgJvFR6qkk0cBlXdR2wkHKW8wpBCQ2Lx4c6foBDSb8UqnLlFwOnU40WVXIhUkf3W2xQHwaQrK6PM5+q1AB/s+Ea8UHab3JNTiWWBGhOnDWKaXuSzWkWrGaIfbl2lcHFKVtVblKrGQbuNTS8LyQ2mXNvstBRmF3jsbUeaFl3yHd473dzs+pxsebHtE7H5re5xFGUr5J7PNU4rzFFLUksinEafbEmcK0rE8cks+hXaeuDbOpE7N8wZBa6/2NofthClQISUGtdF+AZtqaNDERk2BCsA+j6JMMeWAos7MzjLVW1uEWnRp605mG5NOkys7WZD42XF0Rljb85i7o5n03CK9lKF9JZToUMeIFE2+5bqcQn/P0W+E3udxlcVXjOxL7iby5LCPK/X2vOUwW2wCk8lWpCrKkkfTtg785GM4yBIXtUHLYVKsCjkrEFHY52NJzuDUPigF2OdGc+5M2RXeEsdvIPzGe//ZF34L5Ktv/CfffPf43Vjx08BKqFb81HDnbs8fffNFXn38Vb73P/5PkHgtf25bZ1P8ogTkUTOqbD/1sloIkkj9VcjyukFL5h7KGHIVrf5P5aPSNUQInTo8mJZdyqqUWgelak7o6hQXbaqPRH4x531iMmVmPyQGTex8QjeKv7b8m/yWLp1q1DJCyrSJQpKczteFKZaUaDPoviogWju3tiMui2mqxtl6U2nLxTn0plpyTOEJKRGGwODg+8OBohDe326m3ZKSYiKOaTIbLeSmok7dKM9TiN8xM9bxfPPyx1s8p11Tf3XHIwRLbt12OyNbkplyvYVoSZMxyaTIFpVINTEuru5AqmMJPh5H/sBmy/evd7y22eLFEWKq56iKEzfJ9tx0Om2sBCr7US2jH0j5X8qHyE2SCFTTXH78mZS5QrKktpuWVLXrdUBJs15eI0kgntkxTw9KjA7ZOLybgpFKJkIukx/1iktWcBfNsV+lfZYmUlWX83U6MXNi5Uj5GaXx0ZQxLw7TAdWXtpPfAKUZFkkcTJkqhPIFQXZpOnFhgQe+hNMvvfeXv/AVHF/B8e4b//k/+BYrfqpYCdWK33O88kvn/NE3XuBX/8g988H49ADX+c1h05lVHylSHqquIK06kd9Ssw/2MC3q4qUH+ZjlFd9GXM6fxMoUTqEqXdjBijnOAS6HVhDNMaqAPkhVCopfRDEvDYNyCIndIXEdzIdoTErqlBeGjn1U66h1egGn3J20SlX5Krd3pm0vak6Z124KMFqmPFmqBqUjnoaHl0gAU+0tUEnGzU1l19tEG+us1cwU2fQXsv/OIdmEv44cMkEkj/hrTtqUTWmKyXxbWqgfM26oUxnjkimUct5S/hm7yQmyvGBlamTNtkJ40iyfLRTlsp1Cxtpcnh+w3CfBgnLSdM71WtrOvYyYFIaYGGJkSIkIfEQiqZDEJqsu5tf9YSREbaLSa5m+7+l10tRHaROVCOo8j1LM40paTh3DRBqh3KfpPs6c0FMhRzdJVHldtOua67fk/3gzsomeLY4uKGhCo7LtHCe9ObYXFwDn83MehOSgT40KpUJyZRQfNcJ8JdDNPfJRysM8I8P12o80Vjc2NdM120r0fs0mQQAnyLXFEDM7ZSFVOvXkZ3KfF9yvCfJr7/1HX/ibOHn3jb+6hmL4aWElVCt+z/CH/vAD/ugfe4EXzrfmr/CDZCPx5m/IG3+yL69rQbv88l687SXeQqLyrnokDUpcobJqdMTma9PJTat8Iau9t6xPsoMlVTZq4QHQ6Qs9ZXI3jsphNAJ1NVhcoJCUoIlDdoB6IXWVLI1xCrEg5LhBlKHYMjdFYPPh2cvdCJJDcqwnU97GNPngtKPKRGzfUh1tpzp133PeMNbRXG3HPuUQbo5QLGa6EBNJjBSPSdk6x2d6e92kpMRDRPO2VhlEG38ypgjj7XaYk71lMMx2tRCqJa2SY5mPnCcxj2ZelSPVybx6jGGWdS33zXYsZfUUtU9nalSlIA15ahWR9g4EVcaYGEPkkAlVURAjRszOESTZPHYOq/t2FB/YfVaUDqlzLyp2byelaiJG/Wy6mVl12fOUY0F1wjSizqqsXl/vJIck0Wr+E6YReF1WnktZysjcKVrKnHD1eU5CBT52gX1IqDe1eIiJXhwPTjykhFfHJseLcp0dvPCTLle4Q2pan4yc1mep/ElWkeP8/gFGegqayrlBtNp2fDDFqkmZ2kCY0jjR6SO0Pij5dwAeJ/RcwPHncPrn3vsPvvC3EfnKG//1GoLh9xoroVrxE8ej/+O3+BOvfsL2c5+zh36vyEXeGAUbAdN84UOVvF2QHPQvd0AjzYvIMvskMzKFQCyBftpOqMnjijP6kQ7U/KwyYXJT5+GSVCUEqKN2Yv6yFVWc5rl9UcagXB8Sh6g8PgRzGk428iqqdVw7EmcLv6mgTSybrODYC7slVbYc8rQhHnvZF4Ll1Ko2qnVoDqlkQjD/rzJ1a6mCOVeZVsr2sZgXa/pkgiz5UrEbZb+aqMoGYRgjB2xOvxfE8RF5io4YceIYY0JHI5u1PItRXrPpWo6WeV70ymtkfo3lGo7t2ipMy3MtMxQCsWxDx/hUm1gonWSSXghP8fle7lurFKozu9T0QmykTnkSkylUlzGQRHEJzlAOYqRAkrIbRrY4oiqD2tQ0SZs4bEXp0UKKLFioLsoDIMftfHWxDFKjkinb0yFEsn9imoiUZuISs6N90vlzWMtXecRE0hI24G6I03Vc+0hUpSsjR+xh5pOdcn/bQUr5WRO8Cq46nNuFeMkfMH5yWO9apUqlfpjd/OAwuEyy0jFi1Sz7JLN0Cc277Ba2768cyTcNW3KbbJie5HANehcY+CJOv/jev/OFb9PLr7/x11c/q98rrIRqxU8M7/2FN9/u7r70L4dHH7ItZrud5lF6059kU4ALUv2apPE2dRRD1vJ/ewEC9hIpJ5bs+8C8s0t5fjWXZOaD0nZ00v5K8ZnKc3SVl7Ga43lUez8XJ/YYLG0IypMhEpK91B/vg8X/0UKmEtcxEUjsNHA3+UpMqqkOmvXy4p5/ETuUfUo1anPCFC2ffzsRDplwFdNflyNlq8KYA0oVIiTtF3CtFqnLo+pUBqExR859qSSTKckdoiiklHCd3SQLIp1DRKjFRYohcdiniaTk31ouShT2451KvfWL9aJegDlol3tejjldr2T/ITPl1muZkS/J/nZHqRjSnL3kSIUxzRqowWXyMtXbVKGtmirFS3vWS+ti3QjnGCOqdp/J9ZxEucJcCEvhksJViETEHNgzsZmUWa0O34VEka/dM6lJCcClZvv0Rz5WmR+wF1enmgmZKJW2uXWSrfxtObSmneCO+kcdWw86X79MI14cKcKZdyiuTsX0eB94cNIRriOdSeUVfAAAIABJREFUE5x6Nnn6GNflD6V8P3yclCYVpYtS3xP1/i1u0/JWdcGIGEp9R7X75oPPbrNLYu+enNrsNRG2LJkVIhV7azBaDpQJn/tU0K2ipwLCawT9zff+rTffwfHrb/yN1RT4k8ZKqFY8M977N996nY53gS+G73yYCRL2chhc7S3ty1ZrB1cJVj5OG4HHXi5li70sXJoTprbjmxKmt5xPgsuf9y6TuOi0MT3koxeCpZYvoWYGyCXymslVAs2mxjgqh2AE4tN9ZBeMNI2aGFXps1rzOIz5q1zrcS9iZD6yj2q6q8vLbXn5kJROlE4EL8KYlChGWoKoTYyr07YgVIJmPjiTX1as96Kt06kn1zJAIN+r1NT2REByZ5Dr3VQxxYnwaBj5IAWusqYw5DhUDjOVFrNNuRHl1u1CZOMc1zFW8ij5twStBOEqhuxGIg3J1Jp3VJ2mDBHrdEWbEVr5UpXJ7Dm7NpRYtzSofZ3eTCvLTYdYUEZF1usu15x70tq246RKFbIluZzlsfFOeLQf6Z1jCJEhJpIqQadBYZcKu5T4YBgQ13HXdWaCppi0jcA4SrzJplzNb2w/bBSGW6YwUkw5rdHwJTUETaf2iqJpMi8e/532XfpR1XWdbysKVVC1/QUuo3Lup5GyVykxXJsJ8Mw7QlBeOPF4sfeL9NnM6UE8dFHqvRCM7HptPtCaW90SK59sDwF8Vd2nCqvvv5xWW0lO65M06pbMfqas5SMF/CgTh88NR501LolCCtoQMP0iD+R/fe/Pv/lbOPmLb/x33/gWK34iWAnVimfCe3/2rV8n8Wtc5M45idn72zdyJVBaHW7ROVE4kY4oxbMItuf3OeyvSCnUF7nbeOJ4ME6W5/Cav2PmKT4rTe3IomJqVKF+BSrU0XptB+HVzHlR7S9FwEEalcOoPNpHEsrlENlnP6kxv9CvY2RfFJK2dNFe6gK5Y5+I1VZdro+5ejWtwxMdzUwhgseIU/ER2YjjkGIlFEbSCqEQDsXUUUhKJnEWbqE15TWO0jpPK6Ec+nzsUrll36S23z5F8z9R+DAE3g+BqzFwSEoQRxiVyxBtGpR6fKO5VzGyGyOdSCVLPpczqNZ6C5rwmOJSolkX86YI7DTicl2ZP4xMvmo0vlFSrrAcZ06sWhwlVjc2LLbd2KRVlVMmdUqzOe8yRE67JpI8c7NcIWSdE/PLU2UMydopwpDrUVX5cAy80NvoyscxcOJ8NslNXlFBYa+RTR4f2Ko9UzmnZ8UGEjTr01XNnretc1XV0vxBUZa3zjOofYBsnJkiy4dHRLmX+hmJ0kW5FBvR2BKpMiLUBUH7SS28jPYOORHHxhXJKXGlpoJ6zF/MbT0O8J2QRnv2ETMB+hJXKl+bV6kfBtKkzeLGNcpTpzIp3rUhTO/Cuo/YUEFxnUVcKB9ZrmOzPWW4vsh5FY9jT5gIZfOlaM9uE88sjywUwYKPfgIIX2LDl977s2/9p2/899/4dVY8M1ZCteJ3hff+9FsPCbyL8hZKNdmViVIJqTpYF5OK4Ojqsr18SgfXiSB4vO9R3+Gc4+TuA/AeBfoXXmJ49JF9IjohXD5BQ0BjQMNI9deIJbBU+T60l4+9DMtnv203w5upUlFSDeZJ/lodiwNv/nMKF3sz7531josxchUtNEIs5r1MqA6kOnIrqn1vpwDd4BkpPhztV62YzxELBWjxVzoWl1+aLtfnLkUGSTyJY93v1Hk8Di9i6WLX3Co6hZg5kVreQjYOmian91yb5/jGVDaRoXLOgLJRM+ccUuIyjybYOMcHu4E73qNBcDiGqHTiONQpaez6dilylUIuJ7V8ZV2BqxTwTdl9/ktovb4DkQ5Hh5lDo2ZzaVapik+Py4qey+Q25DGX5dq6I9Sq7RdjKfiPBKn+Qi1RcU6yU7kRg8dDyMt5PkkmldP8jJTz3qMKV0Mw5U+s3keEHUbQyPdhh5HufUoMouYTRCFrOZ+miby1Tt/KYrkheMpiedqPAPd8n8lSYpdiraYH9HX5kK+7ngN4rOMNQsVi/QbRK/kGR5SIduXeOhTYk3LcKJdHBCZiFPZ75dw7Hmw9V4fEJjju9lLt2iXEQ+9MNfJKfSD75KbRuPV5bkbwal4n7weggvj/n713j7bkqO97P7+q7t57n/c8pHnoMSAJEEJCQrLjxMIIA9cPMA+DyTJODFznJsHXTmzjZJHgLMeXu5ZtxSuJrRsb7MQEsBfKXXZWwIDt6wBX+KLELwkJ8RLmofeMZjRn5rz33t1Vv/tHVXX33mefmTPSSKOQ/VtzZndXV3dXV1fX71u/p41xqATJcsRmSJYheYGxGSJCsbSf8tQT4ZrOIc7R6cwirsK5Egt01DYgWxrgmpKhKw1Q9+EhwqIyPVswrPyXX3zz9W8g4w0vun0qrXoqNAVUUzpn+uIPXf92lF9FWYQwabgqSl002s9os1JNjKltn5nKfPRKK/FkWY73StYtEGMxvTnIc8hzpNuje/AyyLIaZBGZq1s5VV/Ub27gVk4jxlCtnsZXQ9p+bBoBU2IAliAJEA2qybDKC+7kEkGUxgDTpwaODaecHFZsbnm6IyEJw8S7HqNWe/Ujqr5qCMOBIFStPmjOTcw8pRUZlVA1fxW+Ni5upFstiVOa7IEN76A2RYeTlatBVA2mBPpRcphFOyxLALjr6lugC/bajDWtAoiTps3p/kaErdi+yit9X7HhPasusNxyq+RxKSmwlGrjM4TWrbmqeU4R+r4iE0OGYVNdrfZLgC+x5iqBwNSmVp0NF0BXG3DVfwSV03pVxjIzcjwT4VQ5ZG/eGcNK2vp/lNJ4X3XDkfK2FQyxb62Y0MeuZC7LUUctwdl0MbqUQsdatqKEJRhvSw261soq2Ab5MM7KCEqzCL1XvGcVzwaeXCu6JgtSLTwdNSG6elwEpPE0ImmiFcYAeKwqcaosGksm1ECv+Q3tT7/7rOWUSwaUzYJAgGVXjgCz9q8XJcNMBE8a+9MTI620v79WP+sWdLqKzcFEIG1VqESx6lmQrJZq2ti331gbkBlhX5FROWFvJ4AeE2NFqaeWGmUx6JRByDD4aLRUf4M0AMvYHETIFpZQ77GLS5iZ2XoQ9V5wLeWxR+NDBkcOqjBPFEv7oCyhLPGb60heUJUlRixlVdb9JqZ5d0IMTly/w5aks3QYY4JkzQhiagef6/Hc88Ufuv4NL/r9e++YMLyntAuaAqopnRP91euvu6GXm/84qJokv94FAGGjxGlz6OllgckOS23UTwTGl4BDisXkVakqT2ZLMpvRcREsbPWxRQe1Ftvtke/ZG1ZyNsN2OpjFJcRm8NznoTHUug4HmD37GH71S/itTXRri+rEsQCwTi/jhv1o3xEkFWFVnARX0UDZE2yNNHjrrJae5cpReuX4sArqPZRNrRANxt5DVTY0qACr1krfK6z3YVBCe8oXlBUX2MGCGbfd2b5daujHVe+Dezvh47UI88YE2ymElRgZ20bQZCMYsiKcdgFcJfWZmfBrW/tZWkGr4kVYdq4+1044J6lBlnGsAVbb8oOg+hsCsxJsgAqELXW1HdGGdyG0Q1TrDVUx4mvQ5jWpLIN3Yxsc1d6OSSoabdhSPw1jdPCk5kx1Ur7CUl3d3/WvCCfLwcTvQGiYudb/BXqiHI6weW2dNG8zOqZZWgx8sLlrUzqj792IvZCSYnqFMlclaWXw2HPOUxlDSVD9udbVTkcpUVdhEVjTimEEYek39WNFkLJ2xcRjYXynv1piRmOonvo6gT1oJLZdEUpVKmKoB1UWrKFSpWPCPUsCOC7j/RdMMErPRSZKqNrbq9FTdNEmX9ko6dyCTgXzvWSjHeYpxLDiK2bFUiB4DH2tgiTTC9WwZH+RUZRCLsISBrFh3IkLAD2NJROXPRYb7KrinGiLLtnSXtR7sosOIr0epjdD8fxr8KdOIkUnjGoxMByS7b0I3drEDwboYIBWjvLUMq6/hTiHGw7wgyGVq6icq3+zzGBE6hhcNdBMUqlYVuQBiG9VykwRAbCAEVMnm1ZhsZObj/zV6697+bd99L57Jg78KZ2RpoBqSrumP/n+Fy5lRu5IdhuiIVGpIcRTMgohXZjSr6R2Ofa+ce1PcegSqErbVsAPHRUlw60tjGr42I3FGIPJC+TYsaDyyzIkyyn27wdjyA8ehCynOHSQ9QceZs9lz6X3Xa8EEfzmBtnlR9j6449RPvRN/OlTZIcuof/l+6iG/fAcCJkYKg2rQgGME9arsPI/7T3HK8e6c9FOJTCKPp6SwPA3ohmtJ8yoqsF499E1h3MB0KwnlYeOqirWvEa1FFFSBP1ovN0YqkdJjvf0ROiKYdUHG6L1+GuBDa/MG8Oad9tiWw01MLctVUbshbQBGG0pkYugJYGmcTBlJTxXT8yICu1R59kixF6a0aCC6wPrKqwIzKP01DGrsEWQGGhCDcBmbJshjKnGJixG4YjJfScBwso3XoJbzjfeiS2pXOqTjaqVqfYMlGyc0thIqEtahSMyqLH9+nyF1aoaOZikc0BUSzby1FyE0jdjEpq4XzVM02QEHuBF13tOmGahYBAeUM8qQtc5esBzrI1SKViuHENVBnHctI3DV5OqmgY4eVWWvWtU7PWfJk06hQh9VXwc76fa6kOor+8INkwhQO7obx1vKl1fw3bXCFX8BislWhBJ/W1I7HwB5oxlpa+cLOGyBUsegZCL7VjHMYsJ6lAM3SgV8wqPliUr3nOwyCickKsE43bTfhe2ie4vQlH0ACVb2odZ2kN++XPpfd9rqR56MEqkFL+xwern7mHueVcxPHoUqpLy2DHwnmptDS2HuLU1cA6cw7sKH5Nge/V4SdI5RQ0Mhy70kdD0W9qOEnxjhI0q7StlfH5rBRGHr8K2Cmw5vzhQ/ciffP8Lb/ieP/ryaaZ0TjQFVFPaNTnVt6vTxS0XVrPDqonsTQyOl5GkKs2ELxKOpcnIJAaegJWJ2zaAsCxmKhVV1Fd4B0ZLXD/admiYiDcffSTK7C3S6YbJo9tj7f77yfbuxczOMn/TTXS7XXo/8IP0qoryK1/CPfYI2dHHsCiD40eDOF8VG3yUcBpsUJa957FhiaqypmHichIkUSlmTr+OONooJTzKmleODjxV9BbyBrpiWwAn9I9Jht3SgCYR6O7wDoZVMLgugQ6W6LxDNxMOzeesRfC6j8a7LQGdPQt5DZgMI8GYI9NqQJ4SpANJliIKJ9aqGmyZUhkMlZWNinXxtZRqw3u2FAbG8GVXMSeGOfUM0I1VYXafBFXTUD0rKD0F0xH2X9oln83IOoZr9+WN9BJGGPrWesWgDAyhBE6vlJRR3VxVnpUVh5jw7k6fdpRDXwPTGsTHvjmd4izRSJlGQQI8J7O1yqTuG9lZYnLSaQ2g0rtM28S+2x+9zpZjXQO8YH+HThGcEjYiKHTAvBE6ubBvsUAUBhrGRvKiffhYn/Wt8JylKmsow5hArmMsDzrPmsK697zQWnoinPSujo9WaZB+zs1ayk7IwygCPSvsm82YMTLyfABbLWeLJPFLZKUBQadWy6BarUFaA2bmjXB0rWQzuBfSaUlYnEIvG4GoEMcBGjNKtfYRqUNlKCm+FpQaYpuVwINDz6HcMBujoifawNcPluzvZsUCwpo6bBXGycV5hrGWGU1qQgsaJDxZ0cEu7UUQut/2N7GHLyW/+hrIMgaPPUr/+HHW7roLv7FBdfIkDIes/MWfh3ln0A/gKS5yrJE6JpYx4CutcwUaSYuG+MwoJq4yvDRjPAUhNdp404bf8KiDMkgLfQiAV/dlkYV5IrNyxMMbgA9sewlTOiNNAdWUdk1rQ//T6UNFY64rbdvQjEqeEkMJYKlVFo8TJ4FUMdk0kETqEYQZBbGCQfE+rBJNFt2uPaivcFvrYSLfXMc7RR99FDWGJ/7bf8MsLEKW0V9e5sjb387+7/5fyL/zuyiPHcN/+P24tRV8GYy2B5UyQHl4OOSkK1knuPp7JYCqaBNVSlCFeAlxpgIDDCv6lUyRWcMBY+llhoVejrHCXJExW9ggCYrBBLtW6FnDXHzmGWkYlIVtxjpju9v2x8uMZxtDhAAKrGfEADlJAkZARetYyn1YB19sbT+xXrHRd3zj1JByteJE37FeOYZWOanKvPKVectNCgyANe84cFHGq69ZxM1a1ipl0Qr7c4MqLEUD6kZKIaw7ZX4hr8HUJWI4ur9gSGQckREVEpNaCzgrHBqGMbayUXFyy9VMJAGtR5eHbJYpABEjej9pC7HGJVWExglw6Z6CXsc0B1vXSM5cVx3s1uWpLFtTNN43xRSqAZuASQEa07uJ70fie73ysln+xSePsQeJUl1YdZ5VIxhVd1zVSowWvgoszVqYtTxvT8GeuYzFrg0SyMis29vt3HQj0ktGu6oOaREXRuN9JDAS4HI7VNpetq2ONGnxVGEzLqxWnWegSt9Fg3kfxuzG0LE+rPBOWd0q2ao8pYeVvmfeCR6J9pMeK4a+BqP9HFjXIN2dVxukwKJUThkM4bJOwZxYMhPAr8lziu99HcWRK4KkvNPliTvu4MFfupXO/DwMgwrPZhniPaIeG80hRKOnrxGMCapE0jA0YY6wNJIm4q+YlKZIAK0TM0v8LwErNaE/ksTOJLAb7wtx/iSAto0yTNDeKQpvZwqozpmmgGpKuyZRjjT2T9BtrU5riZOM/koLNKU6Eldc9eTbDmSojQSlzmmWpOo2rNrqOdvFFVaSpEQmLyZJshxYYbC+UkfYfuB3f5cHbr8d5z3X/+zPYL/ju/B/8VnY3MBvbXLCOY6VQ5ajIXBJ8NgbRIWFElbo6rX2XkpHHMpqDr08YyY3EURZjBFm84z5wobJUaArgjVCN9poKNDRljqhxZi0/q+1z/b9FGBZx47JhLrWpRX5dhDVzgMYYxK2Eklr43CgTViFPTOWxZ7lksWCtcrztZUB5bFN/nrFIQrWcGLFBclRB+XtN+3lu6+eIw8Zp8k0SIKsBieBzAtFtBY2Gmyd9toE8BpD2yPYpn80qIDqZ249eGVgfy9j32xWAxgLaAZXL3Vj6HlinjSpI5TbmJi7jkSdrtticinp7USk0Kb1NJDjO6jNs7S+nrau3QZzNShO9eJ7mcuEf/19h/hP961QGPjLB9ZJSQicmJWBq/bmGVw+L/zNwz2uWuwwnxk0Ak40LW5i/C4BiZH2Mx+BUPqW06OP7ZsYk8l6wbWZe4uy1rOkYynO5RnBVJw30BjjKrZ5PkqR94phHSU3ivNKP2YX6BYZhQobWtHpFqxuVWzh0Y5hpXTMl0GWHO7lw4v3nsoIM2JRlHUcHQwdDFsEKfVXB30O5gWXdzrYA4cx1oJzuK1N7v7Jf4Q1JhiRo/TXV0PoEBsjmtkAPhMaFaEOJAoBRGGaPoYgtU/bSR1ad1Ia6L413rXZVqGeL1PEBiGUtdWqitBHa+liDCFzC1M6Z5oCqintmrqEDzCpd9BGTZVWPPXKNQKbmge1Z0kZLUvi7XbUb3FRHUYzcacVOibEiBETJiQj4Cqt4+M0HkAh2GWaaLyCdyXeleDhnn/7qwy2+lz7ylvQY49yYn2dZVexob426N1UV0tJkt1UAlAq4Z4lngphUBiWrGE2N4gR5nKLsYbZ3DKbWypVcoKNVFeEQoQFDA6Y1YZpZnHWPJM0Svzk8t2U2bgqTWXjQCqPwCkxbqsxnUgLQElrm1hHooRgWHmKzPNtBzIuXTD894c21/ul+c1S3a1HDs7M/eIth3/jkiK/jDJcMzDvAJqMJg/MBJzCfvLGJBqS55jWM+nI89ZlbRBajdYra3ZSF0zuPYWRVUMqmtTBTRWysdxIVfuF1XXCM1SR240D50QmiiiUIAVq3lcDHn/kRYv8l/tXGVijmbH3Xt6dvXNvp3vsL04++i9ecrjTOdgzFJlnWHnEmFqinD6usNAJ/RsYegjDkGsAMU1A2CavXTtAalgE6RlB1XiZmVDWzoGXgFR73wJVAlVAH2Efwqp4hlEyk2ys9uYZHRU2cBRdYWPoUKNsqLCGp6g8GUqBRaWJYr+Fix68IcaZU0eBsKHBIWTZVXRdzkHn8Zcc4S//4+9S5BlUVZCMQpzPwgUrdCT0hmjw41WAPLxbieJSG1V4CXcpgI1x4qog6U+LrbBoDAE8E75qA610/gjYim1KeQoBhgodaezuHNryRZ7SudAUUE1p19RDHgSOjIOkZqXKaEFrN22MAKuaxuUoQaVnJEQttnHi9lFFhYRVsXpBTAzol4e4K95LjBgdQh9oAlItKUxFjNnS7wPCvZ/6DM+/9BBmdYvV3DHUEDMnBekM3k0+SKOi5xIkzyZPicFbw0ViA5gSYTa3zHczxMBcblEJxrqFBAC5N8bGAZj3jWQicxMkTBOY7A78fHJ5C6wlz7tgsNz0SVIhBabeqPmsj4EXtBV3SiFXwdLYxvhoCXuydKyVjrVhRakwkws3HJ5xHh740ZcfeOCI5nccJL8sGTHXccsAg2kCvwKOtr4tjpFY37TqtdhJI8lpnzmGjyDYwOjYOWG76SwFchowM46zxs7adixLukXAjma9HaGUTqnp/9Z2q1xQbLQ61vjcVeo7Dz941QIPr5Ty4Er5vH/1out+5hOnH75pUHQ6M7lQelgbVuzLO2yWnn15MCYyNMzVqNS2OAlgiQgdojovtaGl/tO2WpAIqhy41mJoErKaOA0wKpWr+1NG63cIEkc0LEQ2gT1qWEOxElT2qe/25DaAhQw6WrHhKzq5oeM9p6wLYQzwqJo4zyiCYRNHjqIYcgyr3pHjuTgvQi7E1S2G3Q2++kf/FYMwrMp6MZlHsJQWKEYCaDYmpYIK6jyNIQvqAL+mkVIlUJY8hQWQLHmljvTOts6sgdjYdq0liNtpSZG3FgrhVxjCvTu8oimdgaaAakq7JgsfEPiXaX98UlRCMMx0bNKfGdt2GiJmW0L8lxADKEzMRfQ6SqEWrAibzsc4PsE1uPLBFTsY2QbWljxcvGnAVArSmaQuiUmlWDtff/go+zpBzVEmI04fPGJS2giN103pVRzKlrMUVthrLLNFWJbOFQFMIdCzQQKVEyR7hYEFY+o2zGhgGFnL1mlbp56BdNvGmWsnOYltgYRxRp4uJxFMKSkKdFD3pbg9CVwZQsesVZ4ewtC5GsxuBpXZono+cqQsTh+2+fXhBlGtRsqlJ0Fiow08qvM2tphIYpV5C5CmhrfhUTpW6uhaexT4yMhDNyO3uUaSLIwCtYZhG00wY7ynR6kRHIx+NbmGKbgUNxH4QXj8zAcAmMZvZXzMe5iAvWAV/vfr9/FPP3N09if/6r99fHGP2bAG+qXSzQNYWh0OOdjroR46UVSRvkVDYAg1wKIJWZC7BjzVPFyICcOpmXV6ZblGAHw2kl3V2lap46GMZgPzEVQtEOIqreIZuhCZXIFFa9lST6eb01FhfejoFEJnICyrY9MpvayVOlw9mYSwDUNCqAWjBm+E065iv2R0vOXLDz0WQm+00jmJwjDtSwgGmmzTgrpW6yjmhYY6tmVDN/QaAogS5qx2KIrkmFFFh5iTwwqHMpfZGNS2+ZbTwrO9kGyP4XwsVAuMjjk7tZ96UjQFVFPaNTnlVzV4f1zfDsp4YtAKygjMZCaGDRiN/P3w5rBREULj0k5YuT3WL7m0V0RANRo80ojQMULfhTx2fe9ZymwNmNYrTzd6KDmFoW/lFGsxTCWCBG0AFgSxtzroi8NLSKw7JAbljCrAdrRq9YJxOXMGDmQZnTw8zN5uTlEEzhMSswYyBFC1hKHSIHXrRhuVwtGoSXYARg0DHy1s77aPtSdPW0+qyWtv9NnrCbfVT5lG6WDsq2DMKrURexWvF7BlSMqcAcdLz+oggJgqBCwiE3jVlXuO7Jf8iFEzGiG+BczacEPa/7dTdkRkkqLcx6epOb3W0p5wtCNZU09Hzhg9V0elTKlO0bbRYqy/R/zFQtDV0atD1pJMjV5/FCEYP6bCbDPCWrXXgL3MmzoyuVWtw3dYhH/9XYf42f/v6OzKipvdu8fgS6iMUmTC6qDiZOY5HHU/PUydl06ATIME1Wjr+5TGiLpq1W1LPOr3Nma87qIkafS9BvLN42yTZG2zr5rwXeQ+SFCHJkh5+xK+7X0YTkU1fFpAdKxlUz37ujnzxrK8VdIpDJ2BCV6PQ0OZOWztjhzy70UNHIPYzwj0nGc9vq86v2Uax3GxlxpexnmyK8LAQ2HCtw+wWjoW8hDg1ohyunJ0TYjPNZ8b1ivfhKuIYyLMR/DI1rBOvp4AVDjeAKrLZooRMFUYU0vRTgwaD9eLOtkI4MpE7n3VHff/6vYen9LZaAqoprRretUd959+/xtv+d7q+OO/4Cr3DueDp9vpUhHnsEZYzAQdBm+40vmWq3pr7R/FzQk8hEkrBPd7cHOAAeYyS26C1CO5ui/klrUozTrYyTlVOk4OHb0Ym2Y9eKeQidQxZxQo42yTQMMIwKr3lVOVsk/hVO7rlX+KOZUmNYci/ZDApWOEA3lGNwsAak83o5OHtBazNuZikxB+IBOYiyrMmbh4V6CIAhSz3cSmbuM41Z57snO9tD9JEpUkM+NAqpEMNcw6/BOIE3sCPlYbmxOrwqZXtryyVZVBHRf73AJH9s3wfYf31GEj0o2EYMgshIj1IyKa9BRthhv3g1ep2VYn7buWfVR9SNv72qo93nujwCqPqT1G+qt1lm3ZchVRiTr+GBIHYkZgXBWjeq0Euspkuaet+7Tem/Wt/H7xJiUhhIchxLAq1dFR4d/efIifufMomxvK4kwcbD4gpK2qZCszFISx6WKbE3hKjiMp/2FyMjEaU/hEUFWPmxawSu81/aUQKW6CJCoda78MISwyxhWkO0mxBOj5cP252FED4KJorF4BZQy42bGWDfV0ckuhwqnNik5hmBHD41rhSkPlHK6rIQYaARAhBlHFSQiTUqpwsgpJpkmptNLzRVMN+q5SAAAgAElEQVSDel+Cc8UgvqMNp6xUzRe45T1bXtlXhHH2jc0BDmW+tKyWIciEB+YzQ+lj/kta3rk6bmDejJ8HN4Y1uPKEkBgpKOlKFaSaXoQvb/bxIiiySpa99/lv/MFf2KG7p3QWmgKqKe2K/upTv3ewKss/3vf9r7l+sLnFcGuLwdYW1fIye1V50Uu/A/Ue7z13/qf/zHB9ncH6Oq94x/8WP3wffr2voz4nI/JmFd6U9YHlE09QDYagirGWNaC3cprq5DKPLC/jl0+jQF8CoJq3AXpt+SaidiFtJhSepQFSo6BiTSGzRGkU9WTmCdKHwRCyrfDJzOeGA1nGTBbSOCx1M2YKQycXUm7oQiTE5VJYjCL5PKKQwCCb/t0JEE3y3GtXqstl2yGslxHmP/onZC1mnepkSm0XlbLB+ghiBKVT54CLxuJqGHglV2Fl6FneKmsV7NZAUWt445H9IQegjyrCdj5HEuOVpmNISrTmocYld7ZlnzQKi3QEbOlYnfHaCW2OH637g7aESbdJpSax+kocWZpaYwcnEJVhRtrefqwilnuCUV0bPDWgTkZU1zmWTMP4NOpDQlyvZOr5pW8/wD//y8fpZMHRoOiEHH7LWyV7sw77Y766GWNxEvMXRmAVUvqMgikTQVYuQtUCSEk6k0DTyF98QIvgkrt/m0YAcyDzJDwCLU3YhhmFUmAvwooqBaG9pcKcDVkFuoUl98LprYpuZim88LhWrJUGXyn9GU+nEwL+JnCbPteihK3acFyblkQgCuEbSkb7lSeEAInvLY8ePWvOk0kAbeuVx+zbgzu8B923l2NLe4LpgXMgQn9hju7CAjkR9Er8fmongrEyE38l2HR++n3/gc7cHMXcHDf/8JswxiDG8MXP/jkqwvzevXR6vYWi13tXZ6b3rj/74w9/JsvzH/62V7752Pgrm9LONAVUU9oVqepzRLj+4ksOYTOLq0qqssJVFZ2ZDq5yuLKiqipe+iNvxlUVc3sWqIYlVVmG32FJ5T3duZkIshTvtd5WDfYK4RcWDh+K20qWZQwGQ/yhg3hVhgpPfO7z9O+6m0vznC0XzjFA1xg2vZIJDHAIQjcGKGyDKCHaGNQMKhj9JmZQgyqFjVXhYpdjDFgLB2zGXB4iTi92MmY6hk4W7mHjCj5HWJAmjkwvGp+bCUDqXAzPJx4f2ZERNV/NmEnAZRREJUCR+aQiaXN7CYEUNV2rYeYZAUwNfbD3eGKrT+VCv22WQSrwXZcucUmng2hUI9VMu60aagGn+tc0+2OSDOsFP6L7lPj/KAhL0oMJHbRTx42UB0CVxf5resqykxovUEGTMDfVaQOzSSeZCF4djUdjGzxJBFiuNXpT3wUwJaTAQymJzh6T85Mv3Mt7719mYTGAp7A4gGObWxyYn2NIMDqfMTaAqAgC8pbkJUYnaf5U6BLUiKnng6SyDYB05P0KkDmJIR0m9/lOUqjQP5OPJ5stIYQCCfcONokDgaWorlxVonxQ6MXAqkVHKLywslWxN89qUOUc+HV4YlgyO6chMG9rvAK1dLYBjlobz6cMBAr0XRNuxSn0jLAWpUyrlccaOF5WdL/tRva/5MVBMihBEtiJoCjFqDI1SBK8C4vGLM/rOulYNRiS5Tk2z7BZRpZnvPFfvov1U6vYLJZlGTbP+BuveRWDzUFdz2Y5rnKIcIuqHgSmgOocaAqoprQr+vZX/e0/+9Stf+8lc7MzV3VmZ+byoiArcrKiYGtlgM0zxBgufskrfs72Zq/6zK/9Cg888PWGcSdXFYRrXvN6rnn1ayk3lj+6+tDnPlKWJaJKVZWoczDwi0+cXp752tcfeetmxdVmuMHXvhm+6z0zlrW1PmsbW3z90VP0h0FnVnrlYptRiHBRlrFkLQvWcFme41HWK6Uw0kh1IipoT+0KbEbwk2wTTq0qbhMuJgcLPTEcsBmzhaFE2d/JmekYulkj2elEFd8soayjYeL3Eox7A8nOvPw8UNv4PEGN9nMysi8p9kw8J4SvSMApndPezxCGvjn4ROkYlGG/coqvlLluzs37F8lUouH5KICSaJhufWLLDU3abp9nXbuGTjhrlHayTRul0fGQPAm3y1UaqDSpFcmJon3F+jvQZATeArb1TSXIQbTV360/i4yFlaAOIWEk5pCMef1CTkrlmtkuzsPypmLUs1AYChvybT5RuuBIEWmGYL8DLTWexuwH0vRhAjGFb0IojPdOcigYlzDl2i49zxTBmiV4Ac44GMZ27wU2RGI+wQDQikzIO0FSdapfsafIyNVw3Fds4Nm3lXN8q6I7D4tzYU4oJKgUNb37EQlb+39l6BqA+nBZcqJ0bKkPOS1VOe6qKK2C3p//d6585H727Z2n1+3w2KlNiszygqsuobRdZjK+8uIXX3Vrb6aHGIPYnCzLURHyPE/iMiQE4QsqYa/keUYYp56NTFBfom6Adw4detxGRa/XoRoOqdZLyuGQldMr6+WwvOeV7/rtrz09L+pbl6aAakq7ple+67fvAc6YNNMPBu8wnc5VR7/yMN+8888m1rnk27+H2QNXA9yzdMV3fgDg/33BNUsHXvcD1f6Xv3zu/sGJ5/2fv/Lv3tvL7NXv+Cf/kEX/OO/78Gc4OYRr9nUiE9KY6kZwPngCPlFWiIdvMqy9YpyGnF4XieHiTo4IXFbkoHAwz+iIGZkYK4WtyrO87llb8+ReeEFekFkhM8FjKM+E3AqHZgsyC51cGiN70eiZCEg08oVadQI0HIlGpbdrCZWMHpexupnfniqk3tbR8vHjMbblRHVU+5wCYZhseBxseuXEZp8MCV6e0aDj+y7bz4w12y5iYjq72ug5Irm0sp/wqI0kREDa1szjNbfx6tF6Z2blMnbPhkGOKwVrFeWOV2rLkWiB91GZmejodW2M7Oi16fG2lDEwx5akMP1pSAeFCDmWvgZVEWq47cZD/PTnjnJx19QxjjBwYrPPRVlGN0qpRGBWDENa8cZajau3WyCqzUBk7Lddb/x4ZUZ7Y0y2OHHwn0lC1QyJgKCS12zHNzZEHQ2OIUZCpHRVKHLoqDCfW5Y3Skxm6GnOCa0oVZn1OY+erji+6pmfB5kT1ryl2wgKUYWBeo6VYWA/PCxRheODkhPqWfcxqbgEtWkPwce4e+JDonAder76wBPw4EkE+MrJPnsK4Qdf/7dYMRfzG7/y3qs/8Pt3/LTAyz/9149Pc+w9S2kKqKZ03uih337/0mVve+uTOtf2euvZ/MLS7/7xf3npf/3kH35gRnQ2Q2PkZktBCKWQx8COGVLHgwrJjYO9TEfCBDlUDbm8FMqq4lGFRwbBSPMvInO7CHgigjIFZkWYN5Z9Yukaw6IxXGTDJ5IjXGQyrAVjhP3dnF4m5FmSvLQ9pSKIcFozlcA4z21lPrH2DqoPgEwzKhlNpjvpWtt51SRpyeT6HSxDHKLC0IU+3oiOA0OnMd4RmCzj8pkO81ikjAmJNUiXkpOB0KgBa1SbGD6j8KZmxjpecjZGfDYItXMVoZHITWrLyG1bwMi7UQ+DERmVjjaxjGOyXdNY2z4DSfn0tLlW4ufpv5AcOkgWnSpdsQwVREIEXK+w3FdQoSii5DIL724+NwxdSIMkEgDztj4af6ARsDTa6Tv1eBsGd11ej9VJl98ttR1btrdAR7IopOcqlWhDGUBVJw+G61m34ImqJLfKpVrwkBtSCByxOSdcxdYpxzdOltzFBivOsRGljUOUiwVOkBYKzQJLBHpxP6eJRTcgjfPwzjKCBLKK5xeG4DRQ9DAOMu9ZtHL9unLH91598A3/z1eOPXAO3TSlZ4imgGpKT5n+7Hu+7+CB1752bv8rv7uLMfmTucbL7rmretO1l1w6UH2/VT9rRVDnQrTmohcmIxPVacQQBoRtJMZ1IUYlVqUDcR96BNF/SQiPkAvMo/RVuNhE+woR5iSjIyEdzKKxXGIzrAkpYvZnRS3CuaibM5MH1QlE9qbBpqjQFNFb65jquU7ukrPCqxZn2S0Us1rsdIkJl9/56OQjSoZBvTDwDiGoWjeqip41lM7R90G6ceO+BfZkWYh4n6R0LZlPW75Tla4GNu1ku941wbnOxKTDxnbpk2w7aayOjF9XRgBWOQhJABPjkyRWg2AsPIEG/WFrb6denFyqzk8+Piblm2xCDyazQW0bRaG5mOCpB/z6DYf4R/ceZW8RvMWsCjPWMHSe0ipiBfVBulWYJmDoOLUlVtuPSfSwjD05Bv7HQen4WJ1EI7c500egI4JfGvERlFJGIG9AhQ7CEB/CXEhQRxcW8lzJusKJzZLcwvM7XZ4ohziv7CHnUSpWNYRMWTQZ6+qo1LMgsKGwT5Q1hBIoJMwzBbBFYLRDQmDdTIQ5hCESA/pKnT+xK0LKSLQ/F1S6RIEiiNBFr1cj97zp2ktu+M9fePSBs3bglJ5RmgKqKT1l+pt/8sfHvnnb/9XVsrqBcxXDRPr7N16+NGPlIweMzPedMGuEvou6IzFc0hFOOejVsWEkRPj1IfXCPAYX83k58SHkgVf2mSwG/QxllSqHsw6l9wzVB9ur6NZ+WdFjwzlyEQ7kHTIjZEZqKUXHCJ28zdxijKzIbE20Sg3MREKk7BZNUuuJGXMQV8XYjEnMv71hsrwus725iX06ev721yI2A+9RTSHlfbS9iPsiEJ0EUCWbXyS78vkc/9M/AS9YhNXSc3R9wKYPzgNoiAH24qVZetGzb0Q0EfvBRbCkzuMrXz/7TtRuvffjVk06cXP7E+8AEmpR0Oi5bamT2wFAnSuZoi3/ifGlshw7N9tqZrSBafU9PnjK+q2tpm2qMY0J4djQBwZtTK39Sj+dJKUaeGasxRvl6EbFinHMLlj2GxukV90ZFr7jpVRf/yrV2koAHCLEBJlhTJjgORZCe0e7HWNQN0HiFPvQl8NaZFNfT4T573kNpz/6f6fuwFcpB5CO/DSbinfVtvGs6sa+r7jYEcKCZkwymKkJgUs12T42Rxdyy0A9A6fMiEUyqLxypbE8DlxsLLPW8uBwCyOWUpWLjVCI4Wg1IDMmBh8OXoKZEU76KizORLDG1Ntr+NiXYcFnJNgg5iLMGRAxDPpD9uaGrjVseKVrZXHN85G/f+PlL//3dz80Vf89i2gKqKZ0XmjtS1+uxGbH5l90zRAz7lp+dpqz9g6remQ2EwpRuiZ4Hm2trrO0d4ZZI+Si9LAsFbYVAjioiRazHOc8lfc4p1Tec1Hewfmw7eo/5WB3hqFzDJ0jE6F0HhHoWkvXWlClF6MPZ0DHGHpGmC8EZ4S5jqGbGYy1IS+atVhrsVmGIpiiE1aTh48wOH60kf0LiM3BSA2k7Nw80Lj328WlhunQnJcduqTprDGkYBYWgVEVEIDMzGxjfhgDRRHO8R6/tlqDqYmgql1elQy/ej/zL7iOU1+4h1PO068qLp/t8ukTq1SqHB06rl2cYzGzMekuSJmwWUwqXWn9zFmvh8lDk7PFBXRY1no40+1G33OD7fVQ75FkgBvJ9/sBbHgf2thqr4+phRDwW1sNYFNFh8MauKjUOqD6LwEW0wkZLI1tpkq7d1/capiw5DnZ/ouaclXySy+r7wdpX8kOHIBxEKsxx97cbGj75kZw0HAuSGo7Beocfn0NHQzrY9WJE/h+H7eygpYl5YknqFZX8WWJqxxWohREld948UH+0X3H+Nqm41BhyUS4Zf88AKdKz2Kvx+yLb0S6XWZ/8M1Ilo+OmwlgKv2a+QUwBr+6AsPhxPGkm5vNAG5JB5de97dHB3QL+VRHH8P3t2iSCoc/txJwRJIeuvW1+N58GA+ubOYHVToXH2Lroa8HkOo9guKq4KXs47jpZo6iA+teWSgMa04prDBQT2UhN8qiZvX4O1R0ol2UBIN1a7lsZo6j/c0o2TZYY8iM4bARTpQBbFkr8dfQrcomyrEARjhdOgoZMBeTAW6ePMne3Iao6ibYb1ov12fGfAR4OVN61tAUUE3pvNCL3/cb1Z+/+gd4zk/8eP9cz/2Vl1390xd38uvL3FI5x6FuHuZBr7j1DWTfLD0J9gcLRc7ePAsMSwyqyt5OXgeS1PZvTDeTwJdGg+mL5wqc0+bPK3u7lo1BYPgdaVz78aOCk54F62OS48ySFQUmz5EsD1KjooPkHcgLQOgeugysRayFzAapkLVNmbFIFspcv4+dnWuO1X8mADBrA0iwJpwXDLrCij3LkCwLjFZCChwdDmuVAgju9KnIBAXT7QVmGP+ktY0xiB3bzzIkz+nNz1OdWqYougzX1xg6j0NZqypWqmBT1bWWL57a5DBZ7T4ePM8AhGxuDtvrkc3PU1x8UewXCzarn1uyDNObqZ8r9FF8Ru8D2Ir9h7V1/6hqLf0IzxXquPX1wOTTsdZfeewY+JDXDZeAmQsgwXuI26ltptcDFLtnHw33jyC2iGos9YF5R+CGKv7UMqqKO3asBd481aOP1aALVbQsqUUqxtQgAE2AEmSmh5mfI7/oIqTIY9sr/Pombm2N6uQy1enTDJ94ArOxHlRsxoQsAk45MazYnxuc86y6IbNFl0GEOL2X3RKyDABaVbEPWoDVje17D0+ciCB2q45FYpf21M8kCnQ68Vg6NwLJxT3gXHg2F96DiIBz5FdcGe7XApc4R3HgcJCIORfb2BwL9Sqo3Ago7R68BMohWg5gOMBXJVqV+LIMXm4+SKx7BoYtgWRGSFrsBa6c6XJ64BEjHOl0We6HgMbWNn+5DRInMQ1IEoGl2aJOgpx+D5kuy4MSEaHUoIL0UpGL0BXCePUVF3W7MbYUnB6WzOeW3JhbfuVlV7/9n/7pVz5wrnPulJ4emgKqKZ032vjqX59zzJLffOV1SzNZ9gvBCyraIhmpk/HaOKlkEraXOjkHZorgERb/OlkAQChBxRTPrcuiKkoUZnITJvVMaoDlot3PfMfUgQ1DvJ1gW2WoMQzGhiSmQ6e4QcVg6LC5AxlgbI5kfdR7stl5/PBxJM9rQKDOI9agXuNka0ZW/NXK6cjkTQ180sp8ePw4+f79I+ogt7oaOlEEyWxgHhAYULK0SSqXjfWm0yeo/85ISbW4tAc5eIjFQ4dYynIedxVzxvLNjTVK74Mnk8K1szP8rYU5SlUKDzZK7LL5ecRa7NwMttMFaxg++Ai6NQhgaKuPmenh+4MA8EQCs6wc6jUms6YBRiaom8zsTJCmZBk6GCB5jt2/rwaSIoI9eDAAorxAihzJC2RhAUTIFxYjQI1AtSiaPhLBr64EYLS1iV9dpXIVur5OCfT//C8mdpmWQ7QsAzhyDtdv1hmawFP9Pzhf1X1tjR15R81mlOy0wKBYi2QRVBY52cGLsRftJd+3j2x2js6hw2z99V8jp5YxVck/uWIvv/7gMuBYqxzLW1scmZ2n6wLTzntdHv/Ab6OPHwsAvN3I3VJrBWJm5+qHkOYBw5a1aOXq+nZhAWIgyvRsIxLDOmhcWOVki0tjElUfPlLvmm+tqsJfWWKKAi0H+FjmXQmquHKI9x5XVgycw1qD8UqvC7kPHoGVKl5CnLbFro15+WBPz2Jt/FYNYIQre11WB75OeK5R+qTxDxHUUJdl1tTHVGBlNXxLWXzXZnOLhSKPx4XCZtSmBSK/wDTv3rOGpoBqSueNXvG1+89ZOoXqG3JYLDRMornSJFwF/BMn4TmHyCR48m2WFfO2Vxs1C5B5TbwzYJF0toYAf0m9EKJ0pzo0sZFUm/Q42v7V2iMtXE4pvaccKCKu5c0zCACwVVfkBDt55CUGqa1E0gjUOStCv5AORs0Zg+Un6mu0I0ePp+k4I8kZd894nn/8KNXRo6wcvYQFY9iXZWwN+zzYH4QUJqqUCA9tDvhbcz26WR4Yvgq200W8ohvrlCeWGTqH9gchun5UuabWCOD8WC6eEVuaMYOYUw3jr4u//vVt547gAm02dFvZ2KPXdj/h/aao1GVVNYxtrK/SeSPASVpPKE3dOghorJ7GRcM00/UgWV6n9uBAhtRAqzq1DF8Gk3dqKVb3wCGMWIYrp3iB9ww8dG1g2A/2B1w3M8O+vIv3ygN3/nc6K8tkrcw+u6Ft1WKBGwzGj2yjlICbJ46P5qqkGfv1DdrfhzEj71yiMf4kU7zU/7XWN753leA13KRyUbx41GoIlRLrBiWh1EAq/fp0jVaZIsy3QBca4mKlb7n9OAoURYrGHv4q58gEFnoFKoZsY4v5eDGPUGZShyYZCkd+8xXXvvQffvoLnz1rR0/paacpoJrShSWvNySvJOtpAZP4NyxBDPPdHLs5oHK+jmZu0CaOEy0wFC9dH/OthK7t+uhIot5EcREJSB19XQiTWQqzJEll07rfpN8zfWCpnia+K6FN6eD49dplqbxmOLtARtuqtCb48QqT+gQCGN167FG2ejOUXvnS+hrBvjyA2p4x/A2bIQOHiA1nbvVxm1v4mEaoZiYRNCXj70nAZlKZiS/EJTs6xp6jVaATCiZhhMlMOMR8QnWkj8NYaPfRZNSRwFPCACZKINrvGCIgHnnZ2gJSo3Vba4V6J20Hm7VYVvZhpY+snMJ1ZrBLi3SXLuKAy7i8u8yqD9LM0sPn1lY5sKfD0c0h81trUR0V7zM2ECaD0gn742NrJ9ImoKzSLBS0/q8Fhlo3Cd9M9ChM9c7iNzBm7r7tN22b2I/p+/IkML29fnhFcRJRqdvYfnUqQuZHny0BMIDcKV6IoC0ERe2osrg0R6WCdxUmjluDUpRQSQiqGqYhvQqYAqpnAU0B1bcoffqqFywB66/42v2Tg708S0jRG2wFxoVYOtZrLQEQwJVDSoWFxTl6J/sUCoXTJoFrmo1rZtdSN4yBpQZUaQNERo6OMfZY7kdm9tG0E+NnJ2YLoX3D1vFtv7K9TNvbMqGsfd+44UcbvKNGb5w57gSaaN9nhIFHkGjgkdPrOFNyOOtwPxWqIShqrvAXa5tcuTSD8w4TvbbaeRzbNzRtxqvbtxNjklbqvhQg1dQemPG9tV7T9i6Qsfc6SlWlQXXT6gHnGg/PEYArURU9+igTOlS2vatt4LhVbqPNjfMTBu72x6Fm3DX3bkaI4hoQMtzCH+9j8i7qlQe2ShaKEBdp3giX5x2OD0rs1gpFzwSpzPg9JwDRbWBrwjmTaHwMpPPa72/8euk1j4OfkXqt4xPBUgubto+PbI92YyzfeW4YBeoR2kozqIVmwcDI84x+WN7Eb0RAnScXuPSaK8M3srqBdU37VDWoDNEQmwF9CVO137OCpoDqW5cyYD/P8lxM6hXjQ9wWUWUhl3qWUwW3vIqIcPlLXkD2jSdQVbqxSmFg26JUW5Nce+YEOjaopeocb9rwosy0JrjWDJtZaeyHCUbuuTX17Oz8aG7ANjNPXuYTn5vtfHISWJoIDsaOjSeOTSv6MwGmkWvvcK9J9zYmgCYvcGJY8Y3hFv0IpixhNS55Rtc5jHcheGKbGaW2pt+09G7dTzWYwowzZCWY37Sc9YL34DjijJUDQNKR8yeSgi3GAZdgLTjXKh0DSO3wUKms3V+15i4BQBl9UePvOm2aCWhtW9snjKsGgLSZPKiEMAO+2gST8cJuh6N+k0ph1StfG/RRzXl+rxhp7+Rrj9xh5D67OmcEqIwdGxnAE+41il+2329CWX2sdbAtEUtkTTMwq5QyJi3sRKjapgOS2hrKE36qFwcSEiKPg+xaNS9jL5zw/STTuNPDkhzIiuDUYVc36kj2ySNw1SlWwkJgMK4nndIFoymg+halV3zt/if+8g1vupYdANWnr3pB90nZPJ130lusCdGEl0yYoBJAyQwMymGMlh5WzieHJR0bZq7cALY1UacrtkBVeyItbFgOa1zqpfM6WSqTegWYwFaehYCHXrX+7eUxzk/yhKoZfBP+oJMbBmVjB7RNMjFevkPZuBRjUp1OzMem2zpi7MJjx7epucbPH9vNcmE49MleHpUQJiIq9qg0AOPvmC04XjoOdCyNPib817L1bp4lgqJt0Ta2852ROnXTWpxbxzbaEatGmjIBaAmQZU39qtJ6fxvIqN/jziDJ0CqrQRUTaZT5Cr4lpWrbYo1LI3eiEbASVZYqDhEHmcENgpStighAJWPVKfuK8GB5YajK5irbQdZ2xD5a52yIvlGFDobNd7INZOmEMratlSaeN17e/iYTUKq344YAW6UPaWFSehgT0iXVC5UEtEzwnNwc+uZxRWrANXStOUiadzxiF9fqqtI3oMoC3cUFjEBhoWNHQVfPgBoYtBwcpnThaQqovoVp9nlX9h/6D7891zl48NIDP/Carzz8/g9017/61YNr9923H/gacKEB1XMy7+llhr02ePIVhkZCReCVxsD8wYtCag0rdGK2+Dyt5FvgqBZQRCZrpCkvbErhoQ0T1iCFQluASEPU4iKT6OWtpDQVYYKTlvg9XCRiMPLEgIFeZ+d4XDvw1Sd1rKwaJtGuMVk6FjPBTTg2AhB2uGe3a6mGnqVCOF6aOi72goXjVQju+Ynldd55+V6Q5r0kR4D29QJTmpxf74y8uC7TnQ9G2pnVnKmXA+X52euMSyF2S+PYY/wipoW8tHWGEd0RSKQgn9tFX834FGDoQzzzxfj9eEIOwYVcsJnQjQC96Mi2e7RpYrmOgtiz1gfmZrazoTNKm57kMYBu/CbLShtpE1IDlQSqfQu8iBGsDfV9AkcJkAnMFGODOwIzaxqV7Li0sg2kUqF14f1lVugYYc+RS8Lct7aBWOjW14cZESqFgfPMXPrcS2niUT0Q/6Z0AWgKqL5F6e63/N3nLN50I70jl189e8WVpze/+c2re885klVrq4+88Jd/8YEL3T4A/8ixty0cvpx9Jx8lM8kcoGGwotBbXUUF5i7ex6wNq+pOzJ/X8JzWBN6aUVsLe4AQ5DCxlTRhalLFhHJpXUdEguuyaaBGuO/uOeiZLXfa9XZ7ve1ki8l+fjtfc3KbdtcGDXZupeBF6ZmMQ4Xjno2SyiuzVqvcnr4AACAASURBVPg7hxbqwNoQJVBmTCo14X5OdJTRtOrqhPq7afdugNkZTz7L69vN2z2beqqWmE2oOFGIGGlcM1jXqaUzDeBMwNZBSC3jlU0Pz+tm9EyGF63jKBV5yyr9DKREe68zHK8bcAayY2K7na7Ycn7cxT23UzvxdnaGrDfGtHIlxl9rGltKHRmMUjsbtMvbKZRSo8dtx7bdN3oLnhiUdAx0l+YRgRkcaqW9BgwTlwbb04OXPv+N5Z997o0AOL/h7v3Kv9u89Td/ee+DfzqNov4M0xRQnV+64Z/vze640I1IVHzmI3O26GSqWg03Nza9i8nC/o937nTKPb+0XP30M9W+we//EfMPHMXPEV2XBRNZp2mtGNUI3aU5ciM83i9pmzvBGPOVUebbntSSe/ro6nC0PJ0rsTxGzNl2nfp+7DyJn6vgwk8oa18jCe9gu+qnzZMaucQ47SQ7aOrvps2ZNcElEzBiAMe8USofEs9CMLJtg6b064SRd2BaHn51XybpZOtEJUxWk2R+Z2SiNHZ2lgk2dzucA2xz4R8nNwEDTd7XFsjZXlc1gJwQi1bxCrkRnIb9fCw5cjqvilLVdK3MNAuF+vo1I0/SK2F56GKsNY055AxCiK9W1KmVdh4NI6Bugg6zLVE72/leQz8mMiPf2dg5Y5dsfw+Jdrqr0nzPZwO4I+szDT03kkGp1b8apb0yVu7RkTlDGZ2bJo2DVL9Uz5wRsk4RkjtLWLwo6bvXGJJL6SH0/+gO1m7/XLrcLPCuudt+/gbg+3bojik9TTQFVOeXFoFbLnQjEg37fehfaK3ezmQuPUg1O0umqyRZTsOAmtnISMiBVkiYbBRqT+WdZtBtjK3NaHQ78NrpGj62rI6c3lppjoCsCbP0iAfbGI3ftw2UpFUywnzOdP6IHdH2u6a+OlN7/KTYAWMUYxiGHIcSVuJrrqqBzqw1ONs8UymKjc+UvBbT36AVIoNWefv5pCWxTLnOJnnetc9ptmWkvG2MvBspxzaGPrZztt5qA6azHRv40ffdb6EM53Rig8eLSj/aMCVIZduVFWUhM6y7ADBPVxVLtsCL1sbwVX3rMz9hkqhMJt1J6DbS8vGxWp11CIZ7Gpm8ADnT6SnkyVnvEMeYp5FUtaVVO21DI6Wq56ixxd/4efUxbUCXIdgiZtZQHj8ZQHZ93qj0rPSeiw5fSnb1lSPPYJ935HsJnn9v38UjT+k80RRQTemCUeeHvp/vvvk6yscfw0qjcNvGKIZreF/x47/8rxkqPPe66yde70xM0qvGqVhIedq0tr2KzKwVW0pb+3UgyWgAmuxR2ueNXCueM1pPgy0WzaSYrjkSOTuuiLV1v9atmrbUDGuUcY0fp3Wv+skmXYuRzYmgjFbbrFeu8Z7LK8cN3lGqMlTYWF7mka0NThjYf/HFzM0vjFy3fWWP1obiidpSwrQaTxLDmkmN1R9r4rZrjV8/FW6X5J2N/Ye9cYY46UaybaOp49uQbuR4UzYR9KVybQpamwgtAMWoV+Hq6RVOnXwCUL7zOysuPvIcOtaQG6FjDLM2o5sZ1tJ3WIPVtC3bGjRqXN2qVz+XjGw29UfrylmONQ8odV0duW+SIMegq+mMVnmya6qPS1O2U122ndtuR9MZtXF7ynqwS5o02srhkH92/5fpWeHAwcuQwxnF33jzxPMU5SqvzF1+BTP7Ltp+MXgbcBp4xrQO/7PTFFBN6YLS/KFL4dClu6q7/zue5sZMaUpTmtIFpm/79pvP5+V+CrgD+Mj5vOiUJtPObkhTmtKUpjSlKU3pf3T6ILB0oRvxPwNNJVRTatM9F7oBT5W+8dnPcPS+ezj18IM8dt/2x+ktLnHouhs4fO31HLruevZc/pxnvpHnQKceeoBvfPYznHr4Qb7x2Tsm1rnipS9nz2VHuOKltzzrnmc37YfwDL2FxfBurrue7uKFmf930940hlJ7r3jpLc9sI6f0tFGaPx77wr2ceuiBiXX2XP6c8HfZEQ5fdwOHdjBBeBbRAvALTFV/TztNAdWU2vQ/pJvtlz7xUb74hx/lS5/4KP3VlbPX/8M/qLcPXftirnnNG7jpLW991oCRUw89wJ3vu40vfuKjnH74wbPW/+adf1pvH7r2xdz0lrdx04+87Yyg5Buf/Qz//nWv3PH4Ly0/+YxFpx56gLtu/xB3ffiDu2o/jD4DhOe44qUv5+Z3/ONzei9P5rn6K6e568Mf5K7bP8jRL3x+V/dpj6HU3pve8jauec3rz2t7LySN99Unb30Pn7r1PReoNTvTc29+Gf/gY59+0ud/47Of4a7bP7jr+WN8rAJc8+rXcc2rX8+LXvP6C7YYOAv9FPCrTGNUPa00BVTnlx7kf+ycSnc8mZM+fdULukD1TOcNvOvDH+STt75n10x7Eh39wuc5+oXP86lb38ONb3krr3rXz18wYHX0vnv57Pt+jbtv/9CTv8YXPs/Hf+5n+fjP/ewz/jynHnqAT976nqfU/kTpvdz5vtt47s0v47W/+G/PuyTgfLf3QvX7lJ4c3fXhD3Ln+35t1yD6TPSlP/wDvvSHf8DH3/1Obv7xn+Kl7/jHz0Zg9Q7gn13oRnwr0xRQnV964JeWq1+40I24AJRmjmckb+A3PvsZfu8nfuwpAalJdPftH+Lu2z/EjW95K6/9xX/zjE2I/ZXTfOzd7zwvjL1Nd9/+Ib70iY9y84//FK9618+f12u36XwCk0n0zTv/lNtuuYmb3/GP+YFf/DdP+XpPd3vTOHrlu37+ae33KT05+tInPsrH3v3O8z5/APRXV/jUre/hzvf+Gm/+9fdzzWtef97v8RToJ5gCqqeVpkbpU3rK9Iqv3X9s7oVXP+3oo79ymo+/+538+9e98mmZDBPdffuHuPX6K/nSJz76tN0j0Zc+8VFuvf7Kp425pwn+tpfdyNH77j3v1//kre/hX91w1dPW/jbd+b7buO1lN9JfefKa6U/e+h5ue9lNz0h7P3Xre/i9n/ixp/0+U9odnXroAX7rta/gd370TU/r/AHhu/udH30Td334g0/rfc6R5oAfuNCN+FamKaCa0nmh2ec9jwff+5uZVq73dFw/TYZ3vu+2p+Py2yhNiB9/945R5Z8yffzd7+R3fvRNu7LbeKp09Auf57ZbbuLO9/7aebvmbS+78Rm3qTn6hc/zob/7xid9/qdufc8z0t+J7r79Q1NQ9Sygo/fdy20vu2mi/dPTSb//k3/v2Qaq/umFbsC3Mk0B1ZSeMt39w3/nOd3Dh6uZK557g9izJew4d0qT4fmwdThXuvN9t/E7f/eNT0kqMk79ldP83k/82DMGDtv08Z/72fPG4C/E+4CgAjyfwPDppqR6ndKFo62V088okG7Tx9/9zh09Bi8A3XihG/CtTFMbqik9ZTKd4hHb7V5r52bnOM9j6uh99/Jbr33FOU+GS5cdYc/lR7jipS+vy0499ACnHnrgnFepX/rDP+C3XvsK/sHHPn1e7Kp+67WvOGcw0l1Y5NB113P4uhvqNvRXTvPYffdw9L57z6l/7r79QxydEFLi6aJD176Y7uLSyLtIlEITnOs7+eSt7zmrJ+OTpTR22n2d6Mm292PvfuezzZ5mSjvQc29+WR0ao03pezv10IPnpDLsr67wyVvfw5t//f3nu6lPhuaA5zD19ntaaAqopvSU6NNXvWBp8cYbL602Nqry9ArAvvN17XMFU92FRW76kbdx01vedlaPsBRqYbe2NEe/8Hk+9u53PuVJ8fd+4sd2DabO5XmO3ncvd93+Qe768Ad31V9Pp3Spu7DINa95PS969eu54qW3nBn0tIy2z8V9vb+6wl0f/iA3//hPnZc279rtfUJ7dzOGTj/8IHd9+IPc9CNvGyk/fN31/P0/+NSTbveTod20+ZpXv25b2U1veStX3PzMxtz6+Lt/5qxj9aa3vO2Mx89GS5cd4UWvef2uvrNE/ZXTfPETH+Wu2z+4K3B99+0fejZ5fr4VePbFv/gWoCmgmtKTpk9f9YL9wNzwxPGv9B955KrFG19yHJHLzse1g1rsf90VOOguLJ6zq/I1r3k917zm9bzqXT+/a4+vu2//EL3FpSftabbb+zyZ5zl03fX8/+29e5Ac1Z3n+z35qEe/qtUIg7ChC9m6WssCNdLsXc1KIzWCmb3DS/Ks2b2wBjX2mvBcO0Ae37usPLvQcMMoNBEDQmGHiZkFWobAswHDSMbYO7Mgt2RpRxNxJbpHoLEsI7rBRjCIVrf6VY/MPPePc07myaysyqzuqq6SdD6hVlVmnjx5Miurzjd/v9/5nduuewK3Pf4Ejr64Bz/5zp8suItjLu2WWbp+I5au34hzD43gJ9/5k5JcT0GO/mh+gqpW7b35oYfx0je+EtmxnvjpvhJBxSx3CydSTh86EHkPLll5feiDg0houVC8vvOxSDG1+q57S65pXDqv7sbNDz08p/1TmU72sHP31tijjsWI20Zj/cPwvzH+1SolqOqAiqFSzJlNvz55dtOvT4787s/fsKZ+9auRxTdt+j/BJrGfN69+509iWVGWrLweDxw8ipsfenhOneKia7K48/vP4ms/fgOpjkxk+cNP78bpQweqPs7pQwdiBXDP93wAYM3dW/HQ8DuhVoZ6seKWO/DQ8Dvzardg0TVZ3PPCK1h9170Vy83Hyrb6rntr2t77X90f2d653De15MzxYTwfEdC/ZOX1NXNtz4ejL+6J/L6svuveOVmMUx0Z3PbdP8dDw+/MWYzJLF2/EQ8ePIrOq7srljt9uLGfv6Cw/+8/3+g2XKwoQaWoCWv/9mcpomkP1KKuE6/Fc8WtvutePHDwWE2empeu34iHht/BkpXXR5Z96RtfqSpIXQShR1HL80llOnHPC6/gS997Zt51VTxORwb3PP/XuOeFV2reCd/5/WejO6kqRUqqI4Ov/fgN3Pn9Z2ve3tsff6Jie3PnJ2o6uKEaxCjZSlbLVEemacTUy9/8asUyK265Y05iSjyw1NpSlMp0RranWQLTSSq5aKx7Q9NlHb0YUIJKUSu2AYg28cTg1RipCub6dFqJVKYT97+6P1JUjb8/iterSBdw6Ondke6AepwPwKxV9RJVwppRz2DrWifGfGj4nbq52FKZTqz/euVnig/qkAssitzEOBupegGIqTPHhyNTlZRzSUZRyweWMJau34hr120ou71Ro2LL0BNdRFEtSlApakEnajTxZpz53+olPoD4ourw07tjPXGee2+kbq6LuNRLVN3/6v66Twxba/FTb8EQNpKxkeQmxiNHlQox1ehJfuMMQpmrS/Kq61YtyCi7Zvv8w7BPnELii3/wuUa342JECSpFLehDjaxTUZafa9dtqPsPoxBVUTFVcaxUUbmmlqy8HrfXYDqVKNbcvTUyxqdaFsKa0SSjomLTaFESJM6o0ju//2zD2y2EX5QVba6u5YWyvC30KMi54JyfgvPBR8pCVQeUoFLUggWxTqU6MguWyyVOTMSJ1/ZVjInJTYxHZkm+7fEnF+zHPirGR3Fx8dI3vhI5UvJL33um4fmx4oqp+1/df8EJ7GbEfvsUMJNra3Q7LkZU2gTFfOkDUJNe+sRPK2eTXvfHDy7oD+qKWzfj2nUbyg6Hz52fwNuvlQ6FF7wdkU9p9V33LuiQ+VSmEzc/9HBkwG8tOffeCM4cH8YHbw27iREFInHmVStXYcl1q1RnWUN+EmOy7S9975majHKbL83kkjx96ADOHB/C7PkJNxEwAF+iz6XrNuKq61Y1PN5srtDJ6UY34aJFCSrFfKmJdSo3MV7xaVrkjFlo7vz+s/iznvLhBmG5heRtlWjE+ay5eyte3/lYXSeHFUlG335tX8XjBIWqSLC47usPKHE1D46+uCfS1Tyf/E21JI5L8rbHn6irmDr64h6c+Om+SGue2C7SsF67bgPW3LU1OhlsE1E88majm3BRo1x+ivnQC6Amv3RRw98b9eO/6JpsxZE7J37647Juv0o/0CtuuaNhoqFeQu7Ea/uwe8NqNglzjJGNQcbfH8Xhp3fjz3o+h7+4fVPD8zZdiMRJOVDvQRBxeekbX2mYFS03MY7Xdz6GR7OX4eVvfjVSTIXx7uGDePmbX8XOVZ/F6zsfa1hKjGqw3/41AMA5O9b8jb0AURYqxXyoiXUKAD54q/Jw8nPvjVSVqmAh+eD4cInrLkoMrLilcXErX7h1c03dfmeOD+PV73yr6vntKvHu4YP4yztuqnkg/cVMnJQDCzGoIw6Hf/BUpJi67bt/XhcxdeK1fSyXXI1mEsidn8AbOx/D4R881fB4tCjsE6cAAM6Zj5WgqgNKUCnmShZAzX49xKSz5Yg7514jOH34QImgipp8+AsN/OFNZTorxoZVQ72nuWnmz72ZiJty4N4XXlnAVoVz9MU9+MmffrtimdV33Vvz5Ju5iXG8GiO2bM71n59o+vvV4hYqRX1QgkoxV/pqWdm59+oX01Nvwkz95yq4u5asvL7hMRdL1/fOW1DFcdko6k+cUXLNMqXM6UMHGuKSjJOP62KHnp+C/U9KUNUTFUOlmCt9taysnkHS9eaDEGtU2DpBozs1AFg0z/QJSkw1B/XO31RL4swlWA+XpBJTjOLfq4D0eqMsVIq5sAU1SpVwKdIM2ZTnExB/9MU9VYupVEcmdKTWmePDdXMXXuxUkwW90aMmG+mS/OGX/6hqMRVmRc5NjF/Qoqz4d79odBMuepSgUsyFvkY3QNEYzr03Ehn4LOi8uhvrv/4AVty6uWKHfub4ME4fGow156HC49Xv/EnT5G+qBJsc/L6GuCRf3/lYbNf2ilvuwJq7tmLp+o0V23HitX14+6f7WGLfC+hhoPj3leM6FfNHCSpFtXSihsHolyIXwvDqcsQZHSVyhsUdobXkOpbYc90fP1j3IPeLhTgu13rnb4pDXCvand9/ruZi6tx7Izj8g6ciywk3Y1wr3opbN2PFrZuRe5ylXojK+dUM2CdOwfnth/KqwQY15aJGxVApqmVLoxtwoVMpvmqhiBqFGMbpQwcin/ZX33UvHjx4dM7D3dfcvRUPDb8TOTn1pUyclAPNkgU9yt1WTyva6zsfixTmX/reM3N2iaYynbjt8SfwtR+/ETnvZ6PJv/SzRjfhkkBZqBTVUhdBtWTl9WV/eFfccgfuaYLh3tVQaRRdM4xorDQKsRxHf1R5XsJajc5KZTrxwMFj+IvbN9U0t9XFQJyUA/XK31QtL33jK5GfX73EVG5iHCdeqzxTwQMHjtbk2EvXb8T9r+6PjBFrJCGCqvFPdRchykKlqIa6ufsqmfs/OF456Wczkq7wxDr+/mjD3X5Reb/CqNRB1WN01r0vvKImc5Y48dq+WCkHap2/aS7EnUuwXi7J04cOVBQ3t333z2t67CXXrWqKhKlh5F/6Wcn8fV2jBy/cuIMmRgkqRTXUzd1XaeTb+PujOHOBiSoxkWo53o54eq4n594bqXq0UlQHVY/OREzmrGCB+y994ysVyzTLlDJx5hKst0vy9OHyMxUsWXl9XUSnmEy92ci/XGKdUnM61QklqBTVUD9BtW5jxe1R7qZmI5g5PUgjzyfKFRLGufdGym5bsvL6ug3LbwbXVaOJm3KgWcRUlBXtpioGLMyVSnGKa+6q37HXf73x1kEZ+8QpWEdKroVy99UJJagU1dBbr4qXrt9YMbDz6It7Gu4mq5YVt9xRdtu7hw82zOp2aA6jkirFXK24VY1TqBfVpBxoNGeOD8dySTba6hhlPZ4PjU6eGiT3zEthq5WgqhNKUCni0gugrkNZKk0smjs/MSch0EiiJkB+9TvfWqCWeBx9cY/K9XSBECflQLNMKSOsaJVoFpfkpYLzmw+Rf/l/hG0aXOCmXDIoQaWIS2+9DxBlin9j52MVXU/Nxpq7t1a0ur17+CBOH1q4cIbcxHjspJzV1quoPXFSDtQjf1O1nHtv5IJxSV5KTH378bDVo12jB0cWuCmXDEpQKeLSW+8DLF2/MTKoM2ousGYjKvj1+S//0YIJkjhJOctx1cryI6LqGWB/IQnoWhKVcqCZsqA//+U/ajqXZLpSpvOf1u9+nUt+t3pQPPJmWOwUAOxd6LZcSihBpYjDDQAqR1nXiJsfeqTi9jNv/WPkaKf5cub4MHZvWF2TutZ//YGKVqrc+YlIV0kteH3nYzjx0x/Pef9KHff4+6N1s7QdvQQnYI6TBb1ZxFSUS7Lz6u6GuCQrxUnVMx6zWcISpv9kR7lNAwvYjEsOJagUcSgfXV1j4lipjv3oh3UTVacPHXA7ibmMhguSynRGWqnqLRKPvrgHb+x8bF51LLomWzEn1Evf+ErNO6kzx4fn3e4LjTgTT9czf1M1xJlL8N4XXmmIS/ILFeIXc+cn8Hod7qvXdz7WFPGJs08+F5xmRjDaNXqwOUxoFylKUCni8L8t5MFuf/zJyDL1EFVHX9yDv7zjJtd9cejp6HnA4nDzQw9HJqg89qMfYveG1TUXJa/vfCxy5FVcKg11H39/FD+soTtWWD8uJeKkHGiWKWWirGiNdkkuuW5Vxe/c4ad34+iLtUtdUouHllpgnziF2V3Plds8sIBNuSRRgkoRxZ0A6EIecMl1q3BTjKHVx370QxYMO08RIuJAgp3Zu4cP1iyG594YU+eceesf8dSGNTVxn4lA4Vr+yK+5696K2989fLAmovDM8WHsXPXZpp3Gox7ESTmwEPmb4vD6zscirWj3vPBKw61oUekZXv7mV2tiqTr8g6dq9tAyH+j5KUz+xz+tVGRggZpyyaIElaIcD/C/O7EAAelBbn7o4VhZh989fBA7V3021qzyYRx9cQ92rvps2fiiWrkGlly3Crd9988jy42/P4q/vOMmvPSNr8xJzOUmxvH6zsewe8Oams+Dt+iaLNZ9/YGKZc689Y/ses7RXfr6zsewe+OaS05MxUk50Oj8TUA8S8yXvvdMZGLbhWDN3VsjLcNv7HwMf3H7pjl91869N4Lnv/xHkXMrLhTT3368nKsPAPao0X31R02OrCjHbgC/B6AHQLIRDbj3hVcig14BFhPxkz/9Ng49vRtr7t6KNXfdWzFzd25iHG+/ti9WzMOxH/0Qtz/+RE3iQNb98YP44K3hyKd7cdxjP/ohVt91L75wy+aKOboA1ikf/dEeFnBbRzFy80MPRx4jd34Cz9/zb3Htug1Yc9dWfOHWzRWv37n3RnDitX049PTupohBWUjiphxYc9fWBU2xAZRm+487l+Cia7IL2tZ0prOsNez2x5/A8/f824r7v3v4IP6s53NYfde9WHPX1kgxeOb4MA49/VSs7/FCMfPobhT+7lClIv0L1JRLGiWoFJX4BYDPAbivEQdPZTpx/6v7Y7t/xt8fxRs7H8MbOx9D59XduOq6Vb7RPrmJcXxwfKhqy82hp3fXzDogcvHE/TEWwirVkcGS61bhqut6fOLk9KFBnHtvtGohsmTl9VXP5wewz+SeF17BX95xU2TZdw8fxLuHD+Llb34V167bgEXXZH1C99x7IzhzfGhO7bhYOPfeaOS9featf4x1vWvNjjHLt/zBW9GZ/cX9upBcu25D2bQMK27djHVffyBybkGg9LsWnF90rt+1epN/6WfIPftypSJPKevUwqAElSKKsjbkhSCV6cQDB4/i+Ygkh0HG32c/fPNJFQCw4NqoeQarpVpRBTCrjxAo8+Wmhx7G0nUb59xJL12/EV/63jNVxY3Uqu0KRbXc9vgTOH1oMPbvRy2/a/Um/9LPMP1/l02RAAATUNapBUPFUCmimG10AxZdk8X9r+5f8JncRULCesSD3Pn9ZyPjkWpNqiODe57/65pY29bcvRVf+t4zNWiVQlF/7n91P5asvL7RzagpMcQUAPR1jR5UUxksEEpQKS4IhPsvzui/WrDu6w/ggYPH6jpS6bbHn8A9z/91xcSfteLadRvwwMGjkbFY1aBEleJCQfx+rI4YqXqhMP3tx+OIqX1dowdVZvQFRAkqxQXFzQ89jAcOHK3b0+aSldfjaz9+A7c9/kRd6g+y4tbNeGj4nbr90Kc6MvjS957B/a/urxioP1fW3L21bp9H59XduOf5v655vYpLk1SmE3d+/1nc9t0/r8tDzIpb7qj7AwY9P4Xz//6BcpMeywwD6KtrYxQlKEGluOBYct0qPHDwGL70vWcih0XHpfPqbnzpe8/ggYPHFnzIt/ih/9qP36iZWzPVkcFNDz2Mh4bfqXvuolp/HuKzeGj4nZpa1BQKgI22reVDzLXrNuBrP34D97zwSl0eWgTFI29i/F/fWW6OPpkJKFdfQ1BB6YoLljV3b8Wau9lw8qM/2oMTr+2rOmXAilvuwJq7tjZFx710/Ubcv34/zr03gsNP78bbr+2b0+i9NXex67LQU36Iz+Poi3tw4qf7qh4QsOKWO7Dils1NkbxScXEjHmJuf/wJHH1xD47+aE9Vg15SHRmsuHUz1n/9wbonMKXnpzD75LNRI/lketUUM42BULqgSbAveLZ3Gf0Ays3ge2DHmNW7YI1ZGHoB/LzRjYjL6UMHcOb4EM69P4oPQmZ+ZzlrenDVylVYun5jQ+YZq4Zz743g9KEDOPf+KE4fGgwts3R9LxZd3Y2l6zfGfkI+fehAxVF+wSHzcyE3MY7Thw7gg7eGceb4EGZDMqgvXd97wXwWioubqO+a+O1Yum7jglmx8y/9DDOP7gadnI67y31dowcH6tgkRQWUoKoSJagUFwMLIagUCsXcyL/0s0qTHIch3HwqCL2BKJefIoqRRjdAoVAoLnac33yI/Es/Q/6ln1UjpAAmppSbrwlQgkoRxUijG6BQKBQXI85vPkTx799E8e9+ETV1TDkOANiiAtCbAyWoFHGYAFDzccYfvXMMZ39zCmd++Ssc+/kvUJyYxGdau9BBW2BaDjJTBXQtbsUn45P44KNxtBg6FnVkoBMCSoGCSTDRngClFMJxTQHo/JV5/wne+QAAIABJREFUsykcStk+oBAFKf/fSaRANQ3C9U0AOA4FIXDXsbooNAAOBXhNYNVR95VSwEqmxIH5gSjgUGjFHORGem/Fgr8eeEUD24PvvTp0wtpHwYbvuvuKdnIcQjA9O1nxs9n9h5vdCmzdgKOLnwpWk6ProLou1epvsLy+mJt1t1mFIkBt3y5WoQCNyteU/TlWEYZjwwHYn8NegxD3uGLBfZEbhTa98qDm4LlM2w4oBVoNDdNW2JFL9wmjRdfY5yrt492f0rJUaVrXYFMKzTBAdB2OtI+hEeme9u9vEMLuYb6sJ5MwCIEDAmgEhpmAZprQDAPtufPoyE+iLTeJX135eRAAxLahWczdS/j/xLag2bZ/HQEIAUAJKKHQiHfF9UIRhDrQ4CBtzSBtz2LS7EBeT0HTCPuMCWug5n4kxP+ZEfADsFcijk3YuRO5nPRKQMD/uXU6hglqmlJRVkAvFgDqeEcm4rDsaBQUGviJ8iIaawT/jon1/Giz0+wtZasoZdsNfh7iDjKLFFeM53D5WB6ZyQLmytHFln18Wcuaq5d1n7hm75O/1nTdSer4wfW3PPDf51ypYl4oQaWIw2kAN9SywqP/YwD5/+802t/5CJkTo7hj2sKnJk0Ak/yP8+sJLAGwEjpb/rh+E/9eSrxvT+CvKmz/8olzC9aW8hA09idKL/N+IaEA5hPPFt5hf9g+hQ/bvEDnrx4ZmccxSplKFPDry7x7aM0HBG2FfE2Pcaky9pkODK/7NP5q+G0d4/m2RV1Xto3njCXQdBCibZx+9QeP/O7tf7yi0e28FFGCShGHf0QNBJXzmw9R+NtfwDryJq6dm3lboVAoLkkKmSQKm5fB3NCN3wHB7/zB59gGQlCwCsg7OpiZTft8Qxt6CaMElSIOLwOYU3Igen4Khb/9BXLPvAT7n35d42YpFArFxc1kWoP+77+AX35axxc+eyVSSeG8lJzISQBwXenDC91GBUMJKkUcfgIWAhA7s77zmw8x++SzcaZIUCgUCkWAf0gWcKAtj+ytK/AH//rTePfQmzfefP/uwUa3S1EeJagUcXkXwGejCikhpVAoFHNjNEHxt+Ys/mfhHMjlGThOEWs62wFQ2LYdub+isShBpYjLDwE8Wm6jElIKhUJRHe+nDbydG8PxRBHDnSZoewssS0ch14Yk2CjIlnQCAMXXH39lsMHNVUSgBJUiLrtRRlDlnnkJs08+W830CE3DB0u64CYjkPIV+N8D8gB5Ko9vD76LmHmAxijjlaXyIcLrKlNf1HE+zs8CM+Xr/nUmGasuwoeER7XV3zZ/WTehAPXXKR8juM7XttD2BeNMGgchBKUzUpTmdwg/Q7HFv3+56xHREvcgecM/4u70onTl/YCSNgTrvOp8Dqky6SUuZSZaEhhvSQKgGL28HTnDwEedLRi9vB2f//y/wIfv/RKv/dVfQTtvoh02WtvakU6nAacI6gCXdbY2wV2siIMSVIq4jAM4DGCdWOH85kNMffvxOLOfV8swP97g1O99ui+/vKv7B68ehkMNvGsCuaQJSimmpyYxOTGBb2//r9j0+38Ix3ZgOzZs24ZjOygWCygUCqCUwrIsWLYF27JRKBa8spYNx7GRz+fZfpS66xzH8f/x7fI6Sh04DvW9AvCvcxyeX4qCOvw18Of4lh2W94pofJsD6vAyjuNbBwKpTna8RELk5uL5qni9hUIelC8nzlJc9s/lP4AnP59xy5qm6WsreN1h5xH+B//+8NaLpESyqKIiYw/1iy8v55e7ERRASzoNCmBmJiDog/m8SlcAANIt6TLlgdmZGX+OI/YmdDlhJqQ2imsFpNJpf60UMExDXixttPSSTqfY0QjhqZn8703TLNkG+IVo8P3KjyhWfOTlgnzud7NsO2HnlUql3H0ITzolL4t8TaZpettY5SCEIPPJR1jx96+79f/kjn+JycuX+MoQAMlUyi1TIqRFvijdS1lhmibiQgGYhuF+/+WaJR1YHkLc/FruvUoICAiSyQQI0dDR0Q6AQNd1mKYJwzBgmAZ7NUwkk0lWXiMwDAPX6Tp0XYeu6dB0HbquQde3oLWtHXue/W84Pz4OSina2ltBoMF2KByHwrGVUL0QUIJKUQ3/BXxev8Lf/gLT3368FlapAwAGAQwBGAlOn/Dey9/p1XSj+8T/tNgPnJ6AY9uYnpzE5PkJ/D/f6ceNv/+HcBwbtsOElOM4mJmZhqbryBfyTExZFnTdcMWWQx0UC0U4jo1CoQDHcWBz0RQmCmzbBnUcOCIBKBEdgAaNOHCgQddZMj/HodB1CschIITCSCQgEnZSSmEViwER5RdHjsPap2m6u80TXqXLTPCACZ3gHz8uKIVhGCjyY0d1TKlU2lePxpOf+kWRJ5QgHSu4Lp1Oux2S/5WVnZ2dCRVKcvmgeOI7+2yE6XQaszMzoQIlnW6Bm3HRdwypXInAoUinUn47JEVVy8kkEwxS/kcEu3JSWsAlxQWHT8z4RBXxCSHfusB+kISQLFIAsI6fl0mlUp7w4Uk8IQsmaR3ABI9fbJXWrxsGE37SvqlUyv+5cwzD65b8Iov4toVZitk+LK2tbhhuIdEecT+FCazgJ6BJCX/d24ay72mhUIBhGJicnIRhGGhra4ft2IDF9nOIA5uw3xZxbSl/GHM/D4cnSAXBPV/9Jq797HI89l/+EybGzyGdNJFMGrBtAl0n7oOaorlRgkpRDYMA/mHm0d3/Kvfsy3Ot4wCAvQAG48w95TjOeCqlwTQ0WA6BRoDJ8+cxOTGOP+1/HL03/RsUraIrpBzqoJBn7ozc7CyzIjnsRzGXmwWlFMVCEbbNLFmWVYRtO65FyuaCKmid0jQNlBAQbiXSDGYFKhaL7nrWwRNoGrgI4ULEFWKsHYZplFqqSiw+QphooJokUCiF4VqMnLJWLydkO8B+7JPJJIoTYxWvezKZdPcJWrvC13nioWx56b0syBKJBAr5fIlQEp2nXF5sK62LgICipbW1RGh5nbaUVttnoWBWMhBPcnnlqGuJCgqf8GXf3mhta5U6/srXOvgniylZDIWuq7A9JVmBBIlPEr7llpYWAExIuwKKEORzuYCY00C0gLUq8KcRAl33dy2GEFRSOV3X3XudiTJ21fyv3jmZJoslCopzTRPizX+hhaBixbxXwC+wLKsYuDqEZXTn7wHqJUDn2ekdx4FlWbBtG4ZhYHp6GumWNKhOQQsUlm1Bt3Sk0y1MVCUSoIS43wlx37qHALDxpv8DjxDg//2v/xmFfA7pdAc7LqWwHUelQrgAUIJKEZux7g2d2hWLLeejs9Xuug9MRO2tds6pom0PAXTzZz/9KZz67Tk2lYRl4bkXX8HV3VkUC+zHkIIJnUI+zyxNwiUnxAYXVbZlcaEh3HXeqy1Zp8RvnaZpXpyQ6OwIgcbnzNA0DZZV9FlmmLuOuKLGgQaDP6GKP9M0fS44WTBRlK7Tdd2zaLluP42dB/EsSGGuQyZ0JGFBKRJtbaHTuAhEJxwmjsxEItwaFigb9gdQEKKV7LO443JMT0+7x/TwrFmVlltbW33tn56eCrFCheFdl9a2NgQqd9sUFEts0b/sulr5n7CKuQKAnZzvHMWr2Je3CC3CTeizDLGWuIeNuQ0ADG6RFOtKLFSpFNKpNNOQ0r7+dcR9L87fv05MSUOQnEz66k8kErCTfOoZECSTSdFMAATFYqGkDtm16YojCuihUwj5PwsmxrloB3X3ldcR/nFouibdz4Dj2N5nSwDhkvbZyiTr1fTMDAzDgGVb6Ojo4KJSAyUU+XwOlsXannQtf7wS/j1xHArTZOd54+/fCkI0/LcfPAnbtqBpQCJhYGo6p+bquwBQgkoRi7HuDZ0ABp2Pzq6KucswgF2Yg4iS+fjseWTaW6DrGqhjI9Waxg+efQHXZD8LyyqCaASFfAGggCVZl2RRZXN3YD6XA4unsGHbFn+1XUElo+k6CPVEEOCJBNn9BQCGYbrbhUmfUgpN7jQDlhXTNN1ONJ/Plwgq93iOA6LJP/ilossnWLjFR34qLzk+pbB1vcykJIxUOg0tIAIppdCYX9Orv+x7ACjdzixIbJtALAoriRAx7rXzlWPLQkBR/3+hZeXywWOGtUNe19LSIn3+/JykumURFFznxU7JBwhd8JFKp33uNeHOi3r1WXaCYivwKrvOAGBR5yK3o2cPC0FLUeXXYHsSCb8FzDRNOMkkCPHHTbEagESivAs6WBcAFApFycroiR8CWXwFBRWzZLoWJ0qhaQSUz0dIeHnmQndQLBYDVkhvX4jvBgDHtmFRFhZwbmwMpmmivb2DWaK5zTPPwwpaWloB4v1GiIcMlhKBAijgxt+/BQf3/wy/Ovk2NGiu6FI0P0pQKSIRYgpAHDG1B8CuOO68ODiUjjuUInvV5fjVe2dh6DqySz8Hq2jBtplVCRQoFAuwLQuWLYLSbWaS53FVVrHoCinb9gLOPSsV+3ETT8bsSVpHUFCEjdjyXBfUe/KnbtdbYo1gFirmvgC8YGYhrErcZLyuMGFEATdoPNiJBIWWT4jpleemS6fTfuEkNgTXlREbrnXGVxax1iUSSeQLeZ8gEnFibudYpi3ita21TaqX/8ddLgBAQH3uOvcdcbtMgAJt3GXnWt4ka0ep5cM7vicc5fMrXU6mkl7cHHdZpyVBxZpUWUwBQCFf8GKppFimcuuCLrkoN161f4mU30KVTqeRaG/zueekyxGKprFJpU3T9O4TXpaJJu9zkbcJ6y8Te9y2FFrW+xzENt3QuVVbY7FQlMU8ckOV21YKSWLpOnvw4Q9UlmVhanoK7W3tJa7Q2VlmzTITCTi6A53q/HeDQvzeAEBbWxs0QpBOMxFqpNrPh18lRTOhBJWiIjHF1ASYNWqga/TgSG1bQIdAKVpSSdcV4IiYJP7jQwiBVSyyH7NiEYVi0V2mDhMq+UIejm37LFdCSAEiABUAaIlLQZRjrio+Ak8qL17lQO9ikbsiI8SU2BfwYkTy+QLcDjogqCilMA3THyMV+NM1LvBQug2UIpVOI3+uDbkKV90N/g52RLzR8rZkMhkQfXCPHyY+fOUgiVS+XViTmKVKsgCFvAkz+rS2tbrL09NTpeVK6vIQ1gk2opKipbUl9BqL9ppmwivP96GUWSJ8LtCSa+Fdh0Qy4V6ztOvqY//5NV/55XQ6HWrJKUewbGfnIr+Ikw4UtEiFbfesoqw+w/TXrxENZsqz2Hn3FF8S+xmG7/qYkvU3+Oq/tuw7rBs6QAP18LLFQqHkOxu8nw1Ddz978bnqfHCIiJeUhT4FWPwkt1qLhzXbYeV1XUcqmYRpJtDW3s7q5hfNDU6n4vpqrks0NzsNjRBcfUUXkgkNpOOajsgPVdFwlKBSRDGAymJqD4Bt83HrVeKDj8bw2ewVaGtleVw0Dfj1L9/GNUuXuSkS8oU8LNtGscCe0h1upWKpECwUixYLDHcot1wx87qwOBGpE2EjhBjiR1fESzECXxnPSOC6/uT3LL7K3xl4aQjgtkN+n06nYduWJLbYKB931JHbGXv7hK7jx0wlU649QGzPT02WveZGZxfaOzpQLFqA1GmFCTVd00vqljs51w4RXMdfW7klKYzW1lYvripYhspvhUWqZFMFWI3JZAqu9U7+4+fY2tLKrFbiM5K2yZ11cBvbj4RcD1GOtyFwzVpaWt0zYNbOUgta+Lpy68PLBl1+qXRKyDMXwzA8S1iQoLstsE0P1G+YJsxk0r1GvmtCqTcAAXAFi2maJaIo+F7TNffaGzxFgnuNA5+VoRsln13RKroPCxq/vwkoHOKAOnwQCnHgUIKEpoE61PtOiwcB/kq4O5w9yDmwKbNYFy2LBafn87CKRSDNR9A6DnPvagQ0EHJw5jejoNRBOmmy1CtIZksvtKLZUIJKUZax7g0DADaX2XwAQF/tLVJ+1t/+H2/APx9243nYq+OO0rMty2dpyufzLN8UF1Saprkj+CwekA7AJ6QYXjCsqIsQuC4KwzCYJcw33NqPaZZ+nUzT8IQJWF9hGOyH23sS5uKEdw7MimWUPk1LJoCSdZJ4YbFZYnu4cHMmzpU/j67LkOnIuMszszPSQ7kskKpbbgnEMfnxKSR3qaW1FTPT09JW9o65FFFBnLBtiS6WuLVQYBFjpmGWFTNym8U2Q2fBxp5Ypr4X/1vvHdvPloSLX3iQkAXTMEssRGFWI791KMxiFL0ueK+mklJcEyE+jeYuBcSV/P3xfZcIgRYQVK0tLQB/kBDWPNMwvHskeFkpiwX0D7JgViNdF6P3ZIElP6iwcr79yuR/S5jeYADDNJHP50Ad7vrXeIOoBk3sQyhMje1jWRYTXAB0ERNFCHRCYDsOCACLW6mmZ6bR1trm/oZomgZH15nAMrkwdLzBMkyLU1y5uBMOpbj8M/+iG4qmRwkqRShj3Rv6AGwN2TQBJqT2LkQ7Vq79w8xb+w6hJZ1wR/zYjgNQ9uM+MzvL8kwVi+4wZtuyXZdboZCHbXs/VMxdR/w5Zjhyp6DrhtchEW5xIkxYhc2pZYjOISiCINwrnlvDPUbEucvD3WcDokYWVMHEm/IfE29eWddydb68QbH1yquQ5gHiAJBuacHMjJxWXRYfpcvyCEH+xm+ZqfLVF4AeCQ1dTHAXVJw6vJg4HkTsija53jjr2EVJplLu5yF/DsE/fwC8dHVL1rE6NE1zXYTBe5n6PyCf5Qdg6RFk0lIAva7ryOWYQ9iXhqGKV5imbxQp0TRA02CUid0L2rnMRIKlK+GueTmnVNg9IhJ4yoItbFBF2J/DxZ1DHRh6q5d+pVBwhZiX/81zB8Ng110MaJHPQdd19qAHlrMqnU5jZmYGra2tIIS4+eB0TWOjZgE4PJ7zk495xl1C0JpOsdA/zQSltJcQMhh6ARVNgRJUihLGujf0gMVEBdkHJqYWcghvT6HIMpQzCxIw8s4vcXX351hCSMAzl3MLUz6fc0fvFYsWCIH7o6dpuptjRiQAdEfl6TqIZKkSo6yYdUocQLhLiE9YsdgNqbOEP0BdkEqlkM9Xil4ivrLB956wER1KcP9y6/k2yjrPkYnyH2Fm6edYbiSpUxYxN5RSX3yY52bxrAXiOIS7vEqFYHn8o/f8heXRf/EJWsw85HPyBI9/ubW1NULcSOukNge3izQBYbFAgCxoRMB5ABLmeCNS/qaQfX2WJp9tCbZpQra1tnDXJgGQy+V4Cgn3rADw0XnSg0Kl9zSZxKxUfyqdhtnWFlKWWXqSyRQKxYL7/QPhqR003deG8Nua+tzowq3nfqZBERUQtWJ7IpHkOeNYeACLVXSQz+VDBZVOWdC6EE/5fJ5dY35+It6TOg5ys7PQeVxXe1s7s0gBKFoWkMuxgQiEJQUe/+RjaITlVWtrFTnKHADoAYtnVTQpSlApwhgAkJGWJ8DipAYa0JZsou0KtE//FhphT3sOFzJE0wJTw7AM6bbNhJQY6WPbDjSNJyUk0lM0H6dDNDYCRyszYskwyjxVawavRRpNVWFElhBFyVQSACkjrFjb3KSOga1i/ews666ClgiBWM86wVLLz/g/vVX2gl+2sge6rvuseLKlyOeCC1FIJfmXpA40nw8bvRcuMvzxMKWpD+LCxKFXD0AjjyXKCEElOmpD132iwLsEIaKqzHv5uGI1SxlR3lIn9nHTVlCW+LNEoMCLFYLUbk9UsPtv1jB8giqRTPB9dZYlX96HH7tS0Lu4T1n7gHw67RNUpmG4rmh2HT2LkhAMKY2JB5bnzLuHg68GtyZZlgVQlnKBgo10BKEgFG7weLnrKUQV+PFE8l0hqNhUT+zVMAx3WRZX7nbTgGM7TFjZNvKFAkAJdOIl9rUdB7CZ5Xx6ZhptpA08KQYIgFmwe4AQApvaYM98DjQev3fFNZ+H4zjZYP4wRXOhBJXCx1j3hn74g9BHAWypVRqEaqGUriJGkls8mDDRdR2FQh6WG2zOYqqmpqZg2XzOPtvi+zt81J6wPPlH8BmmP4OzbbGkfkJkseHlfiuLiKdJpVLukz+zjOVLRJQQb0lpOg+A/YgKceQXVgQpYc3wLkLJsmmazG3gXSmASu4qXo65OKURiQCmT/2y7PU2WlrxqRUrkRABxHKHzOtsa2/3d04UkpWktN1inW/0Hi0p7cONt/Jt9osTn5gIWD2it/nFULCMeEkmE1JHy15dYRHSttClCucq1ggLlk+ohewrr0um/PuUHiZ8XTKVQjEQ4ySn3nCTYoYdi69za/ZdN++o/oEcQDKRRJIHY4v9w96bCTO8DBdBYhCERjX3Xhf53ELnUgTbt5AvlNzH4tU0E667TfyeiDk73WXNAXE0pNOaW9ayLBAwKxQ0CgrN/SyLhQIoeFC7rkOj1J3aqlAoYEabQStpZSMTuUgWlt9zZ/8ZOZEGg7ffsopIJJI9UDQ1SlApXLir7xFp1TCA3gV28clkLcvC1EwODqVob0nBoQTvnz6JVf/7RlhW0U3cOTs7y37obNsVEoCc6VwapgwWLC6m0TAMwxVBhi5GG7HJiQEK00y6IosQLTDXmfcqRFO+kA9YqLzM0GGYpsmCUwEAxB367VmfvA6fSB2VYZpob2/H5ORkqDvINA2v85DqO/W/DpRty2fW93Lh46+xdAJhilkeZxPUCSINgNzRyueSyWQACjfAX9e9kYIl500g1UUAisC199oTJFyqxd9AiIZ0WrYCBYVEGWERXOYrU6mUa9UoFApu6ZZ0iyeXpPOn4K6s4FyOkoUqKG5cK47pWYCEJYeCIs2tT7nAXI5CJMoB6O514N8dFpekCcOu/1r5d4ATEGyarrkPJ+XaTEGRTCR9y8HXoAD2xw/CFYVEk+KnHM8iZjvybAhMTOX5VFUEYNNI8XtLIwSOpjGZRAkIHDiEgDgir5SGRDKB6elp9gDGrVa2bUPTNDadEhEjBQkMHqwOy2LbKEW71i6eFN1759zYx0inEsjlZqDpBI7eBo1o0HQtC0VTowSVQkaOm9qDOqZDiEmWUorMpz6H6U9+iysXL8L7H42Dgs2+nsvloGkapianWMJOSx7NxyxJbMSMLKRMaBpL2kc0zc1z40JY56JxsSW/JpPJ8nEp0nszkWAjfCw2obPrggG8J2PA9xRvGAabtgIE5yfP+2JJ5KlA2tvaWTXS/y3pltL4okCHJ3dUH/yvX5S94Mt+/w+ZBYpXL/YhmveLL459xRVXYGpqyt1XpC7wZElQfHjrp6enkUSyrLihYO624L4zPDdVWU0UOHTlIl6hcoH9TOyEdf7uCkkAeu+TqaTbyUOuE5S7tUzX8pLmlhvfZNnSPglpcm3As9qIjOpBi0tQiIjEmBTcTUhRktjTc21SKb0AO564d3xiJsx9Bs8a6gTcg8lkkseJ+esxDJ2lBXAc5i70XWuUXdaIxuMqpTg9yubQ8113UHcuTErBEmnCu7agLImmLFbz+XzABSi98vgqSh2YZgK2baOjXWcPdTOzKBQL0AjLh6VrOrOYFy0I6xjhoor9RgHnrHPo6uqCbVtunKdjsxxWmkagawR6KsNEF0V3yJOToolQgkoBwB3Vt5Ev7ukaPdjXuNYwKKU9hmG4T5VXXtaJ3348gUJu1u3kZnhgusiazlIogMcAEbCxdOxH1xNTLD6IPTXrbseTTqd9YkvTNGiEMPdXFQgr1+WXfwqTk+c9UeSKI8IsPiGdBgB0dV0GgCUJZC4Ob6PfleL9un76M58BwETc9NSUHJns/U+Aj4ePYerMb0Pb3fHpz6Dni/8OpZ0Yyq5btGhRYJ2/EC2zLpPpLFOnf0UimfQ6Mcfhrs6Cr2gYLCEn/B2+9N4NRg7ZJr9vaUlXFBBh24R4EXMoynWKbfI6EXNWKtTKv/fimeTtUlvK7CtGlJkBC1UbD0Kn8Gf+p1QaXBFar4fOM4tTSoEWf7ybYZhIJEzovtgpPuqWUDia5s1nyM9B/owM3XDrZhY3ilQqWXL9TYg0CKXWLPEqEueKpKyyJUt+EBPrwwSWaZrs+6nr7NWxoesGHGEtt1mQeiKRgKEbyBf49FKOA92dd9OBTnRMnj+PjkwGjs0E1eTEGAghSCYMaBqBZds+l7qieVGCqrZ0bu8yehvdiBDGd4xZUTFQ/fy1KcQUABBCOovFIvRkBwyDuJOYnv3wt8zroGmYnZkBIRpPhOnwH0Sdz3/H6tF13R1Fo2ls0mKDT12RSCSg6Tp0XYfO4xnEMnuypyWdVSqVCgwTZ9akTKbTPQYLgCfoXNQJQjScPz/huv9clxVXOeI109HhC0aaPH/ei7kKlC0XoD09PY2OTCZ0GwAMvvLfy25bded/KOlog4ineYFsofII73BZm0XH5mUxDysr19HW1h7YL2q0HyvIYtTCRA/8nW6FbSKVgfzn5QiDdy3c+4TG2iYfMy0dA5Sy0WCBYwb/0jwg3Sd6pPb7RrDxdclk0l0fHGjhTu3jbmdtkFN++AL5y1xHOa5JJpFMsGB3qbzP9ZbwH18T81dKZUUuKHGupjQZdbCsvM6bjJv9Puj8gaqkPBdbGnVAqeaKrFQy5XO12rbtPhxRhwWjU8dB0SrCsTXorTpsnurB4cmHHccGpYDNJ162LUu6fuye7sx0olgs4vz4J6CU4uorF4MQgvSibjZ3IQhM0+whhDQknlURjRJUtWUVgJ83uhEhHADQW24jt051A9jXLGKK02NZFpKti+A4FK1pli3d0DXk83k22owCIlknpV7+KEI0gDArAXPVwbUOGYSNuGMzw2u+eczCXH3lXzW0M/fYhPiR40JrhBAyIi3jsssWjwAYcRynJGBXLi9TSRiVo62trew2LvbL3Z8Tv9i1M3vLw98NdfFSSrMAsoA8ShLi/EEp9a3n9ADoLNceZqVy6eTlI2FuK9qJeHNLVg0bQekJqoWAUuobsepaaxAQMrxdfPsBkdTWcRwYQgxLDwHyvrJYdqansmDfeQBAKpU+EDwe4M+oLq9ueSR0AAAdVElEQVSv9N40TczmZn2fj67rXjb0kPMKprAIey+LuKCL1ptsOHw6JvZHmBWK+MWYLL586RekbbO5WT6yj6KtNeF+TrOzMyyOkxCYhMDRmbsOhCCdTsNxHBQLBei6DsuyoOs6pqamfBM4A4Rb4BwmSnn6ivaWNAydwLJsN9WLorlRgkoBMOvUMIC+xjbDj2Pbnbqu+bKTazy3SyE34+Z5EVNBGIbOhRF7+kyn0tB1w9eRdHR0QDcML78QZU/PQmxlOjuh6zpmZ2dZAlCiTRBNG9I0MkKINpJKpYYAjAMYn8uTYoOHPYflFnO37RizysbLccE3UmF72OrBmO2qmjLHqwW9cpLLGO0YrMVBmWWzRGjXfB/Bb196oR/SABRd13vjHC8ux//T/9ULSbwPf7Pvxk1HTg7GOQal1G2LLNY4vcJKJW0LCvdssVjs9lvWvPdh8XKehUtaB3giSrIaitkXbNuBmTDh2GxgTC7H8t+ZhgGbjzzO53PQkkmQIvusDMOApmmYnppiMWCUolDII5lMspkdiIaPP/otNI2gvZVZ9IxUByjl7n6lq5oaJagucbh1qhNAT4MD0EsgmtbjOA4uu+pzeI9SpJIGNI25vz755J+Rbu10f/g0TfdG4oGgrbUNhmmyvEGUYtGiLpgJE6ZpcveecO1p7vu2tjYQQg4QQgaTyeQggCFCSFNdk7myvcvYhfIWndEdY1b/AjanmRmso1hTxEAWqSGfRaVtLrLL0bbtHgCd/LciSynNcpdmllKa5Va+jczF54DlN2fWLk3X2Sg9/pdIJHyWRDGtlW2zIHXHsTEzMwPbtt0pZmzb4nNjFjE5eR6maaKltdWNtSIaMJubRVtbG3MbFgtwHIuLSyDZ2gnKUzUYMK6sxTVW1AclqBT9YHmmmk44EEIyjs3mtXIcKtaxZctxM5Unk0mevJOlOUil0m4M1Kcu/5QbfC7yTbW3d0DXNZYN2TQnDMPYC2AvIWRBptNpEINgFsgwP2LfQjZEoVhIdF2PbUlm4ot2UsqEF3N10yyl6Ekmkxkx8EWIKdtmWdJ1XYgrnQens+V8Ls8GUlhFmCZ7oBsb+wSJRBKJRBKTk+fduKypyUm0dzAXOiEEyaQJh1LkCxYsyxJxbVcqwd+8KEF1CTPWvaEXwN6u0YODDW5KGCnLstwRPlqiHZTOoq0liaJlY2riYyRb22EYBnRdc2eKX7RoETRdR0d7h5uAMpVKuaP60ukWkZtqn6ZpA5qmXcwiymXHmLV3e5fRA2Av/Jaqp3aMWYONaZVC0VxEiS/uGs3yP/Gex6KJeC9RmqKrqwuWbaEwwUamapqGRZ2LYNk2Jicn0dHRgempKTfL+tTEOAgBdJ5YGADaFn3KHb2sxFRzowTVpU0vvNF9zUbKcRwYhol8LgcjlYGhn4WuaQBlpnCR4Vjjo3i6urpACMGVS5aAEMKfCBPukyGPpdpDgH6EBIFf7OwYs0YA9GzvMgbAJr4eRvN+/rHYv3b5LnjB7EObjpzcxtdvAbO89cJvlRsFMAQmLPduOnJyXKqrE8AW/hd7P75vHyRL36YjJ3urOIdBaXFg05GTAxHl5TZ2S5uGeRsH4sQrVag/C2Ab2HXdKG0aBbN0Dka1cY7H7QM7rx6Untcg2HlVHbco3Qud8J/PXK7XoM5HAUt02rbd4zhOr+PYvbbt9DiOk0mnU2zidstiyXstC5OTk2wCd9tGKpXE2bNnkW5pcXPqzeZnWNwUT/ti2xS6kYSuG42Ov1TEQAmqS5uhZnT1CRKJBHK5HArFIvKFIkCARZk2jI3PIDc7xYI8NRYs2t7OrFVXLlnCzekmHIf9MOmGMaFp2i4Auy6WmKj5sGPM6tveZewFMFQpEP0Cwdfp8065H/4OWaab/20GsGv/2uV9m46c3Lt/7fJ+MBFRbmhlcL9tAVGRhb+zrgZ5v8FyhfavXd4LNs9muXNbxf+27l+7/ACAbdUIEC4o+wE8WKZIN5gQ3yqu16YjJ+dt4eWCZxeiz+tBfl59m46cHIlR7zawz7Qu10tiXNf1QV3XBwF3AEwPgF6A9BKibdZ1A4ZhQ9N02LaF6elpWJaFyy//FM6fP49EgmVcLxZysB0HrS1sdgZoJgzDQLFY9E2WrmhOlKCqEh6829/gZtSErtGDzezuGgeAYrHIcrFkrgDOvIdkIgFdm4WVn3WHYS9atAidnYvQ0tKCltZWFIsFaJqGZNIcNQxzFyFkQNSnYOwYs5r5s58rG1GdqMkA+Jv9a5ePonynW26/5/avXY56WGrC4ALmkahyEhsBvLl/7fJvbTpystLoTlG/cAfHvQ7dYNduz6YjJ/uqaFfwuANgIi0uGwEMhQjaWtQ7iAppPqpkCMCQruu7ePLPLZqmbdE0bYtt2xmRZX1qahKGYaBQKPC5AVmC1FSCWaOMlstgWRZSqbRInVA+L4qi4ShBpWhqxMgbm2qwKYWuadA0wDCT0HUdqVQKbW3tyGQy0PmQ5NbWtlEA/YZhDDS6/YqGIlw6I3y5E8xNFhztGBQRwrUl9sui1L0GMEtVifuv1lQQB8IVNg52bltC2vjk/rXLs8IVWoFBlFrn5OtQ7tpt5cKyL6L+EmKeVxal176ioOUu1KCwDt4LALMiye7F6hO/xUTX9b26ru8FAMsq9lmW1WdZ1saOjg4kkynMzs6gvb0dualx9vvGE69ajpfCgU/srgRVE6MElaJpcRxnOJFIrHIch03jQYGEaaAjswgrf+f38Omrr0EimUAymYJuGEgkEhO6rvfruh75RK64qNkDoL+cW4hbYwZQKg72ANhVzu3DXW574XW8GTARMzDfBpeDu62ComMYzD01GFi/jbcxmCLjwf1rlw9FWNNkMVGu/nLXbuv+tcvHY4g2uZ5dKD2vsu68Mu7O5/avXT4it5O7D4Ni6oZKrrw5WP/mhWGYA4ZhDgDooZRuI4Rs1XUdyWQKK3v+JY4fWQbkPgEAOJRPgcUTe1JKP1SB6c3L3LLCKRQLACFkF3PdJbH0ug1Ytek/4Pe2/DHuvP9hfGrJp5FKp5ibr6UFqVRqn2kmskpMXdJMALhx05GTFWNseOe6JbD6AN+vbMfLO+7gftm5NTUaHhzeH1i9Z9ORkz3lgqg3HTk5uOnIyR4wcSizi8dIRbEHQG+F+ofALEZPBTY9yEVPJLxcME5rz6YjJ3vLfW68PT1gYk9mIHBewWz7j0bFRW06crIfwLUhddebIUJIn+M4NyQSiQNsAukWfPkbD+PWrf8ZX9jw79C96mae7oUlBSWEHFrgNiqqQAkqRdNCCBlIJBJ7TNNES1s7ruxejquuXoorrrgCly++HB0dGbS2to2mUqkvGoaxhRAVJ3WJMxR3tBbvuKvuQOczem4O9MNvOdoX17XGy+2TVmVQOVM+AAxzUVnxe7TpyElhjdoX2NQfp20h5WLFYfF29cL/uXWjch61WDFR/H7ojVO21miaNgSg1zCMb7W3t6Ojox1Xfroby76wBld9JsunFrJh2/YBAL9uRBsV8VAuP0Wz02cYxkA6ndqm6/pm6jhoaW0VsR0XezJORX1pWgHOrS6yS2wC1Sdg7QOLGRKiLGhdCxK1Par+jfvXLu+JcK9lEUjFUE381aYjJ8e5W+9dafU2eGIx+JkKy9k4b+uItG0ELAXEiKg7bjvqxC7w3zUA3YlEkk+plUJLS8uwruvVfj6KBUZZqBQXAoOGYW5paWkhrW1thBCSJYT0KTGluIjpDSzvqrbD5+Vlq1SGi5Ew9sRJRRBSf19gdbWirb+aY/LjjsDv0uzmsV0AEyMTgV1WgYm4rWCxUuLvOQDv7l+7fFDav6FomjaUTKayHR2ZyxOJxLVtbe3Xtre3X63reg+a+AFAwVAWKoVCoWg+gh38I/vXLq9F4LRIjxBkTg8nPIfXBDwrVW/ELsHtz+1fu/y5uRw7QA+Yy3dECmAvN3dlEJFi4r6FSoMRg7OGYZxtdCMU1aEsVAqFQtF81Mtiki2zfi4JLeeyb63yPAXJijdS4Px9YMHzB/hf0HIV5Lm4gfUKRRjKQqVQKBTNR92Fh0y17r5mh7sjByqV4e7PbfDHdO3lcWAj9Wud4mJFCSqFQqFoPobg7+gfrVG9g2Er969dXjZVQgzmI/7qel6V4NPm7OW5vp7kq8VoSBUArqgaJagUCoWi+RgJLA/VYt68CvRgDqKEj0aUY5VGInYJCsWBRluDNh05uYu7+jbzVZsrFFcoyqJiqBQKhaL5GAws19ti0jfH/foDy4MR5YPbY2dXrzMDjW6A4sJHCSqFQqGYPyPyAs+3FEm54fo8sHpUWrW1zgHTq7jrKzYhGc8nEDFakFvZ5ODwvrjXSqFodpSgUigUivkzGFjui7lf0PIk19Mf2LY35vQx2L92eR+fL68a+uPmY+LtGAisjpsry5cbC9WfV3+cslUi1xk1GlChCEUJKoVCoZgnPA5Itig9sn/t8r5K+3DxErQKuSkIeE4keZqVDICRKNHDhdRzYFnCsxFNl8kAGIzR7i1gFjl5ouIJRE9tI9gF/7VaxY+bjThuP9h5VbSk7V+7fMv+tctjzV24f+3yzv1rlw/CHwemEgYr5oQKSlcoFIrasA3A30jLz3HxsUseQceFQx9Ytm6Zp0IsPFvARJZInJkBS0K5h9frCjDuguuHP+i7D9VlI8/wdveBWaAGebLMTrDcTn0ID9reEjeTuzR9zJvS6lUAhrgY9AWqh6Q3yOxfu7yvQhLOLWBZ0fv2r12+F0wgDQXqzPJz2Qb/fInDaJ64LsUFhhJUCoVCUQN41vBvwRuCDzDxsXn/2uUA66zLZe8eRojwkTJ/D8Lf8W8Fi6uKqrc3ZvMPwC/ENoplfoxK3FdtyoVNR04O7V+7/D4wi5MgAz4tTIzz2oLygeTCjZoBv06Aex6V6pxAFcJQoQiiXH4KhUJRIzYdObkLLDt3GJXEVG+5jlzK/D0ctr1CvXsQc3TgpiMne1G+3eWYAHDjXKdr4fvdAL/7T6bceT216cjJSudVyfVYrs5RsM9gpMK+CkVFlKBSKBSKGrLpyMltAG4Es/pUYgIssWVZMSXVObTpyMkeXr6cABEcABM6fdVYW+bQ7uw8koGKYw6B5cB6FNHB4AcA3MDbWanOfgCLYtYpzqVHdp8qFHOBUEob3QaFQqGYEzxAWwQfj1fTKc5138Aos8FKooLH6mwBm/KlB8A4WEzUCIC9c3UvcTdgL683y+sTdUaeB29XViwHz0Fqdw8vJ9odK8Eoj7mSg+eH4pwrj5fq4X+d8F+rkaj9y9TZC/+1qupcFIq4KEGlUCgUCoVCMU+Uy0+hUCgUCoVinihBpVAoFAqFQjFPlKBSKBQKhUKhmCdKUCkUCoVCoVDMEyWoFAqFQqFQKOaJElQKhUKhUCgU80QJKoVCoVAoFIp5ogSVQqFQKBQKxTxRgkqhUCgUCoVinihBpVAoFAqFQjFPlKBSKBQKhUKhmCdGoxugUFwobO8y+gFgx5jV39CGXGJs7zJ6wSa33btjzIo9+THftx/A+I4xa1eN2tIHIHux3APbu4wsgD6w6zt4sZyXQtEIlKBSXPJs7zI6AZwrs/nAjjGrl5d5BMAwgP6Falu94OezF8C2akVKzPqzALYB2AKgW9o0yo+5t4rqtgHYDGCQ1x2r7bwNjwA4AKAmggrAcwAmUMN7gJ9PH/9bJW2aALCrXiJne5exBcDf8MVRANl6HEehuFRQgkqhAHr46yiAkcC2wUCZmouPBrENwEawTrSm58StOLsAZMCu6R6w69oDZgmp9ng9ALBjzBrky31gbe8DO4+K+83heKFwgVaz+nidPWDisBtMQO3j9WfBrtVIrY4VwgB/vaGWopoLxC07xqyBqLIKxcWEElQKBeu4AGCggjVAdM4j9W7MQrBjzOrf3mUMSiKlJnAxJaw436qRq60bzDIIANgxZu3a3mWMx+iway2Cay3QesAEewbAo2DWqPFa1B3j2L38uHvqYKE8B/Z5DdS4XoWiqVGCSqHwXB2DFcr0hJURT+MAOsFiUEI7JykOaATAUIVyWX6sLFjHPSQ6Wb5NrAevLxtxXFEXeF0jUntCkfbplNob2dHz9gkB1Ru3ow4555GQdo5I5XtRRthK13kQnlAuaUelY4bU18PLVKqvFyxWayiwvgfsOoZdwwEwURNLePJ7TVj5BoN1SttHdoxZI/zYvXx5r1SuB8y6BwDjvO3yfdbJ9+sBu7cGA+3Iwrtu4v4X9W+JuiYKxcWKElSKpubs6mW9AEYWHzs1UmZ7FvzHffGxU6GdPq9jfPGxU+V+2ONYHkrK8IDnR+RC27uMp3aMWduk5W1g8TaZQLnhHWNWj7TcAyZGNoYcm/DXbQAeBLNmbJPr3N5lfDGk0yypb3uXsYi//TmYFUFuQy/fR47jAeLH1/TzNj0apxPlHfNAsI0ccc5hn83Pg20KuBkB6XOR21LpmNu7jEWSqOjl5bqD5RB+n/w80G4hTAZ5m64FIIufPrDrfCCmmOpD6flNbO8yZOHaw9vxFP/8N0r779kxZvXxxUGpngf5340ABkPu6Ue2dxnDYAJZtL+Pl3mKv8+AXZN+6ZireFsOgAvRs6uX9QDoXHzs1GDYOZ5dvcwVhPP5visUjUKlTVA0JWdXL+s5u3rZONiP8rtnVy8bCCnTD+BdXmbk7OplWwLbO8+uXjbEt795dvWyIf6jHWQVmIuqZ3uX0Sv9ZQNlRqUOtx9ewPONYHFCAOucwMvsAvAkWEd6Hy/3KN8sd67C9bMRrJO6EcAX+eYDUhuEuNjGy8vHlUWcXN8eXu4+APfx9oeJwz5+nbK8jTcC+BbfPIJ4iOs/EFWQt3Eo0MYb+eZRqajPMihZrIJtf44vBq/zsFSu4jGlz3YL2LXohHct7hP1lBGLB/i+WWndFnhutZFAeXGt4oqp4Pnt4XXvlYqKYz/I2/5Fqd1bpbZtAbvfAe8aDPH7VQy8+CJfvw/s3pfbKerpA7s3HuVWrG28PMDunRt5GZxdvWwQwJsAfn529bIRLoxcuNgaQeXv+y74v++9wTIKRSNRFipFszIAv1Vn69nVywYXHzs1ALg/wPKTdIbvIwumfvitLav4Oll89Er7/xx+vgVgF++IAS4spNFjw2DBt+NgT/e94BYN/v5BMHHQE3CnAP4Ra4P8+K6VKUw4wBMXe4W1YXuXMQRga6Dde3l995WJMxJ1y+ezC6yTdS0eUgc8GFKHD36NMgCGw1xngbKdYW0sc87ZwDrfMt9HxGzJbQfYZySWyx2zJ1BfJzxBKNfXyY/jCrQAQqgJYQB4IwH7S4u7n8FgmfogHVeIGdkaNcjbvmp7l9HD14tzGYVkUeKCbCP4d2PHmDW4vcsQn9UgL9MLdr9OBPYdAouJ2grPTZjlryNy2R1j1pB0fw+I9WdXL9sGv0Wwm5+T/AA0gNLv+97Fx07t5XX0QHpYgfd9z/J2ZqFGKSoWHp/bvaygEjl3FIoFZEQSAEG3E+D/wQyzNGUCyz0hZYLrRJ17UGpZkV0pgNf59fPXvWBWrU6wzkYOnhZl+gKxMz5xBs+N82gglUCvXI4fIwPW4W2TyvnOh3ee3WCupOD5CLIh5yNiecIEXKT7Dt7nEccNs423cU+gjaJd8vE2ApiQrmGwTeJaBFMohJULO2ZYuTC3ZdS1kO+VvdzKJY43ElI+AwAxYtP6UD54fBDseyKuvWvBDNQrhJQsQgG/5bEvbN8dY9b49i7jAPyCSLzfEtL+jZCsffLxAwTXhX3fe+BZ4MLqkN2xfQi43xWKBeBGSA9FlSxU6uZULDQH4Ima4I844O/MRkL2Hw0sC6uBzGBgWbb6BLcFy4jj9/LXR+D/nuwBsI2LH9GxBOsU+4q6yrl+gseU2xnWWQXbNlByFuXr3gomWoJtCLa1Vohz7i9zvEGg1HrECa7bDNb2gUBdwXJRxwyWC9YXLBdkMHBcIfSCx6sWcdy9IduygeUesGsRLCtc2nI5wH8usY4jWS1LLJFBS65EmGgMlhlGqagajKhD/r4PIIYlVaGoMb7fg7KCaseYRcptUygWgG3w8vMAwFPC/A8Ai4+dGjm7etl98GJLJuA9ZQv6wToPIarCEjzGscIEy4g2ifgbOUdSOQuAPApLuEeyYNaHAyGjtTYH6hV1BtsZbFs27NgB3HiwMm420XGu4m2oVJdAtD9bqVDg+MF6hZgR64OWQcCzWI2UEVyC3sC2qGPK5cLOOVifD94eNw6Pt7Ocdcple5eRjShTyfLntkm+lwL1VxKlg9K6bqDUYsbr7YYnXsL2rVQvFh87tYvHO23mq4ZRmj+sD6Xfd7eexcdODZ1dvexReA8wE5BchvwajoS0SaFYMFRQuqIpWXzs1NDiY6eyYKLl2sXHTgV/gMHjqRYBuHHxsVMlo4cWHzs1vvjYqV4ANwC4YfGxU70hI4PcDrpCc3rCyuwYswbFX8zT6gePM+LL2QrlgPDg7GCH3ltmfZiLpFycUhhCeAY76Gwg8BqA606aANDN3Y5RBDvufnhusBG+WhxHuKqC16DcOQr3XtD1FOeYYfX1govyiM96iB+3jy/3VygrgrdL7usy+M6Vn2MGwL5yAw04YSInG1J2gtcbvKb9/HUgUF/Y/SPqHQluWHzs1BawkY43LD52qif4PYz5fe+H//tea8upQjEvlKBSNDWLj50aLDeEmm8fLzcMWyozFPbjKwmDkcDovl4hPKQnf3n/fXzbiFyOx81AKrtxe5exZXuX0ck77wcD2+VyPbyebVI5+byzQGiH7lq8+LLY3i86x+1dRo/UtmCHKDq2Hqn8ADyh5rK9yxgBG2WVDW7jCBG2a3uXsS1w/D5JzAE8mJpv3waeBgD+oG9RPmh9q3T9tsATASOB9sU55ijf3ifaDs8NJrvNwhjkr1sRbZ0S1+rB7V3GLnEvivtIEqXi2PLnuQVs9Kg8BU6UoJLXB+PS5OO4Flx+jbaCXROxvrfMcQDv8+kN2YbFx06NRImgWnzfFYpGoQSV4lJGdDYiZ478NxAoI3cE/eDWGAA/l4TGLsB1m4hh+38DNkpqGzxrz5BUTlgq3tzeZYyDdZTuEH2JVQjEiEmB6rIVaRcvtwrAue1dBgUbri6e+LOBNgzx/TNgwnIc/hFdwjrUCy/YfTCkfWLSaDGc/8nA8Z+D19E+JZ3zSOCc5U5eiMUReRn+6xes629QKriqOaYQDs/xa/EmPLERZREJ3iNl4ddQHP9BAO/ya/UuP4c+vm0AXnzRiHSOE2ADHsQxxbUZCRzKd80quEn7eZ1b+YPCCNg1GoU/+DzL2x92LcSxt/Jrp1BcUqi0CYpLGVn4BBkJlBkUG3j8Uw+YSBEd1ACkQOYdfGoXMBExDtYp94NZB9y64M1H18uPOcCHtWfhT2vwKEo7y87geh4X1cPrlS1msih4FP4OVVh1enhdu/irfN59/LUfFdgxZvVxC9cW+Dt5tw07xqxtvMPtBbs2fcFz5uwKLAfbFFoXL9cXVS7smDv4tDZ8/3GwQQADXGDIbQlDXO/I2Cl+rAF+j/TBE5vj8F8rEefWB3/A/EDgGHvBhnAPws9esGznomzJ/cyPMxJyT++ClP5AOnY5sbQLTHBlER7crlBc1BBKaaPboFBc9PCO+12wuJ5sY1tTHVLb9+0Ys7ZEFL8k2e6fwzAbIx2CQqG4yFAWKoWixvAn/S3g86Bt96Z0AWJkxm5C+sDcgtsiyl1ycLeriMcC/FO0KBSKSwhloVIoagx3eQWzlwPMFdS3sK1R1BPustsIL6ZJuboUiksUZaFSKGrPNrAYlay0bm+ZQF7Fhc0AWGxVf8x8XQqF4iJFWagUCoVCoVAo5olKm6BQKBQKhUIxT5SgUigUCoVCoZgnSlApFAqFQqFQzBMlqBQKhUKhUCjmiRJUCoVCoVAoFPNECSqFQqFQKBSKeaIElUKhUCgUCsU8UYJKoVAoFAqFYp4oQaVQKBQKhUIxT5SgUigUCoVCoZgnSlApFAqFQqFQzBMlqBQKhUKhUCjmyf8PrMgyP+wwpmcAAAAASUVORK5CYII=">
+    <h1 class="wordmark">Descubrimiento de marca</h1>
+    <p class="sub">Un cuestionario para ustedes, los dueños. De aquí sale todo lo demás: quién es Eleganzza hoy, a quién le habla y en qué quiere convertirse.</p>
+    <div class="metaline">
+      <span><b>Preparado por</b>Enki Soluciones</span>
+      <span><b>Fecha</b>Agosto 2026</span>
+      <span><b>Duración</b>30–45 min</span>
+      <span><b>Secciones</b>20</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="intro col">
+  <p class="lede">Estamos por definir qué va a representar Eleganzza durante los próximos cinco años. <strong>Antes de dibujar un solo logotipo</strong> necesitamos entender el negocio desde adentro: cómo nació, a quién le vende, contra quién compite y qué quiere llegar a ser.</p>
+
+  <ol class="rules">
+    <li><span class="n">1</span><span><strong>No hay respuestas correctas.</strong> Hay respuestas honestas y respuestas de folleto. Las de folleto no nos sirven.</span></li>
+    <li><span class="n">2</span><span><strong>Eviten “calidad”, “servicio” y “precio” a secas.</strong> Todas las mueblerías del país dicen exactamente lo mismo. Si van a usarlas, acompáñenlas de un ejemplo concreto: <em>“entregamos e instalamos el mismo día y armamos el mueble en la sala del cliente”.</em></span></li>
+    <li><span class="n">3</span><span><strong>Si no saben algo, escriban “no sé”.</strong> Es información valiosa: nos dice dónde hay que investigar.</span></li>
+  </ol>
+
+  <div class="key">
+    <div class="key-row"><span class="m m-req">⬤</span><span><strong>Obligatoria</strong> — sin esto no podemos avanzar. Contestando solo estas, son 30–45 minutos.</span></div>
+    <div class="key-row"><span class="m m-rec">◐</span><span><strong>Recomendada</strong> — mejora mucho la calidad del resultado. Con estas, 70–80 minutos.</span></div>
+    <div class="key-row"><span class="m m-opt">○</span><span><strong>Opcional</strong> — pueden dejarla en blanco sin problema.</span></div>
+  </div>
+
+  <div class="callout"><strong>Se puede contestar en varias sesiones.</strong> Lo que escriban se guarda solo en este navegador, así que pueden cerrar la página y volver después. Al terminar, hasta abajo hay un botón para descargar sus respuestas y enviárnoslas.</div>
+  <div class="callout"><strong>Lo ideal es que cada socio conteste por separado</strong>, cada quien en su propio dispositivo: las diferencias entre ustedes son justo lo que necesitamos ver. Si comparten computadora, el segundo debe usar “Empezar de nuevo” antes de contestar.</div>
+</section>
+
+<section class="section" id="s0">
+  <div class="shead"><div class="snum">00</div><div><h2 class="stitle">Quién contesta</h2><p class="stime">1 minuto</p></div></div>
+  <div class="sbody">
+    <div class="q" data-p="req"><div class="qh"><span class="qid">D1–D3</span><span class="qm m-req">⬤</span><p class="qt">Nombre, rol en Eleganzza y desde cuándo está en el negocio</p></div>
+      <div class="grid2"><div class="field"><label>Nombre completo</label><div class="box"></div></div><div class="field"><label>Rol</label><div class="box"></div></div></div>
+      <div class="field"><label>¿Desde cuándo?</label><div class="box"></div></div>
+    </div>
+    <div class="q" data-p="req"><div class="qh"><span class="qid">D4</span><span class="qm m-req">⬤</span><p class="qt">¿Contesta solo/a o acompañado/a?</p></div>
+      <div class="opts"><span class="opt pick">Solo/a</span><span class="opt pick">Con otro socio</span><span class="opt pick">Con el equipo</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="s1">
+  <div class="shead"><div class="snum">01</div><div><h2 class="stitle">La historia de Eleganzza</h2><p class="stime">≈ 6 minutos · 10 preguntas</p></div></div>
+  <div class="sbody">
+    <p class="snote">Queremos la versión real, no la de la página web.</p>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.1</span><span class="qm m-req">⬤</span><p class="qt">¿En qué año abrió Eleganzza y dónde fue el primer local?</p></div>
+      <div class="grid2"><div class="field"><label>Año</label><div class="box"></div></div><div class="field"><label>Dónde</label><div class="box"></div></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.2</span><span class="qm m-req">⬤</span><p class="qt">¿Quién la fundó? ¿Qué hacía esa persona antes de abrirla?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.3</span><span class="qm m-req">⬤</span><p class="qt">Cuéntennos cómo nació, como se lo contarían a un amigo en una comida</p></div>
+      <p class="qhelp">No queremos la versión de la página web: queremos qué estaba pasando en sus vidas, qué los llevó a meterse a vender muebles, con cuánto dinero empezaron, qué salió mal al principio.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.4</span><span class="qm m-req">⬤</span><p class="qt">¿De dónde salió el nombre “Eleganzza”?</p></div>
+      <p class="qhelp">¿Quién lo eligió y por qué? ¿Significa algo en particular, o simplemente sonaba bien?</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">1.5</span><span class="qm m-rec">◐</span><p class="qt">¿Por qué con doble “z”?</p></div>
+      <p class="qhelp">¿Fue decisión de diseño, disponibilidad del nombre, o algo más?</p>
+      <div class="lines"><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.6</span><span class="qm m-req">⬤</span><p class="qt">Los 3 momentos que más cambiaron el negocio</p></div>
+      <p class="qhelp">Pueden ser buenos o malos: una apertura, una crisis, un cliente grande, un socio que se fue, la pandemia, un cambio de proveedor.</p>
+      <div class="scroller"><table>
+        <thead><tr><th></th><th>Año aprox.</th><th>Qué pasó</th><th>Qué cambió después</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="fill">····</td><td class="fill">··············</td><td class="fill">··············</td></tr>
+          <tr><td class="num">2</td><td class="fill">····</td><td class="fill">··············</td><td class="fill">··············</td></tr>
+          <tr><td class="num">3</td><td class="fill">····</td><td class="fill">··············</td><td class="fill">··············</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">1.7</span><span class="qm m-rec">◐</span><p class="qt">El error más caro que han cometido, y qué aprendieron</p></div>
+      <p class="qhelp">Esto no sale publicado en ningún lado; nos sirve para entender los límites de la marca.</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">1.8</span><span class="qm m-rec">◐</span><p class="qt">¿Hay alguna historia o anécdota que siempre cuentan cuando les preguntan por Eleganzza?</p></div>
+      <p class="qhelp">Escríbanla aunque parezca tonta.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">1.9</span><span class="qm m-req">⬤</span><p class="qt">De todo lo que ha sido Eleganzza hasta hoy</p></div>
+      <div class="grid2">
+        <div class="field"><label>Qué NO se toca nunca</label><div class="box tall"></div></div>
+        <div class="field"><label>Qué quieren dejar atrás</label><div class="box tall"></div></div>
+      </div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">1.10</span><span class="qm m-opt">○</span><p class="qt">¿Existen fotos, catálogos viejos, el primer anuncio o documentos del arranque?</p></div>
+      <p class="qhelp">Si sí, ¿nos los pueden compartir?</p></div>
+  </div>
+</section>
+
+<section class="section" id="s2">
+  <div class="shead"><div class="snum">02</div><div><h2 class="stitle">Eleganzza hoy</h2><p class="stime">≈ 8 minutos · la mayoría son datos, van rápido</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.1</span><span class="qm m-req">⬤</span><p class="qt">Categorías de producto y peso en las ventas</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Categoría</th><th>¿La venden?</th><th>% de ventas</th></tr></thead>
+        <tbody>
+          <tr><td>Salas / sillones</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Recámaras</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Comedores</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Colchones y blancos</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Muebles de oficina</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Exterior / jardín</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Decoración y accesorios</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Iluminación</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Tapetes y textiles</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Cocinas / closets a medida</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Otra</td><td>☐</td><td class="fill">···</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.2</span><span class="qm m-req">⬤</span><p class="qt">¿Qué servicios ofrecen además de vender el mueble?</p></div>
+      <div class="opts"><span class="opt">Entrega a domicilio</span><span class="opt">Instalación / armado</span><span class="opt">Asesoría de decoración</span><span class="opt">Diseño de interiores</span><span class="opt">Fabricación sobre pedido</span><span class="opt">Personalización</span><span class="opt">Financiamiento / meses</span><span class="opt">Retiro del mueble viejo</span><span class="opt">Renta / staging</span><span class="opt">Proyectos para empresas u hoteles</span><span class="opt">Otro</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.3</span><span class="qm m-req">⬤</span><p class="qt">Sucursales y cobertura</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Sucursal</th><th>Ciudad</th><th>m² aprox.</th><th>¿Desde cuándo?</th></tr></thead>
+        <tbody><tr><td class="fill">·········</td><td class="fill">·········</td><td class="fill">····</td><td class="fill">····</td></tr>
+        <tr><td class="fill">·········</td><td class="fill">·········</td><td class="fill">····</td><td class="fill">····</td></tr></tbody></table></div>
+      <div class="grid2"><div class="field"><label>¿A qué ciudades entregan hoy?</label><div class="box"></div></div><div class="field"><label>¿Hasta dónde les gustaría entregar?</label><div class="box"></div></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.4</span><span class="qm m-req">⬤</span><p class="qt">¿Por dónde les llegan las ventas hoy? Repartan 100 puntos</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Canal</th><th>Puntos</th></tr></thead>
+        <tbody>
+          <tr><td>Cliente que entra directo al showroom</td><td class="fill">···</td></tr>
+          <tr><td>WhatsApp</td><td class="fill">···</td></tr>
+          <tr><td>Facebook / Instagram</td><td class="fill">···</td></tr>
+          <tr><td>Página web / tienda en línea</td><td class="fill">···</td></tr>
+          <tr><td>Marketplace (Mercado Libre, Amazon…)</td><td class="fill">···</td></tr>
+          <tr><td>Teléfono</td><td class="fill">···</td></tr>
+          <tr><td>Recomendación de cliente</td><td class="fill">···</td></tr>
+          <tr><td>Arquitectos, diseñadores, constructoras</td><td class="fill">···</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td>100</td></tr></tfoot></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.5</span><span class="qm m-req">⬤</span><p class="qt">Ticket promedio de venta</p></div>
+      <div class="field"><label>MXN</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">2.6–2.7</span><span class="qm m-rec">◐</span><p class="qt">Venta más grande que han hecho, y cuántas ventas cierran al mes</p></div>
+      <div class="grid2"><div class="field"><label>Venta más grande · a quién y de qué</label><div class="box"></div></div><div class="field"><label>Ventas al mes</label><div class="box"></div></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.8–2.9</span><span class="qm m-req">⬤</span><p class="qt">Los 5 productos que más venden, y los 5 que más les dejan</p></div>
+      <p class="qhelp">Volumen de unidades por un lado; margen por el otro. No tienen por qué coincidir.</p>
+      <div class="scroller"><table>
+        <thead><tr><th></th><th>Más venden (unidades)</th><th>Más les dejan (margen)</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="fill">············</td><td class="fill">············</td></tr>
+          <tr><td class="num">2</td><td class="fill">············</td><td class="fill">············</td></tr>
+          <tr><td class="num">3</td><td class="fill">············</td><td class="fill">············</td></tr>
+          <tr><td class="num">4</td><td class="fill">············</td><td class="fill">············</td></tr>
+          <tr><td class="num">5</td><td class="fill">············</td><td class="fill">············</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.10</span><span class="qm m-req">⬤</span><p class="qt">¿Qué quieren vender más de lo que venden hoy? ¿Y por qué no está pasando ya?</p></div>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">2.11</span><span class="qm m-rec">◐</span><p class="qt">¿Qué venden hoy que preferirían dejar de vender?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.12</span><span class="qm m-req">⬤</span><p class="qt">Temporadas: marquen cada mes como fuerte, normal o flojo</p></div>
+      <div class="months"><div>E<span></span></div><div>F<span></span></div><div>M<span></span></div><div>A<span></span></div><div>M<span></span></div><div>J<span></span></div><div>J<span></span></div><div>A<span></span></div><div>S<span></span></div><div>O<span></span></div><div>N<span></span></div><div>D<span></span></div></div>
+      <div class="field"><label>Sus 2 fechas más importantes del año</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">2.13</span><span class="qm m-rec">◐</span><p class="qt">Promociones: ¿cuáles hacen y cada cuánto?</p></div>
+      <p class="qhelp">¿Sienten que las promociones les ayudan, o que ya los tienen atrapados en descuento permanente?</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">2.14</span><span class="qm m-req">⬤</span><p class="qt">Rápido y sin filtro</p></div>
+      <div class="grid2"><div class="field"><label>3 cosas que Eleganzza hace muy bien</label><div class="box tall"></div></div><div class="field"><label>3 cosas que Eleganzza hace mal</label><div class="box tall"></div></div></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">2.15</span><span class="qm m-opt">○</span><p class="qt">¿Cuántas personas trabajan en Eleganzza? ¿Cuántos son vendedores?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s3">
+  <div class="shead"><div class="snum">03</div><div><h2 class="stitle">A dónde quieren llegar</h2><p class="stime">≈ 5 minutos</p></div></div>
+  <div class="sbody">
+    <p class="snote">Queremos descubrir qué tipo de empresa quieren construir, no solamente cómo quieren que se vea.</p>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">3.1</span><span class="qm m-req">⬤</span><p class="qt">Terminen la frase</p></div>
+      <p class="qhelp">“En 3 años, Eleganzza va a ser la mueblería que…”</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">3.2</span><span class="qm m-req">⬤</span><p class="qt">En 3 años, ¿cuántas sucursales quieren tener y en qué ciudades?</p></div>
+      <div class="grid2"><div class="field"><label>Cuántas</label><div class="box"></div></div><div class="field"><label>Dónde</label><div class="box"></div></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">3.3</span><span class="qm m-req">⬤</span><p class="qt">En 5 años, ¿qué tamaño tiene Eleganzza?</p></div>
+      <div class="opts"><span class="opt pick">Lo mismo que hoy, pero mejor y con más margen</span><span class="opt pick">2–3 sucursales en la misma región</span><span class="opt pick">Presencia en varios estados</span><span class="opt pick">Marca nacional</span><span class="opt pick">Marca con franquicias</span><span class="opt pick">Marca + fabricación propia</span><span class="opt pick">Marca digital con showroom de exhibición</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">3.4</span><span class="qm m-req">⬤</span><p class="qt">¿Qué quieren hacer crecer? Ordenen del 1 al 7</p></div>
+      <div class="rank">
+        <div><i></i><span>Vender más caro (subir el ticket)</span></div>
+        <div><i></i><span>Vender a más gente (más volumen)</span></div>
+        <div><i></i><span>Abrir sucursales</span></div>
+        <div><i></i><span>Vender en línea</span></div>
+        <div><i></i><span>Vender a empresas, desarrolladores u hoteles</span></div>
+        <div><i></i><span>Fabricar en vez de solo revender</span></div>
+        <div><i></i><span>Nuevas categorías de producto</span></div>
+      </div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">3.5</span><span class="qm m-rec">◐</span><p class="qt">Tienda en línea: ¿quieren vender por internet de verdad, o la web es un catálogo?</p></div>
+      <div class="opts"><span class="opt pick">Vender en línea en serio</span><span class="opt pick">La web es catálogo, la venta es en tienda</span><span class="opt pick">Mixto: piezas chicas en línea</span><span class="opt pick">Todavía no lo decidimos</span></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">3.6</span><span class="qm m-rec">◐</span><p class="qt">¿Hay alguna línea de negocio nueva que les dé vueltas en la cabeza?</p></div>
+      <p class="qhelp">Marca propia, fabricación, diseño de interiores, renta, franquicia, exportación…</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">3.7</span><span class="qm m-rec">◐</span><p class="qt">¿Qué NO quieren llegar a ser nunca?</p></div>
+      <p class="qhelp">Nombren un tipo de mueblería que no quieren ser, aunque venda mucho.</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">3.8</span><span class="qm m-opt">○</span><p class="qt">¿Hay algún plan de sucesión, venta del negocio o entrada de socios en el horizonte?</p></div>
+      <p class="qhelp">Nos ayuda a saber si la marca debe poder vivir sin ustedes.</p>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s4">
+  <div class="shead"><div class="snum">04</div><div><h2 class="stitle">Quién les compra hoy</h2><p class="stime">≈ 6 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.1</span><span class="qm m-req">⬤</span><p class="qt">Piensen en el último cliente que les compró algo grande. Descríbanlo.</p></div>
+      <p class="qhelp">¿Quién era, qué compró, cómo llegó, cuánto tardó en decidirse, con quién vino?</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.2</span><span class="qm m-req">⬤</span><p class="qt">Perfil general de su cliente actual</p></div>
+      <div class="scroller"><table>
+        <tbody>
+          <tr><th>Edad</th><td>25–34 · 35–44 · 45–54 · 55–64 · 65+</td></tr>
+          <tr><th>Quién decide</th><td>Ella · Él · La pareja junta · Depende del producto</td></tr>
+          <tr><th>Ciudades</th><td class="fill">·······················</td></tr>
+          <tr><th>Nivel socioeconómico</th><td>Medio · Medio alto · Alto · Muy alto · Mezclado</td></tr>
+          <tr><th>Vivienda</th><td>Casa propia · Departamento · Fraccionamiento · Segunda casa · Renta</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.3</span><span class="qm m-req">⬤</span><p class="qt">¿En qué momento de su vida está la gente que les compra? Marquen los 3 más comunes</p></div>
+      <div class="opts"><span class="opt">Estrenando casa</span><span class="opt">Recién casados</span><span class="opt">Familia creciendo</span><span class="opt">Remodelando</span><span class="opt">Hijos que se fueron</span><span class="opt">Segunda casa</span><span class="opt">Se le rompió algo</span><span class="opt">Se dieron un gusto</span><span class="opt">Arquitecto o diseñador</span><span class="opt">Empresa o negocio</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.4</span><span class="qm m-req">⬤</span><p class="qt">¿Qué está tratando de resolver realmente el cliente cuando entra a Eleganzza?</p></div>
+      <p class="qhelp">No la respuesta obvia (“necesita un sofá”). ¿Qué hay detrás?</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.5</span><span class="qm m-req">⬤</span><p class="qt">Las 5 objeciones que más escuchan sus vendedores</p></div>
+      <p class="qhelp">Escríbanlas como las dice el cliente, entre comillas.</p>
+      <div class="lines"><i></i><i></i><i></i><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.6</span><span class="qm m-req">⬤</span><p class="qt">Las 3 preguntas que todo cliente hace antes de comprar</p></div>
+      <div class="lines"><i></i><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.7</span><span class="qm m-req">⬤</span><p class="qt">¿Qué es lo que más valora su cliente? Ordenen del 1 al 8</p></div>
+      <div class="rank">
+        <div><i></i><span>Que se vea bonito</span></div>
+        <div><i></i><span>Que dure</span></div>
+        <div><i></i><span>Que sea cómodo</span></div>
+        <div><i></i><span>Que esté disponible ya</span></div>
+        <div><i></i><span>Que se lo entreguen rápido</span></div>
+        <div><i></i><span>Que le den buen precio</span></div>
+        <div><i></i><span>Que lo asesoren bien</span></div>
+        <div><i></i><span>Que nadie más tenga uno igual</span></div>
+      </div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">4.8</span><span class="qm m-rec">◐</span><p class="qt">¿Cuánto compara el cliente antes de comprarles? ¿Y con quién?</p></div>
+      <div class="opts"><span class="opt pick">Casi nada, compra en la primera visita</span><span class="opt pick">Visita 2–3 tiendas</span><span class="opt pick">Compara mucho, tarda semanas</span></div>
+      <div class="field"><label>¿Con quién los compara?</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">4.9</span><span class="qm m-req">⬤</span><p class="qt">¿Cómo se enteran de Eleganzza los clientes nuevos? Repartan 100 puntos</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Cómo llegan</th><th>Puntos</th></tr></thead>
+        <tbody>
+          <tr><td>Pasaron por enfrente / vieron el local</td><td class="fill">···</td></tr>
+          <tr><td>Se los recomendaron</td><td class="fill">···</td></tr>
+          <tr><td>Facebook / Instagram</td><td class="fill">···</td></tr>
+          <tr><td>Google</td><td class="fill">···</td></tr>
+          <tr><td>Anuncio pagado</td><td class="fill">···</td></tr>
+          <tr><td>Ya eran clientes</td><td class="fill">···</td></tr>
+          <tr><td>Arquitecto o diseñador</td><td class="fill">···</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td>100</td></tr></tfoot></table></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">4.10–4.11</span><span class="qm m-rec">◐</span><p class="qt">¿Qué redes usa su cliente típico? ¿Cada cuánto les vuelve a comprar?</p></div>
+      <div class="opts"><span class="opt">Facebook</span><span class="opt">Instagram</span><span class="opt">TikTok</span><span class="opt">Pinterest</span><span class="opt">WhatsApp</span><span class="opt">YouTube</span><span class="opt">Casi ninguna</span></div>
+      <div class="field"><label>% de ventas de clientes que repiten</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">4.12</span><span class="qm m-opt">○</span><p class="qt">¿Tienen alguna base de datos o lista de clientes? ¿De cuántas personas?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s5">
+  <div class="shead"><div class="snum">05</div><div><h2 class="stitle">A quién quieren venderle mañana</h2><p class="stime">≈ 4 minutos · sección clave</p></div></div>
+  <div class="sbody">
+    <div class="callout"><strong>Esta sección decide más del rebranding que cualquier otra.</strong> Si el cliente que quieren es distinto al que tienen, la marca tiene que cambiar de verdad, no solo verse mejor.</div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">5.1</span><span class="qm m-req">⬤</span><p class="qt">¿El cliente que quieren tener en 3 años es el mismo que tienen hoy?</p></div>
+      <div class="opts"><span class="opt pick">Sí, el mismo — solo queremos más</span><span class="opt pick">Parecido, pero con más poder adquisitivo</span><span class="opt pick">Más joven</span><span class="opt pick">Bastante distinto</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">5.2</span><span class="qm m-req">⬤</span><p class="qt">Ticket promedio: ¿a cuánto quieren llevarlo en 3 años?</p></div>
+      <div class="grid2"><div class="field"><label>Hoy</label><div class="box"></div></div><div class="field"><label>Meta a 3 años</label><div class="box"></div></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">5.3</span><span class="qm m-req">⬤</span><p class="qt">¿Quieren que Eleganzza se perciba más premium de lo que se percibe hoy?</p></div>
+      <div class="opts"><span class="opt pick">Sí, bastante más</span><span class="opt pick">Un poco más</span><span class="opt pick">No, queremos seguir siendo accesibles</span><span class="opt pick">Las dos cosas: una línea premium y una accesible</span></div>
+      <p class="qhelp">Si marcaron “las dos cosas”: ¿deberían tener nombres distintos, o todo bajo Eleganzza?</p></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">5.4</span><span class="qm m-req">⬤</span><p class="qt">Descríbannos al cliente que les encantaría tener más</p></div>
+      <p class="qhelp">¿Quién es, dónde vive, en qué trabaja, cuánto gasta, qué le importa?</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">5.5</span><span class="qm m-rec">◐</span><p class="qt">¿Hay algún tipo de cliente que preferirían dejar de atender?</p></div>
+      <p class="qhelp">Sean honestos: el que regatea todo, el que compra una sola pieza barata, el que devuelve, el que no paga.</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">5.6–5.7</span><span class="qm m-rec">◐</span><p class="qt">¿Les interesa venderle a arquitectos, diseñadores, constructoras u hoteles? ¿Y llegar a alguna zona nueva?</p></div>
+      <div class="opts"><span class="opt pick">Ya lo hacemos y queremos más</span><span class="opt pick">Nos interesa mucho, no sabemos cómo</span><span class="opt pick">Poco</span><span class="opt pick">No es nuestro camino</span></div>
+      <div class="field"><label>Ciudad o zona nueva en los próximos 2 años</label><div class="box"></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="s6">
+  <div class="shead"><div class="snum">06</div><div><h2 class="stitle">La competencia</h2><p class="stime">≈ 5 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">6.1</span><span class="qm m-req">⬤</span><p class="qt">Sus 3 competidores directos: contra quién pierden ventas de verdad</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th></th><th>Nombre</th><th>¿Dónde está?</th><th>Qué hacen mejor</th><th>Qué hacen peor</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="fill">·········</td><td class="fill">······</td><td class="fill">···········</td><td class="fill">···········</td></tr>
+          <tr><td class="num">2</td><td class="fill">·········</td><td class="fill">······</td><td class="fill">···········</td><td class="fill">···········</td></tr>
+          <tr><td class="num">3</td><td class="fill">·········</td><td class="fill">······</td><td class="fill">···········</td><td class="fill">···········</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">6.2</span><span class="qm m-req">⬤</span><p class="qt">¿A dónde más se va el dinero de su cliente cuando no les compra a ustedes?</p></div>
+      <div class="opts"><span class="opt">Mueblerías de cadena</span><span class="opt">Cadenas de bajo costo</span><span class="opt">IKEA</span><span class="opt">Amazon / Mercado Libre</span><span class="opt">Carpintero o fabricante local</span><span class="opt">Tiendas de decoración</span><span class="opt">Marcas de diseño</span><span class="opt">Tiendas que solo venden por redes</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">6.3</span><span class="qm m-req">⬤</span><p class="qt">¿Por qué alguien compraría en su competidor número uno y no con ustedes?</p></div>
+      <p class="qhelp">Contesten como si fueran el cliente.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">6.4–6.5</span><span class="qm m-rec">◐</span><p class="qt">¿Qué marca mexicana admiran? ¿Y qué marca internacional les gusta?</p></div>
+      <p class="qhelp">¿Qué exactamente les gusta: los productos, cómo se ven las tiendas, cómo comunican, los precios?</p>
+      <div class="grid2"><div class="field"><label>Mexicana</label><div class="box tall"></div></div><div class="field"><label>Internacional</label><div class="box tall"></div></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">6.6</span><span class="qm m-rec">◐</span><p class="qt">Si un cliente dice “encontré lo mismo más barato”, ¿qué le contestan hoy sus vendedores?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">6.7</span><span class="qm m-opt">○</span><p class="qt">¿Hay algún competidor que sientan que les está comiendo el mandado? ¿Qué está haciendo?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s7">
+  <div class="shead"><div class="snum">07</div><div><h2 class="stitle">Por qué Eleganzza y no otra</h2><p class="stime">≈ 5 minutos · la sección más importante</p></div></div>
+  <div class="sbody">
+    <div class="callout"><strong>Aquí no valen “calidad”, “servicio” ni “precio” como respuesta suelta.</strong> Todos dicen eso. Necesitamos hechos.</div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">7.1</span><span class="qm m-req">⬤</span><p class="qt">Completen esta frase con algo que su competencia no pueda decir</p></div>
+      <p class="qhelp">“La única mueblería en <span class="blank"></span> que <span class="blank"></span>.”</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">7.2</span><span class="qm m-req">⬤</span><p class="qt">¿Qué hacen ustedes que a un competidor le costaría mucho trabajo copiar?</p></div>
+      <p class="qhelp">Un proveedor exclusivo, una relación de años, un taller propio, gente con oficio, una forma de comprar, un catálogo que nadie más tiene.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">7.3–7.4</span><span class="qm m-req">⬤</span><p class="qt">¿Por qué regresa un cliente? ¿Y cuál es el elogio que más repiten?</p></div>
+      <p class="qhelp">No lo que ustedes creen: lo que les han dicho. Y escríbanlo con las palabras que ellos usan, no con las suyas.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">7.5</span><span class="qm m-rec">◐</span><p class="qt">Cuéntennos una historia concreta de un cliente al que le resolvieron algo que otra tienda no habría resuelto</p></div>
+      <p class="qhelp">Con nombre del producto, qué pasó y cómo terminó.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">7.6–7.7</span><span class="qm m-rec">◐</span><p class="qt">Si Eleganzza cerrara mañana, ¿qué perdería la ciudad? ¿Qué venden que nadie más tiene?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s8">
+  <div class="shead"><div class="snum">08</div><div><h2 class="stitle">El producto y el estilo</h2><p class="stime">≈ 5 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">8.1–8.2</span><span class="qm m-req">⬤</span><p class="qt">¿Qué estilos dominan su catálogo hoy? ¿Y cuál quieren que domine en 3 años?</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Estilo</th><th>Hoy</th><th>% aprox.</th></tr></thead>
+        <tbody>
+          <tr><td>Clásico / tradicional</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Contemporáneo</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Minimalista / nórdico</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Industrial</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Rústico / mexicano contemporáneo</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Boho / natural</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Glam / lujo</td><td>☐</td><td class="fill">···</td></tr>
+          <tr><td>Mezclado, de todo un poco</td><td>☐</td><td class="fill">···</td></tr>
+        </tbody></table></div>
+      <div class="field"><label>El estilo que quieren que domine en 3 años</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">8.3</span><span class="qm m-req">⬤</span><p class="qt">¿De dónde viene su mercancía?</p></div>
+      <div class="opts"><span class="opt">Fabricantes nacionales</span><span class="opt">Fabricación propia / taller</span><span class="opt">Importación de Asia</span><span class="opt">Importación de Europa o EUA</span><span class="opt">Artesanos y talleres locales</span><span class="opt">Distribuidores mayoristas</span></div>
+      <div class="field"><label>¿Marcas o proveedores en exclusiva para su zona?</label><div class="box"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">8.4</span><span class="qm m-req">⬤</span><p class="qt">¿Se puede personalizar lo que venden?</p></div>
+      <div class="opts"><span class="opt pick">Sí, mucho: medida, tela, color, acabado</span><span class="opt pick">Algo: tela y color</span><span class="opt pick">Casi nada, es catálogo cerrado</span></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">8.5–8.6</span><span class="qm m-rec">◐</span><p class="qt">¿Cómo eligen qué meter al catálogo? ¿Qué garantía dan y qué pasa cuando algo sale mal?</p></div>
+      <p class="qhelp">¿Lo que se ve bien? ¿Lo que deja margen? ¿Lo que pide el cliente? ¿Lo que ven en ferias? ¿Y quién decide?</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">8.7</span><span class="qm m-req">⬤</span><p class="qt">¿Cuánto tardan en entregar? ¿Eso es una ventaja o un dolor de cabeza?</p></div>
+      <div class="opts"><span class="opt pick">Mismo día</span><span class="opt pick">2–7 días</span><span class="opt pick">2–4 semanas</span><span class="opt pick">Más de un mes</span><span class="opt pick">Depende mucho</span></div>
+      <div class="opts"><span class="opt pick">Ventaja clara</span><span class="opt pick">Neutro</span><span class="opt pick">Dolor de cabeza</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">8.8</span><span class="qm m-req">⬤</span><p class="qt">Imaginen una casa amueblada al cien por ciento por Eleganzza. Descríbanla.</p></div>
+      <p class="qhelp">¿De quién es esa casa, cómo se siente al entrar, qué se ve, qué colores, qué materiales, qué música suena?</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">8.9</span><span class="qm m-rec">◐</span><p class="qt">¿Cuál es la pieza que mejor representa a Eleganzza?</p></div>
+      <p class="qhelp">Si tuvieran que poner un solo mueble en un anuncio, ¿cuál sería y por qué?</p>
+      <div class="lines"><i></i><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s9">
+  <div class="shead"><div class="snum">09</div><div><h2 class="stitle">Dónde quieren competir</h2><p class="stime">≈ 3 minutos · va rápido</p></div></div>
+  <div class="sbody">
+    <p class="snote">En cada línea marquen dos veces: dónde están <b>hoy</b> y dónde quieren estar <b>en 3 años</b>.</p>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">9.1</span><span class="qm m-req">⬤</span><p class="qt">Las ocho escalas</p></div>
+      <div class="scale">
+        <div class="srow"><div class="slabels"><b>Accesible</b><b>Premium</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Masivo</b><b>Exclusivo</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Promocional</b><b>Aspiracional</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Tradicional</b><b>Contemporáneo</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Funcional</b><b>Diseño</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Compito por precio</b><b>Compito por experiencia</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Local</b><b>Nacional</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Vendo muebles</b><b>Diseño espacios</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+      </div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">9.2–9.3</span><span class="qm m-req">⬤</span><p class="qt">Comparados con su competidor número uno, sus precios son… ¿y están cómodos con eso?</p></div>
+      <div class="opts"><span class="opt pick">Bastante más baratos</span><span class="opt pick">Un poco más baratos</span><span class="opt pick">Iguales</span><span class="opt pick">Un poco más caros</span><span class="opt pick">Bastante más caros</span></div>
+      <div class="opts"><span class="opt pick">Sí, cómodos</span><span class="opt pick">No, deberíamos poder cobrar más</span><span class="opt pick">No, estamos caros para lo que ofrecemos</span></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">9.4</span><span class="qm m-rec">◐</span><p class="qt">Si tuvieran que subir precios 20% el año que entra, ¿qué tendría que cambiar para que el cliente lo acepte sin reclamar?</p></div>
+      <div class="field"><div class="box tall"></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="s10">
+  <div class="shead"><div class="snum">10</div><div><h2 class="stitle">La personalidad de Eleganzza</h2><p class="stime">≈ 5 minutos · aquí no hay respuestas técnicas, solo intuición</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">10.1</span><span class="qm m-req">⬤</span><p class="qt">Si Eleganzza fuera una persona que entra a una reunión, ¿cómo sería?</p></div>
+      <p class="qhelp">Cómo va vestida, cómo saluda, de qué habla, si es hombre o mujer o da igual, qué edad tiene, si habla mucho o poco.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">10.2</span><span class="qm m-req">⬤</span><p class="qt">Elijan máximo 5 rasgos</p></div>
+      <p class="qhelp">Solo cinco. Si marcan diez, no nos sirve.</p>
+      <div class="opts"><span class="opt">Elegante</span><span class="opt">Sofisticada</span><span class="opt">Cálida</span><span class="opt">Cercana</span><span class="opt">Moderna</span><span class="opt">Atrevida</span><span class="opt">Clásica</span><span class="opt">Exclusiva</span><span class="opt">Accesible</span><span class="opt">Experta</span><span class="opt">Joven</span><span class="opt">Familiar</span><span class="opt">Artística</span><span class="opt">Minimalista</span><span class="opt">Aspiracional</span><span class="opt">Confiable</span><span class="opt">Divertida</span><span class="opt">Serena</span><span class="opt">Práctica</span><span class="opt">Mexicana</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">10.3</span><span class="qm m-req">⬤</span><p class="qt">Ahora al revés: ¿qué NO debe ser Eleganzza nunca? Elijan al menos 3</p></div>
+      <div class="opts"><span class="opt">Corriente</span><span class="opt">Fría o distante</span><span class="opt">Anticuada</span><span class="opt">Presumida</span><span class="opt">Barata</span><span class="opt">Escandalosa</span><span class="opt">Aburrida</span><span class="opt">Impersonal</span><span class="opt">Complicada</span><span class="opt">Genérica</span><span class="opt">Agresiva en la venta</span><span class="opt">Infantil</span><span class="opt">Recargada</span><span class="opt">Snob</span><span class="opt">Improvisada</span></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">10.4</span><span class="qm m-rec">◐</span><p class="qt">Completen sin pensarlo mucho: si Eleganzza fuera…</p></div>
+      <div class="scroller"><table><tbody>
+        <tr><th>Un restaurante</th><td class="fill">····························</td></tr>
+        <tr><th>Un hotel</th><td class="fill">····························</td></tr>
+        <tr><th>Una marca de ropa</th><td class="fill">····························</td></tr>
+        <tr><th>Un coche</th><td class="fill">····························</td></tr>
+        <tr><th>Una casa, ¿dónde estaría?</th><td class="fill">····························</td></tr>
+      </tbody></table></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">10.5</span><span class="qm m-rec">◐</span><p class="qt">De estas dos frases, ¿cuál suena más a Eleganzza?</p></div>
+      <div class="pairs">
+        <div class="pair"><span>Muebles que duran toda la vida</span><span>o</span><span>Muebles que cambian tu casa hoy</span></div>
+        <div class="pair"><span>El buen gusto no se improvisa</span><span>o</span><span>Tu casa, a tu manera</span></div>
+        <div class="pair"><span>Diseño al alcance de todos</span><span>o</span><span>Piezas que no encuentras en otro lado</span></div>
+        <div class="pair"><span>Te acompañamos en cada decisión</span><span>o</span><span>Entra, elige, listo</span></div>
+      </div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">10.6</span><span class="qm m-opt">○</span><p class="qt">¿Hay alguna persona real, famosa o no, que represente el espíritu de Eleganzza?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s11">
+  <div class="shead"><div class="snum">11</div><div><h2 class="stitle">Qué debe sentir la gente</h2><p class="stime">≈ 3 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">11.1</span><span class="qm m-req">⬤</span><p class="qt">En los primeros 10 segundos dentro del showroom, el cliente debería sentir… <em>máximo 3</em></p></div>
+      <div class="opts"><span class="opt">Inspiración</span><span class="opt">Tranquilidad</span><span class="opt">Deseo</span><span class="opt">“Aquí sí me van a atender bien”</span><span class="opt">Confianza</span><span class="opt">Aspiración</span><span class="opt">Comodidad</span><span class="opt">Sorpresa</span><span class="opt">“Qué bonito, aquí me quedaría”</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">11.2</span><span class="qm m-req">⬤</span><p class="qt">Cuando le entregan los muebles en su casa, debería sentir…</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">11.3</span><span class="qm m-req">⬤</span><p class="qt">Cuando ve una publicación de Eleganzza en Instagram, debería pensar…</p></div>
+      <p class="qhelp">Escríbanlo como un pensamiento textual: <em>“ay, eso lo quiero para mi sala”.</em></p>
+      <div class="lines"><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">11.4–11.5</span><span class="qm m-rec">◐</span><p class="qt">¿Qué NO debe sentir nunca un cliente? ¿Y con qué palabras les gustaría que los recomendaran?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s12">
+  <div class="shead"><div class="snum">12</div><div><h2 class="stitle">Cómo los ven hoy</h2><p class="stime">≈ 4 minutos · sean brutalmente honestos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">12.1–12.2</span><span class="qm m-req">⬤</span><p class="qt">Si 10 clientes describieran Eleganzza en 3 palabras, ¿qué dirían? ¿Y qué quisieran que dijeran?</p></div>
+      <div class="grid2">
+        <div class="field"><label>Lo que creen que dirían hoy</label><div class="box"></div></div>
+        <div class="field"><label>Lo que quisieran que dijeran</label><div class="box"></div></div>
+      </div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">12.3</span><span class="qm m-req">⬤</span><p class="qt">¿Hay alguna idea equivocada sobre Eleganzza que les gustaría desmontar?</p></div>
+      <p class="qhelp">“Creen que somos carísimos”, “creen que solo vendemos clásico”, “creen que somos sucursal de una cadena”, “creen que solo entregamos en la ciudad”.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">12.4</span><span class="qm m-req">⬤</span><p class="qt">¿Qué partes de Eleganzza sienten que ya se ven viejas o desactualizadas?</p></div>
+      <div class="opts"><span class="opt">El logotipo</span><span class="opt">Los colores</span><span class="opt">Las fotos de producto</span><span class="opt">El showroom</span><span class="opt">La página web</span><span class="opt">Las redes sociales</span><span class="opt">Los anuncios</span><span class="opt">El letrero</span><span class="opt">Los uniformes</span><span class="opt">Las camionetas</span><span class="opt">Los catálogos</span><span class="opt">Cotizaciones y facturas</span><span class="opt">La forma de vender</span><span class="opt">El nombre</span><span class="opt">Nada, todo está bien</span></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">12.5–12.6</span><span class="qm m-rec">◐</span><p class="qt">¿Algún comentario de fuera sobre su imagen que se les quedó grabado? ¿De qué se quejan en las reseñas malas?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s13">
+  <div class="shead"><div class="snum">13</div><div><h2 class="stitle">La imagen actual, pieza por pieza</h2><p class="stime">≈ 5 minutos · va rápido, son casillas</p></div></div>
+  <div class="sbody">
+    <p class="snote">Para cada elemento: conservar tal cual, ajustar, o eliminar y rehacer desde cero.</p>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">13.1–13.17</span><span class="qm m-req">⬤</span><p class="qt">Inventario de piezas</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Elemento</th><th>Conservar</th><th>Ajustar</th><th>Rehacer</th><th>No tenemos</th><th>¿Por qué?</th></tr></thead>
+        <tbody>
+          <tr><td>Logotipo</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>El nombre “Eleganzza”</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Colores de la marca</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Tipografías</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Fotos de producto</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Redes sociales</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Página web</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Showroom por dentro</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Letrero y fachada</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Señalización y etiquetas de precio</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Uniformes</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Camionetas de entrega</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Empaque</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Cotizaciones, facturas, tarjetas</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Anuncios y publicidad</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Catálogo impreso</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+          <tr><td>Bolsas y detalles</td><td>☐</td><td>☐</td><td>☐</td><td>☐</td><td class="fill">·······</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">13.18</span><span class="qm m-req">⬤</span><p class="qt">¿Hay algo del logotipo actual que sea intocable? ¿O algo que les choque?</p></div>
+      <p class="qhelp">Un color, la forma, un símbolo, la doble Z.</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">13.19</span><span class="qm m-req">⬤</span><p class="qt">Pregunta seria: ¿están dispuestos a que el logotipo cambie por completo y sea irreconocible?</p></div>
+      <div class="opts"><span class="opt pick">Sí, empecemos de cero</span><span class="opt pick">Sí, pero que se siga sintiendo “Eleganzza”</span><span class="opt pick">Preferimos una evolución, no una revolución</span><span class="opt pick">No, el logo se queda</span></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">13.20–13.21</span><span class="qm m-opt">○</span><p class="qt">¿Tienen los archivos originales del logo? ¿El nombre está registrado ante el IMPI?</p></div>
+      <div class="opts"><span class="opt pick">Sí, tenemos vectores</span><span class="opt pick">No</span><span class="opt pick">No sabemos</span></div>
+      <div class="opts"><span class="opt pick">Registrado</span><span class="opt pick">No registrado</span><span class="opt pick">En trámite</span><span class="opt pick">No sé</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="s14">
+  <div class="shead"><div class="snum">14</div><div><h2 class="stitle">Referencias visuales</h2><p class="stime">≈ 5 minutos · la sección más divertida</p></div></div>
+  <div class="sbody">
+    <div class="callout"><strong>No tienen que ser mueblerías.</strong> Pueden ser hoteles, restaurantes, marcas de ropa, cafés, coches, revistas. Nos importa el gusto, no el giro.</div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">14.1</span><span class="qm m-req">⬤</span><p class="qt">3 marcas que visualmente les encantan</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th></th><th>Marca o @</th><th>Qué les gusta específicamente</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+          <tr><td class="num">2</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+          <tr><td class="num">3</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">14.2</span><span class="qm m-req">⬤</span><p class="qt">3 marcas que visualmente NO les gustan</p></div>
+      <p class="qhelp">Pueden ser competidores.</p>
+      <div class="scroller"><table>
+        <thead><tr><th></th><th>Marca o @</th><th>Qué NO les gusta</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+          <tr><td class="num">2</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+          <tr><td class="num">3</td><td class="fill">·············</td><td class="fill">····························</td></tr>
+        </tbody></table></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">14.3–14.7</span><span class="qm m-rec">◐</span><p class="qt">Un hotel, un restaurante, una tienda y una marca de ropa que les gusten</p></div>
+      <div class="scroller"><table><tbody>
+        <tr><th>Hotel</th><td class="fill">····························</td></tr>
+        <tr><th>Restaurante o café</th><td class="fill">····························</td></tr>
+        <tr><th>Tienda de cualquier cosa</th><td class="fill">····························</td></tr>
+        <tr><th>Marca de ropa</th><td class="fill">····························</td></tr>
+        <tr><th>Cuentas de Instagram</th><td class="fill">····························</td></tr>
+      </tbody></table></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">14.8</span><span class="qm m-rec">◐</span><p class="qt">¿Qué les gusta más? Elijan uno por par</p></div>
+      <div class="pairs">
+        <div class="pair"><span>Fotos con gente viviendo la casa</span><span>o</span><span>Fotos del mueble solo, limpio</span></div>
+        <div class="pair"><span>Fondos claros y luminosos</span><span>o</span><span>Ambientes cálidos y con contraste</span></div>
+        <div class="pair"><span>Muchos colores</span><span>o</span><span>Poca paleta, tonos naturales</span></div>
+        <div class="pair"><span>Letras clásicas, con serifas</span><span>o</span><span>Letras modernas, sin serifas</span></div>
+        <div class="pair"><span>Diseño lleno, con textura</span><span>o</span><span>Diseño con mucho espacio en blanco</span></div>
+        <div class="pair"><span>Casa real, vivida</span><span>o</span><span>Casa perfecta, de revista</span></div>
+      </div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">14.9</span><span class="qm m-opt">○</span><p class="qt">Si tienen un tablero de Pinterest o capturas guardadas, compártanlas</p></div>
+      <p class="qhelp">Vale más que veinte respuestas escritas.</p></div>
+  </div>
+</section>
+
+<section class="section" id="s15">
+  <div class="shead"><div class="snum">15</div><div><h2 class="stitle">Cómo debe hablar Eleganzza</h2><p class="stime">≈ 3 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">15.1</span><span class="qm m-req">⬤</span><p class="qt">Marquen dónde debe estar el tono</p></div>
+      <div class="scale">
+        <div class="srow"><div class="slabels"><b>Formal</b><b>Casual</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Experta</b><b>Cercana</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Inspiracional</b><b>Comercial</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Sobria</b><b>Expresiva</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Seria</b><b>Divertida</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+        <div class="srow"><div class="slabels"><b>Exclusiva</b><b>Para todos</b></div><div class="track"><u></u><i></i><u></u><i></i><u></u><i></i><u></u><i></i><u></u></div></div>
+      </div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">15.2</span><span class="qm m-req">⬤</span><p class="qt">¿De tú o de usted?</p></div>
+      <div class="opts"><span class="opt pick">Tú siempre</span><span class="opt pick">Usted siempre</span><span class="opt pick">Depende del cliente</span><span class="opt pick">No lo hemos definido</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">15.3–15.4</span><span class="qm m-req">⬤</span><p class="qt">5 palabras que Eleganzza sí debería usar, y 5 que nunca</p></div>
+      <p class="qhelp">Ejemplos de lo que suele prohibirse: “baratísimo”, “último día”, “aprovecha”, “ganga”, “promoción explosiva”.</p>
+      <div class="grid2">
+        <div class="field"><label>Sí</label><div class="box tall"></div></div>
+        <div class="field"><label>Nunca</label><div class="box tall"></div></div>
+      </div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">15.5–15.6</span><span class="qm m-rec">◐</span><p class="qt">¿Tienen un slogan hoy? ¿Les gusta? ¿Hay alguna frase que la gente ya asocia con ustedes?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">15.7–15.8</span><span class="qm m-opt">○</span><p class="qt">¿Cómo contestan el WhatsApp hoy? ¿Qué palabra los describe mejor?</p></div>
+      <div class="opts"><span class="opt pick">Muebles</span><span class="opt pick">Decoración</span><span class="opt pick">Espacios</span><span class="opt pick">Hogar</span><span class="opt pick">Diseño</span><span class="opt pick">Interiores</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="s16">
+  <div class="shead"><div class="snum">16</div><div><h2 class="stitle">Redes sociales y contenido</h2><p class="stime">≈ 4 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">16.1</span><span class="qm m-req">⬤</span><p class="qt">¿Qué esperan de las redes sociales? Ordenen del 1 al 6</p></div>
+      <div class="rank">
+        <div><i></i><span>Que vendan directo</span></div>
+        <div><i></i><span>Que generen mensajes de WhatsApp</span></div>
+        <div><i></i><span>Que la gente conozca la marca</span></div>
+        <div><i></i><span>Que se vea que somos serios y confiables</span></div>
+        <div><i></i><span>Que la gente venga al showroom</span></div>
+        <div><i></i><span>Que nos vean como referentes de decoración</span></div>
+      </div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">16.2</span><span class="qm m-req">⬤</span><p class="qt">Repartan 100 puntos entre los tipos de contenido</p></div>
+      <div class="scroller"><table>
+        <thead><tr><th>Tipo de contenido</th><th>Puntos</th></tr></thead>
+        <tbody>
+          <tr><td>Producto solo, bien fotografiado</td><td class="fill">···</td></tr>
+          <tr><td>Ambientes y casas completas</td><td class="fill">···</td></tr>
+          <tr><td>Personas usando los muebles</td><td class="fill">···</td></tr>
+          <tr><td>Consejos de decoración</td><td class="fill">···</td></tr>
+          <tr><td>Tendencias</td><td class="fill">···</td></tr>
+          <tr><td>Detrás de cámaras, el equipo, la tienda</td><td class="fill">···</td></tr>
+          <tr><td>Clientes reales y sus casas</td><td class="fill">···</td></tr>
+          <tr><td>Promociones y precios</td><td class="fill">···</td></tr>
+          <tr><td>Entretenimiento</td><td class="fill">···</td></tr>
+          <tr><td>Educación: materiales, cómo elegir, cuidados</td><td class="fill">···</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td>100</td></tr></tfoot></table></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">16.3</span><span class="qm m-req">⬤</span><p class="qt">¿Qué contenido NO quieren ver nunca en las redes de Eleganzza?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">16.4–16.7</span><span class="qm m-rec">◐</span><p class="qt">Personas, dueños y precios en el contenido</p></div>
+      <div class="scroller"><table><tbody>
+        <tr><th>¿Deben aparecer personas?</th><td>Siempre que se pueda · A veces · Casi nunca</td></tr>
+        <tr><th>¿Los dueños dan la cara?</th><td>Sí, nos gusta · Solo el equipo · Preferimos que no</td></tr>
+        <tr><th>¿Se pone el precio?</th><td>Siempre · Solo en promociones · Nunca · Sin decidir</td></tr>
+        <tr><th>Publicación que mejor les funcionó</th><td class="fill">····························</td></tr>
+      </tbody></table></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">16.8</span><span class="qm m-opt">○</span><p class="qt">¿Qué redes quieren atender en serio el próximo año?</p></div>
+      <div class="opts"><span class="opt">Instagram</span><span class="opt">Facebook</span><span class="opt">TikTok</span><span class="opt">Pinterest</span><span class="opt">YouTube</span><span class="opt">WhatsApp Business</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="s17">
+  <div class="shead"><div class="snum">17</div><div><h2 class="stitle">La experiencia Eleganzza</h2><p class="stime">≈ 5 minutos · aquí es donde la marca se vuelve real</p></div></div>
+  <div class="sbody">
+    <p class="snote">Una marca no es el logo: es lo que le pasa al cliente desde que los descubre hasta que ya tiene el mueble en su casa.</p>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.1</span><span class="qm m-req">⬤</span><p class="qt">Antes · Cuando alguien les escribe por WhatsApp, ¿qué debería pasar?</p></div>
+      <p class="qhelp">Qué tan rápido contestan, quién contesta, cómo saluda, qué le manda.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">17.2</span><span class="qm m-rec">◐</span><p class="qt">Antes · ¿Qué debería encontrar en la web alguien que nunca ha oído de ustedes?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.3</span><span class="qm m-req">⬤</span><p class="qt">Antes · Cuando alguien entra al showroom, ¿cómo debería recibirlo el vendedor?</p></div>
+      <p class="qhelp">Escriban qué debería decir, y qué NO debería hacer.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.4</span><span class="qm m-req">⬤</span><p class="qt">Durante · ¿Cómo debería ser una cotización de Eleganzza?</p></div>
+      <p class="qhelp">¿Un WhatsApp con precios? ¿Un PDF cuidado? ¿Con fotos, medidas, render?</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">17.5–17.6</span><span class="qm m-rec">◐</span><p class="qt">Durante · ¿Cómo debería sentirse el momento de pagar? ¿Qué debería llevarse el cliente al salir, aunque no compre?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.7</span><span class="qm m-req">⬤</span><p class="qt">Después · ¿Cómo debería ser el día que llegan los muebles a la casa del cliente?</p></div>
+      <p class="qhelp">Cómo llegan los que entregan, cómo van vestidos, qué hacen, qué se llevan, qué dejan.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.8</span><span class="qm m-req">⬤</span><p class="qt">Después · ¿Qué debería pasar una semana después de la entrega? ¿Y a los 6 meses?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">17.9</span><span class="qm m-req">⬤</span><p class="qt">Después · ¿Qué pasa HOY cuando algo sale mal?</p></div>
+      <p class="qhelp">Llega dañado, se retrasa, al cliente no le gustó. Descríbanlo tal como pasa hoy, no como debería ser.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">17.10–17.11</span><span class="qm m-rec">◐</span><p class="qt">De todos estos momentos, ¿cuál es hoy el más flojo? ¿Y cuál el mejor?</p></div>
+      <div class="opts"><span class="opt">Primer contacto</span><span class="opt">Web</span><span class="opt">Atención en tienda</span><span class="opt">Cotización</span><span class="opt">Cierre y pago</span><span class="opt">Tiempos de entrega</span><span class="opt">La entrega</span><span class="opt">Instalación</span><span class="opt">Postventa</span><span class="opt">Reclamaciones</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="s18">
+  <div class="shead"><div class="snum">18</div><div><h2 class="stitle">Por dentro: la gente y la cultura</h2><p class="stime">≈ 4 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">18.1</span><span class="qm m-req">⬤</span><p class="qt">¿Qué significa “servicio Eleganzza”?</p></div>
+      <p class="qhelp">Descríbanlo con acciones concretas, no con adjetivos. Buscamos algo como <em>“que ningún cliente espere más de 3 minutos sin que alguien lo salude”</em>, no “atención personalizada”.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">18.2–18.3</span><span class="qm m-req">⬤</span><p class="qt">3 comportamientos que sí representan a Eleganzza, y 3 que no se deberían permitir jamás</p></div>
+      <div class="grid2">
+        <div class="field"><label>Sí representan</label><div class="box tall"></div></div>
+        <div class="field"><label>Jamás</label><div class="box tall"></div></div>
+      </div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">18.4</span><span class="qm m-req">⬤</span><p class="qt">¿Qué esperan de un vendedor de Eleganzza? ¿Cómo distinguen a uno bueno de uno malo?</p></div>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">18.5–18.7</span><span class="qm m-rec">◐</span><p class="qt">¿Los vendedores cierran ventas o acompañan decisiones? ¿Tienen valores escritos? ¿Cómo se siente trabajar aquí?</p></div>
+      <div class="opts"><span class="opt pick">Cierran ventas</span><span class="opt pick">Acompañan decisiones</span><span class="opt pick">Las dos cosas, en ese orden</span><span class="opt pick">Depende del producto</span></div>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">18.8</span><span class="qm m-opt">○</span><p class="qt">¿Hay alguien en el equipo que es “la cara” de Eleganzza para muchos clientes?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s19">
+  <div class="shead"><div class="snum">19</div><div><h2 class="stitle">Eleganzza en 2031</h2><p class="stime">≈ 4 minutos · contéstenlo sin filtros</p></div></div>
+  <div class="sbody">
+    <div class="callout">Estamos en agosto de 2031. Han pasado cinco años. El rebranding fue un éxito rotundo y a Eleganzza le fue mucho mejor de lo que esperaban. <strong>Una revista de negocios les hace un reportaje.</strong></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">19.1</span><span class="qm m-req">⬤</span><p class="qt">¿Cuál es el titular del reportaje?</p></div>
+      <p class="qhelp">“Eleganzza: …”</p>
+      <div class="lines"><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">19.2</span><span class="qm m-req">⬤</span><p class="qt">¿Qué dice el reportaje que hicieron distinto? ¿Qué cambió en 2026 que lo detonó todo?</p></div>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">19.3</span><span class="qm m-req">⬤</span><p class="qt">¿Qué tamaño tiene Eleganzza en 2031?</p></div>
+      <p class="qhelp">Sucursales, ciudades, ventas, gente.</p>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">19.4</span><span class="qm m-req">⬤</span><p class="qt">¿Qué dicen los clientes en el reportaje?</p></div>
+      <p class="qhelp">Escriban una cita textual que les gustaría leer.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">19.5–19.6</span><span class="qm m-rec">◐</span><p class="qt">“Eleganzza es la marca que…” ¿Y qué NO cambió en esos cinco años?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="opt"><div class="qh"><span class="qid">19.7</span><span class="qm m-opt">○</span><p class="qt">Si en 2031 alguien quisiera comprarles el negocio, ¿qué estaría comprando además de la mercancía?</p></div>
+      <div class="lines"><i></i></div></div>
+  </div>
+</section>
+
+<section class="section" id="s20">
+  <div class="shead"><div class="snum">20</div><div><h2 class="stitle">Las preguntas incómodas</h2><p class="stime">≈ 5 minutos · la sección que hace que el rebranding sirva</p></div></div>
+  <div class="sbody">
+    <div class="confid"><b>Confidencial</b>Estas respuestas no aparecen en ninguna presentación ni las ve nadie de su equipo. Son para nosotros y para ustedes. Un rebranding hecho sobre puras cosas bonitas se cae a los seis meses.</div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">20.1</span><span class="qm m-req">⬤</span><p class="qt">¿Qué es lo peor de Eleganzza hoy?</p></div>
+      <p class="qhelp">Lo que, si pudieran esconderle a un cliente, se lo esconderían.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">20.2</span><span class="qm m-req">⬤</span><p class="qt">Si mañana pudieran cambiar UNA sola cosa del negocio, con dinero ilimitado, ¿cuál sería?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">20.3</span><span class="qm m-req">⬤</span><p class="qt">¿De qué se quejan sus clientes a sus espaldas?</p></div>
+      <p class="qhelp">Lo que sospechan que dicen pero no les dicen en la cara.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">20.4–20.5</span><span class="qm m-req">⬤</span><p class="qt">¿En qué su competencia es claramente mejor? ¿Y qué parte de Eleganzza ya no representa la empresa que quieren ser?</p></div>
+      <div class="grid2">
+        <div class="field"><label>La competencia es mejor en…</label><div class="box tall"></div></div>
+        <div class="field"><label>Ya no nos representa…</label><div class="box tall"></div></div>
+      </div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">20.6–20.7</span><span class="qm m-rec">◐</span><p class="qt">¿Qué venden solo porque deja dinero? ¿Qué le prometen al cliente que a veces no pueden cumplir?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">20.8</span><span class="qm m-rec">◐</span><p class="qt">¿En qué NO están de acuerdo entre ustedes, los socios, sobre el rumbo del negocio?</p></div>
+      <p class="qhelp">Esta es de las más importantes. Si hay dos visiones distintas de Eleganzza, es mejor saberlo ahora que a la mitad del proyecto.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">20.9</span><span class="qm m-rec">◐</span><p class="qt">¿Qué les da miedo de este rebranding?</p></div>
+      <div class="opts"><span class="opt">Perder clientes</span><span class="opt">Que no nos reconozcan</span><span class="opt">Gastar sin resultado</span><span class="opt">Que el equipo no lo adopte</span><span class="opt">Que la competencia lo copie</span><span class="opt">Que no nos guste el resultado</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">20.10</span><span class="qm m-req">⬤</span><p class="qt">¿Qué tendría que pasar para que dentro de un año digan “el rebranding valió la pena”?</p></div>
+      <p class="qhelp">Sean concretos: un número, un tipo de cliente, un comentario que quisieran escuchar.</p>
+      <div class="field"><div class="box tall"></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="cierre">
+  <div class="shead"><div class="snum">·</div><div><h2 class="stitle">Cierre</h2><p class="stime">≈ 2 minutos</p></div></div>
+  <div class="sbody">
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">C1</span><span class="qm m-req">⬤</span><p class="qt">De todo lo que contestaron, ¿qué es lo más importante que no debemos perder de vista?</p></div>
+      <div class="field"><div class="box tall"></div></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">C2</span><span class="qm m-rec">◐</span><p class="qt">¿Hay algo que no les preguntamos y que deberíamos saber?</p></div>
+      <div class="lines"><i></i><i></i></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">C3</span><span class="qm m-req">⬤</span><p class="qt">Tiempos: ¿para cuándo les gustaría tener la nueva marca en la calle?</p></div>
+      <div class="grid2">
+        <div class="field"><label>Fecha deseada</label><div class="box"></div></div>
+        <div class="field"><label>Fecha que no se puede mover</label><div class="box"></div></div>
+      </div>
+      <div class="opts"><span class="opt">Letrero</span><span class="opt">Redes</span><span class="opt">Web</span><span class="opt">Camionetas</span><span class="opt">Uniformes</span><span class="opt">Showroom</span><span class="opt">Catálogo</span></div></div>
+
+    <div class="q" data-p="req"><div class="qh"><span class="qid">C4</span><span class="qm m-req">⬤</span><p class="qt">¿Quién valida cada entrega y quién tiene la última palabra?</p></div>
+      <div class="lines"><i></i></div></div>
+
+    <div class="q" data-p="rec"><div class="qh"><span class="qid">C5</span><span class="qm m-rec">◐</span><p class="qt">Materiales que nos pueden mandar</p></div>
+      <div class="opts"><span class="opt">Logo en vectores</span><span class="opt">Fotos del showroom</span><span class="opt">Fotos de producto</span><span class="opt">Catálogo actual</span><span class="opt">Reseñas de Google</span><span class="opt">Lista de clientes</span><span class="opt">Ventas por categoría</span><span class="opt">Accesos a redes</span><span class="opt">Fotos históricas</span><span class="opt">Registro IMPI</span><span class="opt">Tableros de Pinterest</span></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="close">
+  <div class="wrap col">
+    <p class="thanks">Gracias. Con esto construimos el <em>Diagnóstico de Marca de Eleganzza</em>, y de ahí sale todo lo demás.</p>
+    <p>Posicionamiento, personalidad, identidad visual y verbal, Brand Book, Design System y el plan de lanzamiento. Ninguna de esas piezas se decide sin lo que ustedes contesten aquí.</p>
+    <div class="phases">
+      <span class="now">1 · Brand Discovery</span><span>2 · Auditoría</span><span>3 · Estrategia</span><span>4 · Conceptos</span><span>5 · Identidad visual</span><span>6 · Identidad verbal</span><span>7 · Brand Book</span><span>8 · Aplicaciones</span><span>9 · Lanzamiento</span>
+    </div>
+    <div class="actions" id="actions">
+      <button class="act primary" id="btnEnviar" type="button" hidden>Enviar respuestas a Enki</button>
+      <button class="act primary" id="btnSave" type="button">Guardar mis respuestas</button>
+      <button class="act" id="btnCopy" type="button">Copiar todo</button>
+      <button class="act ghost" id="btnReset" type="button">Empezar de nuevo</button>
+      <div class="copybox" id="copyBox" hidden>
+        <p>Selecciónenlo todo y cópienlo con <b>Ctrl+C</b> (o <b>Cmd+C</b>), luego péguenlo en un correo o WhatsApp.</p>
+        <textarea id="copyArea" rows="10" readonly></textarea>
+      </div>
+      <p class="actnote" id="actNote">Sus respuestas se guardan solas en este navegador conforme escriben. Al terminar, descárguenlas o cópienlas y envíenoslas.</p>
+    </div>
+    <p class="sig">Enki Soluciones · Fase 1 de 9 · Agosto 2026</p>
+  </div>
+</footer>
+
+<style>
+/* ===========================================================
+   Controles de formulario · Eleganzza Design System
+   Basado en components/components.css (ez-input, ez-checkbox,
+   ez-radio, ez-btn) — mismo alto, radios, anillo de foco blush
+   y check rojo de marca.
+   =========================================================== */
+input[type=text],input[type=number],textarea{
+  font-family:var(--font-body);font-size:16px;color:var(--text-primary);
+  background:var(--bg-surface);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-md);padding:11px 14px;width:100%;line-height:1.6;
+  transition:border-color var(--duration-base) var(--ease-standard),box-shadow var(--duration-base) var(--ease-standard);
+}
+input[type=text],input[type=number]{height:46px;padding:0 14px}
+textarea{resize:vertical;min-height:52px;display:block}
+input[type=text]::placeholder,textarea::placeholder{color:var(--text-secondary)}
+input[type=text]:hover,input[type=number]:hover,textarea:hover{border-color:var(--border-strong)}
+input[type=text]:focus,input[type=number]:focus,textarea:focus{
+  outline:none;border-color:var(--brand-primary);box-shadow:0 0 0 3px var(--color-blush-100);
+}
+
+/* casillas y opción única, según ez-checkbox / ez-radio */
+.choice input[type=checkbox],.choice input[type=radio],
+td input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;
+  width:20px;height:20px;flex:none;position:relative;cursor:pointer;
+  border:1.5px solid var(--border-strong);background:var(--bg-surface);
+  transition:background var(--duration-fast),border-color var(--duration-fast);
+}
+.choice input[type=checkbox],td input[type=checkbox]{border-radius:var(--radius-sm)}
+.choice input[type=radio]{border-radius:50%}
+.choice input[type=checkbox]:checked,td input[type=checkbox]:checked{
+  background:var(--brand-primary);border-color:var(--brand-primary);
+}
+.choice input[type=checkbox]:checked::after,td input[type=checkbox]:checked::after{
+  content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+.choice input[type=radio]:checked{border-color:var(--brand-primary)}
+.choice input[type=radio]:checked::after{
+  content:'';position:absolute;left:3.5px;top:3.5px;width:10px;height:10px;
+  border-radius:50%;background:var(--brand-primary);
+}
+.choice input:focus-visible,td input[type=checkbox]:focus-visible{
+  outline:2px solid var(--focus-ring);outline-offset:2px;
+}
+
+.choice{
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+  border:1px solid var(--border-subtle);border-radius:var(--radius-pill);
+  background:var(--bg-surface-alt);padding:7px 16px 7px 12px;
+  font-size:14.5px;color:var(--text-primary);
+  transition:background var(--duration-base) var(--ease-standard),border-color var(--duration-base) var(--ease-standard);
+}
+.choice:hover{background:var(--bg-surface);border-color:var(--border-strong)}
+.choice:has(input:checked){
+  background:var(--color-blush-100);border-color:var(--brand-primary);
+  color:var(--brand-primary-hover);font-weight:700;
+}
+
+/* celdas de tabla */
+td .cellinput{
+  height:auto;border:0;background:transparent;padding:4px 0;font-size:15px;border-radius:0;
+}
+td .cellinput:hover{border:0}
+td .cellinput:focus{box-shadow:none;border:0;border-bottom:1.5px solid var(--brand-primary)}
+td .chips{display:flex;flex-wrap:wrap;gap:6px}
+td .chips .choice{padding:5px 12px 5px 9px;font-size:13.5px;gap:7px}
+td .chips .choice input{width:16px;height:16px}
+td .chips .choice input[type=radio]:checked::after{left:2.5px;top:2.5px;width:8px;height:8px}
+
+.ranknum{width:46px;text-align:center;padding:0;font-variant-numeric:tabular-nums;font-weight:700}
+
+/* escalas */
+.tracks{display:grid;gap:7px;margin-top:6px}
+.trackrow{display:flex;align-items:center;gap:10px}
+.trackrow .role{
+  font-size:10.5px;letter-spacing:var(--tracking-wider);text-transform:uppercase;
+  font-weight:800;width:38px;flex:none;color:var(--gold);
+}
+.trackrow.meta .role{color:var(--brand-primary)}
+.ticks{display:flex;align-items:center;justify-content:space-between;flex:1;gap:2px}
+.tick{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;flex:1}
+.tick input[type=radio]{
+  appearance:none;-webkit-appearance:none;margin:0;
+  width:15px;height:15px;border-radius:50%;position:relative;cursor:pointer;
+  border:1.5px solid var(--border-strong);background:var(--bg-surface);
+}
+.tick input:checked{border-color:var(--gold)}
+.tick input:checked::after{
+  content:'';position:absolute;left:2.5px;top:2.5px;width:8px;height:8px;
+  border-radius:50%;background:var(--gold);
+}
+.trackrow.meta .tick input:checked{border-color:var(--brand-primary)}
+.trackrow.meta .tick input:checked::after{background:var(--brand-primary)}
+.tick input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.tick span{font-size:10px;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1}
+.tick:has(input:checked) span{color:var(--text-primary);font-weight:800}
+
+/* meses: estados semánticos del sistema */
+.mstate{
+  display:block;width:100%;height:24px;margin-top:8px;cursor:pointer;
+  border:0;border-top:1px solid var(--color-sand-200);background:transparent;
+  font-family:var(--font-body);font-size:10px;letter-spacing:var(--tracking-wider);
+  text-transform:uppercase;font-weight:800;color:var(--text-secondary);padding:0;
+  transition:background var(--duration-fast);
+}
+.mstate[data-v="fuerte"]{background:var(--color-success-100);color:var(--color-success-600)}
+.mstate[data-v="normal"]{background:var(--color-warning-100);color:var(--color-warning-600)}
+.mstate[data-v="flojo"]{background:var(--color-danger-100);color:var(--color-danger-600)}
+.mstate:focus-visible{outline:2px solid var(--focus-ring);outline-offset:-2px}
+
+/* progreso */
+.prog{
+  display:flex;align-items:center;gap:10px;font-size:12px;
+  font-weight:800;color:var(--text-secondary);white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.prog .track2{width:60px;height:4px;background:var(--bg-sunken);border-radius:var(--radius-pill);overflow:hidden}
+.prog .track2 i{display:block;height:100%;width:0;background:var(--brand-primary);transition:width var(--duration-slow) var(--ease-standard)}
+@media(max-width:700px){.prog .lbl{display:none}}
+
+/* acciones del pie · ez-btn */
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-top:1px solid var(--border-subtle);padding-top:28px;margin-top:32px}
+.act{
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--font-body);font-size:16px;font-weight:700;
+  height:44px;padding:0 22px;border-radius:var(--radius-pill);
+  border:1px solid transparent;cursor:pointer;background:transparent;color:var(--brand-primary-hover);
+  transition:background var(--duration-base) var(--ease-standard),border-color var(--duration-base) var(--ease-standard),transform var(--duration-fast) var(--ease-standard);
+}
+.act:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.act.primary{background:var(--brand-primary);color:var(--text-on-brand)}
+.act.primary:hover{background:var(--brand-primary-hover);color:var(--text-on-brand)}
+.act.primary:active{background:var(--brand-primary-active);transform:scale(.98)}
+.act:not(.primary){border-color:var(--border-strong)}
+.act:not(.primary):hover{background:var(--bg-surface-alt);border-color:var(--brand-primary)}
+.act:active{transform:scale(.98)}
+.act.ghost{color:var(--text-secondary);border-color:var(--border-subtle)}
+.act.ghost:hover{background:var(--bg-surface-alt);border-color:var(--color-danger-600);color:var(--color-danger-600)}
+
+.copybox{flex-basis:100%;margin-top:8px}
+.copybox p{font-size:14px;color:var(--text-secondary);margin:0 0 10px}
+.copybox textarea{font-size:13px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.actnote{flex-basis:100%;font-size:14.5px;color:var(--text-secondary);margin:6px 0 0}
+.actnote.ok{color:var(--color-success-600);font-weight:700}
+.actnote.warn{color:var(--color-danger-600);font-weight:700}
+
+@media print{
+  .actions,.mstate,.copybox{display:none}
+  input[type=text],textarea{border:0;border-bottom:1px solid #999;background:transparent;box-shadow:none}
+}
+</style>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "eleganzza-discovery-v1";
+
+  /* ---------------- utilidades ---------------- */
+  function el(tag, cls){ var n=document.createElement(tag); if(cls) n.className=cls; return n; }
+  function txtInput(name, cls, label){
+    var i=el("input", cls||""); i.type="text"; i.name=name;
+    if(label) i.setAttribute("data-label", label);
+    return i;
+  }
+  function area(name, rows, label){
+    var t=el("textarea"); t.name=name; t.rows=rows;
+    if(label) t.setAttribute("data-label", label);
+    return t;
+  }
+  function choice(type, name, value, label){
+    var l=el("label","choice"), i=el("input"); i.type=type; i.name=name; i.value=value;
+    if(label) i.setAttribute("data-label", label);
+    var s=el("span"); s.textContent=value;
+    l.appendChild(i); l.appendChild(s);
+    return l;
+  }
+
+  /* ---------------- transformación ---------------- */
+  document.querySelectorAll(".q").forEach(function(q, qi){
+    var idNode=q.querySelector(".qid");
+    var base="Q"+qi+"_"+((idNode?idNode.textContent:"").trim().replace(/\s+/g,""));
+    var c=0;
+    function nm(){ return base+"__"+(c++); }
+    var dual = !!q.closest("#s9");
+
+    /* líneas de escritura → textarea */
+    q.querySelectorAll(".lines").forEach(function(g){
+      var rows=Math.max(2, g.querySelectorAll("i").length);
+      g.replaceWith(area(nm(), Math.min(rows,5)));
+    });
+
+    /* recuadros con etiqueta → input o textarea */
+    q.querySelectorAll(".field").forEach(function(f){
+      var box=f.querySelector(".box"); if(!box) return;
+      var lab=f.querySelector("label");
+      var labText=lab?lab.textContent.trim():"";
+      box.replaceWith(box.classList.contains("tall") ? area(nm(),4,labText) : txtInput(nm(),"",labText));
+    });
+
+    /* opciones → casillas o botones de opción única */
+    q.querySelectorAll(".opts").forEach(function(g){
+      var opts=Array.prototype.slice.call(g.querySelectorAll(".opt"));
+      if(!opts.length) return;
+      var radio=opts[0].classList.contains("pick");
+      var gname=nm();
+      opts.forEach(function(o,i){
+        o.replaceWith(choice(radio?"radio":"checkbox", radio?gname:gname+"_"+i, o.textContent.trim()));
+      });
+    });
+
+    /* celdas de tabla */
+    q.querySelectorAll("td").forEach(function(td){
+      var head=td.parentNode.querySelector("th,td");
+      var rowLabel=(head && head!==td) ? head.textContent.trim() : "";
+      if(td.classList.contains("fill")){
+        td.textContent=""; td.classList.remove("fill");
+        td.appendChild(txtInput(nm(),"cellinput",rowLabel));
+        return;
+      }
+      var t=td.textContent.trim();
+      if(t==="☐"){
+        td.textContent="";
+        var cb=el("input"); cb.type="checkbox"; cb.name=nm(); cb.value="sí";
+        var colIdx=Array.prototype.indexOf.call(td.parentNode.children, td);
+        var table=td.closest("table"), heads=table?table.querySelectorAll("thead th"):[];
+        var colLabel=heads[colIdx]?heads[colIdx].textContent.trim():"";
+        cb.setAttribute("data-label", (rowLabel?rowLabel+" · ":"")+colLabel);
+        td.appendChild(cb);
+        return;
+      }
+      if(t.indexOf(" · ")>-1){
+        var parts=t.split(" · ").map(function(x){return x.trim();});
+        var gname2=nm();
+        td.textContent="";
+        var wrap=el("div","chips");
+        parts.forEach(function(p){ wrap.appendChild(choice("radio",gname2,p,rowLabel)); });
+        td.appendChild(wrap);
+      }
+    });
+
+    /* rankings → número de orden */
+    q.querySelectorAll(".rank").forEach(function(r){
+      var items=r.querySelectorAll("div");
+      items.forEach(function(d){
+        var bar=d.querySelector("i"); if(!bar) return;
+        var label=d.querySelector("span");
+        var i=txtInput(nm(),"ranknum",label?label.textContent.trim():"");
+        i.type="number"; i.min=1; i.max=items.length; i.setAttribute("inputmode","numeric");
+        bar.replaceWith(i);
+      });
+    });
+
+    /* escalas → marcas seleccionables */
+    q.querySelectorAll(".srow").forEach(function(row){
+      var track=row.querySelector(".track"); if(!track) return;
+      var n=track.querySelectorAll("u").length || 5;
+      var labs=row.querySelectorAll(".slabels b");
+      var axis=(labs[0]?labs[0].textContent.trim():"")+" → "+(labs[1]?labs[1].textContent.trim():"");
+      var box=el("div","tracks");
+      var roles = dual ? [["hoy","Hoy"],["meta","Meta"]] : [["solo",""]];
+      roles.forEach(function(r){
+        var gname=nm();
+        var line=el("div","trackrow"+(r[0]==="meta"?" meta":""));
+        if(dual){ var rl=el("span","role"); rl.textContent=r[1]; line.appendChild(rl); }
+        var ticks=el("div","ticks");
+        for(var i=1;i<=n;i++){
+          var l=el("label","tick"), inp=el("input");
+          inp.type="radio"; inp.name=gname; inp.value=String(i);
+          inp.setAttribute("data-label", axis+(dual?" ["+r[1]+"]":""));
+          var s=el("span"); s.textContent=i;
+          l.appendChild(inp); l.appendChild(s); ticks.appendChild(l);
+        }
+        line.appendChild(ticks); box.appendChild(line);
+      });
+      track.replaceWith(box);
+    });
+
+    /* pares A / B */
+    q.querySelectorAll(".pair").forEach(function(p){
+      var sp=p.querySelectorAll("span"); if(sp.length<3) return;
+      var gname=nm();
+      var a=sp[0].textContent.trim(), b=sp[2].textContent.trim();
+      sp[0].textContent=""; sp[0].appendChild(choice("radio",gname,a));
+      sp[2].textContent=""; sp[2].appendChild(choice("radio",gname,b));
+    });
+
+    /* meses → botón de tres estados */
+    q.querySelectorAll(".months > div").forEach(function(d){
+      var s=d.querySelector("span"); if(!s) return;
+      var b=el("button","mstate"); b.type="button";
+      b.setAttribute("data-name", nm());
+      b.setAttribute("data-label", d.firstChild.textContent.trim());
+      b.setAttribute("data-v","");
+      b.setAttribute("aria-label","Mes "+d.firstChild.textContent.trim());
+      s.replaceWith(b);
+    });
+  });
+
+  var CYCLE=["","fuerte","normal","flojo"];
+  document.addEventListener("click", function(e){
+    var b=e.target.closest(".mstate"); if(!b) return;
+    var i=CYCLE.indexOf(b.getAttribute("data-v"));
+    var v=CYCLE[(i+1)%CYCLE.length];
+    b.setAttribute("data-v", v);
+    b.textContent = v ? v.charAt(0).toUpperCase() : "";
+    save();
+    progress();
+  });
+
+  /* ---------------- guardado ---------------- */
+  function controls(root){
+    return Array.prototype.slice.call((root||document).querySelectorAll("input,textarea"));
+  }
+  function collect(){
+    var d={};
+    controls().forEach(function(c){
+      if(!c.name) return;
+      if(c.type==="radio"||c.type==="checkbox"){ if(c.checked) d[c.name]=c.value; }
+      else if(c.value!=="") d[c.name]=c.value;
+    });
+    document.querySelectorAll(".mstate").forEach(function(b){
+      if(b.getAttribute("data-v")) d[b.getAttribute("data-name")]=b.getAttribute("data-v");
+    });
+    return d;
+  }
+  var t=null;
+  function save(){
+    clearTimeout(t);
+    t=setTimeout(function(){
+      try{ localStorage.setItem(KEY, JSON.stringify(collect())); }
+      catch(err){ note("No pudimos guardar en este navegador. Copien sus respuestas antes de cerrar la página.","warn"); }
+    }, 400);
+  }
+  function restore(){
+    var raw=null;
+    try{ raw=localStorage.getItem(KEY); }catch(err){ return; }
+    if(!raw) return;
+    var d;
+    try{ d=JSON.parse(raw); }catch(err){ return; }
+    controls().forEach(function(c){
+      if(!c.name || !(c.name in d)) return;
+      if(c.type==="radio"||c.type==="checkbox"){ if(c.value===d[c.name]) c.checked=true; }
+      else c.value=d[c.name];
+    });
+    document.querySelectorAll(".mstate").forEach(function(b){
+      var v=d[b.getAttribute("data-name")];
+      if(v){ b.setAttribute("data-v",v); b.textContent=v.charAt(0).toUpperCase(); }
+    });
+  }
+  document.addEventListener("input", function(e){
+    if(e.target.matches("input,textarea")){ save(); progress(); }
+  });
+  document.addEventListener("change", function(e){
+    if(e.target.matches("input,textarea")){ save(); progress(); }
+  });
+
+  /* ---------------- progreso ---------------- */
+  var reqQs=Array.prototype.slice.call(document.querySelectorAll('.q[data-p="req"]'));
+  var bar=document.querySelector(".bar-in");
+  var prog=el("div","prog");
+  prog.innerHTML='<span class="track2"><i id="progFill"></i></span><span class="lbl" id="progTxt">0 / '+reqQs.length+'</span>';
+  bar.insertBefore(prog, document.getElementById("filterBtn"));
+  function answered(q){
+    var done=false;
+    controls(q).forEach(function(c){
+      if(c.type==="radio"||c.type==="checkbox"){ if(c.checked) done=true; }
+      else if(c.value.trim()!=="") done=true;
+    });
+    q.querySelectorAll(".mstate").forEach(function(b){ if(b.getAttribute("data-v")) done=true; });
+    return done;
+  }
+  function progress(){
+    var n=0;
+    reqQs.forEach(function(q){ if(answered(q)) n++; });
+    document.getElementById("progFill").style.width=Math.round(n/reqQs.length*100)+"%";
+    document.getElementById("progTxt").textContent=n+" / "+reqQs.length;
+  }
+
+  /* ---------------- exportación ---------------- */
+  function labelOf(c){ return c.getAttribute("data-label")||""; }
+  function report(){
+    var out=[], who="";
+    var first=document.querySelector('#s0 input[type=text]');
+    if(first && first.value) who=first.value.trim();
+    out.push("ELEGANZZA · DESCUBRIMIENTO DE MARCA");
+    out.push("Fase 1 de 9 · Enki Soluciones");
+    if(who) out.push("Contesta: "+who);
+    out.push("Enviado: "+new Date().toLocaleString("es-MX"));
+    out.push("");
+    document.querySelectorAll(".section").forEach(function(sec){
+      var num=sec.querySelector(".snum").textContent.trim();
+      var title=sec.querySelector(".stitle").textContent.trim();
+      var lines=[];
+      sec.querySelectorAll(".q").forEach(function(q){
+        var qid=q.querySelector(".qid");
+        var qt=q.querySelector(".qt");
+        var ans=[];
+        controls(q).forEach(function(c){
+          var v=null;
+          if(c.type==="radio"||c.type==="checkbox"){ if(c.checked) v=c.value; }
+          else if(c.value.trim()!=="") v=c.value.trim();
+          if(v===null) return;
+          var lb=labelOf(c);
+          ans.push(lb ? "   "+lb+": "+v : "   - "+v);
+        });
+        var meses=[];
+        q.querySelectorAll(".mstate").forEach(function(b){
+          if(b.getAttribute("data-v")) meses.push(b.getAttribute("data-label")+"="+b.getAttribute("data-v"));
+        });
+        if(meses.length) ans.push("   "+meses.join("  "));
+        if(!ans.length) return;
+        lines.push((qid?qid.textContent.trim()+"  ":"")+(qt?qt.textContent.trim():""));
+        lines.push(ans.join("\n"));
+        lines.push("");
+      });
+      if(lines.length){
+        out.push("─────────────────────────────────────────");
+        out.push((num==="·"?"":num+" · ")+title.toUpperCase());
+        out.push("─────────────────────────────────────────");
+        out.push(lines.join("\n"));
+      }
+    });
+    return { text: out.join("\n"), who: who };
+  }
+
+  var note_el=document.getElementById("actNote");
+  var noteDefault=note_el.textContent;
+  var noteT=null;
+  function note(msg, kind){
+    clearTimeout(noteT);
+    note_el.textContent=msg;
+    note_el.className="actnote"+(kind?" "+kind:"");
+    noteT=setTimeout(function(){ note_el.textContent=noteDefault; note_el.className="actnote"; }, 7000);
+  }
+
+  document.getElementById("btnSave").addEventListener("click", function(){
+    var r=report();
+    if(r.text.split("\n").length<8){ note("Todavía no hay respuestas que guardar.","warn"); return; }
+    var slug=(r.who||"eleganzza").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+    (window.claude && window.claude.use ? window.claude.use("downloads") : Promise.resolve(null))
+      .then(function(dl){
+        if(!dl){ note("Este visor no permite descargas. Usen “Copiar todo” y péguenlo en un correo.","warn"); return; }
+        return dl.save({ filename: "eleganzza-descubrimiento-"+slug+".txt", data: r.text })
+          .then(function(){ note("Listo. Envíennos ese archivo.","ok"); })
+          .catch(function(err){
+            if(err && err.code==="declined") return;
+            note("No se pudo descargar. Usen “Copiar todo”.","warn");
+          });
+      })
+      .catch(function(){ note("No se pudo descargar. Usen “Copiar todo”.","warn"); });
+  });
+
+  function manual(text){
+    var box=document.getElementById("copyBox"), ta=document.getElementById("copyArea");
+    ta.value=text; box.hidden=false;
+    ta.focus(); ta.select();
+    note("Su navegador no nos deja copiar solos. Aquí abajo están sus respuestas para copiarlas a mano.","warn");
+  }
+
+  document.getElementById("btnCopy").addEventListener("click", function(){
+    var r=report();
+    if(r.text.split("\n").length<8){ note("Todavía no hay respuestas que copiar.","warn"); return; }
+    function fallback(){
+      var ta=el("textarea");
+      ta.value=r.text;
+      ta.style.cssText="position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok=false;
+      try{ ok=document.execCommand("copy"); }catch(e){}
+      document.body.removeChild(ta);
+      if(ok){ note("Copiado. Péguenlo en un correo o WhatsApp y envíennoslo.","ok"); return; }
+      manual(r.text);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(r.text).then(function(){
+        note("Copiado. Péguenlo en un correo o WhatsApp y envíennoslo.","ok");
+      }).catch(fallback);
+    } else fallback();
+  });
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(!confirm("¿Borrar todas las respuestas de este navegador y empezar de nuevo? No se puede deshacer.")) return;
+    try{ localStorage.removeItem(KEY); }catch(e){}
+    controls().forEach(function(c){
+      if(c.type==="radio"||c.type==="checkbox") c.checked=false; else c.value="";
+    });
+    document.querySelectorAll(".mstate").forEach(function(b){ b.setAttribute("data-v",""); b.textContent=""; });
+    progress();
+    note("Listo, en blanco.","ok");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  /* ---------------- envío al servidor ---------------- */
+  function campo(etiqueta){
+    var c=document.querySelector('[data-label="'+etiqueta+'"]');
+    return c && c.value ? c.value.trim() : "";
+  }
+  function avance(){
+    var n=0; reqQs.forEach(function(q){ if(answered(q)) n++; });
+    return {hechas:n, total:reqQs.length};
+  }
+
+  var ENDPOINT = window.ENVIO || null;
+  var btnEnviar = document.getElementById("btnEnviar");
+  if(ENDPOINT){
+    btnEnviar.hidden = false;
+    document.getElementById("btnSave").classList.remove("primary");
+    noteDefault = "Sus respuestas se guardan solas mientras escriben. Cuando terminen, denle a Enviar y nos llegan directo.";
+    note_el.textContent = noteDefault;
+  }
+
+  btnEnviar.addEventListener("click", function(){
+    var a=avance();
+    if(a.hechas===0){ note("Todavia no hay respuestas que enviar.","warn"); return; }
+    if(a.hechas<a.total && !confirm("Llevan "+a.hechas+" de "+a.total+" preguntas obligatorias.\n\nEnviarlas de todos modos? Pueden seguir contestando y volver a enviar despues.")) return;
+
+    var original=btnEnviar.textContent;
+    btnEnviar.disabled=true; btnEnviar.textContent="Enviando...";
+    var r=report();
+
+    fetch(ENDPOINT,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        respondiente: campo("Nombre completo"),
+        rol: campo("Rol"),
+        respuestas: collect(),
+        texto: r.text,
+        avance: a.hechas,
+        total: a.total
+      })
+    })
+    .then(function(res){ if(!res.ok) throw new Error("HTTP "+res.status); return res.json(); })
+    .then(function(){
+      btnEnviar.textContent="Enviado";
+      note("Listo, ya las recibimos. Pueden cerrar la pagina; si quieren completar algo mas, vuelvan y envien de nuevo.","ok");
+      setTimeout(function(){ btnEnviar.disabled=false; btnEnviar.textContent=original; }, 6000);
+    })
+    .catch(function(){
+      btnEnviar.disabled=false; btnEnviar.textContent=original;
+      note("No pudimos enviarlas. Usen \u201cGuardar mis respuestas\u201d y mandennos el archivo.","warn");
+    });
+  });
+
+  /* ---------------- filtro y barra ---------------- */
+  var btn=document.getElementById("filterBtn");
+  btn.addEventListener("click", function(){
+    var on=document.body.classList.toggle("only-req");
+    btn.setAttribute("aria-pressed", on?"true":"false");
+    btn.lastChild.textContent = on ? " Ver todas" : " Solo obligatorias";
+  });
+
+  var barTitle=document.getElementById("barTitle");
+  var secs=Array.prototype.slice.call(document.querySelectorAll(".section"));
+  var baseTitle='Eleganzza <i>· Descubrimiento de marca</i>';
+  function updateBar(){
+    var cur=null;
+    for(var i=0;i<secs.length;i++){ if(secs[i].getBoundingClientRect().top<90) cur=secs[i]; }
+    if(!cur){ barTitle.innerHTML=baseTitle; return; }
+    var n=cur.querySelector(".snum").textContent.trim();
+    var ti=cur.querySelector(".stitle").textContent.trim();
+    barTitle.innerHTML=(n==="·"?"":n+" <i>·</i> ")+ti;
+  }
+  var ticking=false;
+  window.addEventListener("scroll", function(){
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(function(){ updateBar(); ticking=false; });
+  }, {passive:true});
+
+  window.addEventListener("beforeunload", function(){
+    try{ localStorage.setItem(KEY, JSON.stringify(collect())); }catch(e){}
+  });
+
+  restore();
+  progress();
+  updateBar();
+})();
+</script>
+
+</body></html>

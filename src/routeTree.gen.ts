@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BrandDiscoveryRouteImport } from './routes/brand-discovery'
 import { Route as CatalogoTokenRouteImport } from './routes/catalogo.$token'
 import { Route as PublicacionesTokenRouteImport } from './routes/publicaciones.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrandDiscoveryRoute = BrandDiscoveryRouteImport.update({
+  id: '/brand-discovery',
+  path: '/brand-discovery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoTokenRoute = CatalogoTokenRouteImport.update({
@@ -31,30 +37,40 @@ const PublicacionesTokenRoute = PublicacionesTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/brand-discovery': typeof BrandDiscoveryRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
   '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/brand-discovery': typeof BrandDiscoveryRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
   '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/brand-discovery': typeof BrandDiscoveryRoute
   '/catalogo/$token': typeof CatalogoTokenRoute
   '/publicaciones/$token': typeof PublicacionesTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo/$token' | '/publicaciones/$token'
+  fullPaths:
+    '/' | '/brand-discovery' | '/catalogo/$token' | '/publicaciones/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo/$token' | '/publicaciones/$token'
-  id: '__root__' | '/' | '/catalogo/$token' | '/publicaciones/$token'
+  to: '/' | '/brand-discovery' | '/catalogo/$token' | '/publicaciones/$token'
+  id:
+    | '__root__'
+    | '/'
+    | '/brand-discovery'
+    | '/catalogo/$token'
+    | '/publicaciones/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BrandDiscoveryRoute: typeof BrandDiscoveryRoute
   CatalogoTokenRoute: typeof CatalogoTokenRoute
   PublicacionesTokenRoute: typeof PublicacionesTokenRoute
 }
@@ -66,6 +82,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand-discovery': {
+      id: '/brand-discovery'
+      path: '/brand-discovery'
+      fullPath: '/brand-discovery'
+      preLoaderRoute: typeof BrandDiscoveryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo/$token': {
@@ -87,6 +110,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BrandDiscoveryRoute: BrandDiscoveryRoute,
   CatalogoTokenRoute: CatalogoTokenRoute,
   PublicacionesTokenRoute: PublicacionesTokenRoute,
 }
