@@ -1802,4 +1802,60 @@ td .chips .choice input[type=radio]:checked::after{left:2.5px;top:2.5px;width:8p
 })();
 </script>
 
+<script>
+(function(){
+  "use strict";
+  var cfg=null;
+  try{ var m=(location.hash||"").match(/cfg=([^&]+)/); if(m){ cfg=JSON.parse(atob(decodeURIComponent(m[1]))); } }catch(e){}
+  if(!cfg||!cfg.u||!cfg.k) return; /* acceso directo sin config -> sin envio */
+  function gather(){
+    var respuestas={}, lines=[];
+    document.querySelectorAll("input[name],textarea[name]").forEach(function(c){
+      var val="";
+      if(c.type==="radio"||c.type==="checkbox"){ if(!c.checked) return; val=c.value||""; }
+      else { val=(c.value||"").trim(); if(!val) return; }
+      var label=c.getAttribute("data-label")||c.name;
+      respuestas[label]=respuestas[label]?(respuestas[label]+" | "+val):val;
+    });
+    document.querySelectorAll(".mstate[data-name]").forEach(function(b){
+      var v=b.getAttribute("data-v"); if(v){ respuestas[b.getAttribute("data-name")]=v; }
+    });
+    Object.keys(respuestas).forEach(function(k){ lines.push(k+": "+respuestas[k]); });
+    return { respuestas:respuestas, texto:lines.join("\n") };
+  }
+  function findName(){
+    var els=document.querySelectorAll("input[data-label],textarea[data-label]");
+    for(var i=0;i<els.length;i++){
+      var lab=(els[i].getAttribute("data-label")||"").toLowerCase();
+      if(lab.indexOf("nombre")>=0 && els[i].value && els[i].value.trim()) return els[i].value.trim();
+    }
+    return "";
+  }
+  var btn=document.createElement("button");
+  btn.type="button";
+  btn.textContent="Enviar a Eleganzza";
+  btn.style.cssText="display:inline-flex;align-items:center;gap:8px;margin:8px 8px 8px 0;padding:12px 22px;background:#c73a2a;color:#fff;border:none;border-radius:999px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer";
+  btn.addEventListener("click",function(){
+    var data=gather();
+    if(!Object.keys(data.respuestas).length){ alert("Aun no hay respuestas para enviar."); return; }
+    btn.disabled=true; var prev=btn.textContent; btn.textContent="Enviando...";
+    fetch(cfg.u+"/rest/v1/rpc/submit_brand_discovery",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json", "apikey":cfg.k, "Authorization":"Bearer "+cfg.k },
+      body:JSON.stringify({ p_nombre:findName(), p_respuestas:data.respuestas, p_texto:data.texto })
+    }).then(function(r){ return r.json().catch(function(){return null;}).then(function(j){ return {ok:r.ok,j:j}; }); })
+      .then(function(res){
+        if(res.ok && res.j && res.j.success){ btn.textContent="✓ Enviado a Eleganzza"; btn.style.background="#4d7a52"; }
+        else { throw new Error((res.j&&res.j.message)||"No se pudo enviar"); }
+      })
+      .catch(function(e){ btn.disabled=false; btn.textContent=prev; alert("No se pudo enviar: "+((e&&e.message)||e)); });
+  });
+  function place(){
+    var anchor=document.getElementById("btnCopy");
+    if(anchor&&anchor.parentNode){ anchor.parentNode.insertBefore(btn, anchor); }
+    else { document.body.appendChild(btn); }
+  }
+  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", place); } else { place(); }
+})();
+</script>
 </body></html>

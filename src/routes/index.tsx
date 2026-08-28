@@ -25,6 +25,7 @@ import { AirtableInventory } from "@/components/dashboard/AirtableInventory";
 import { SupabaseInventory } from "@/components/dashboard/SupabaseInventory";
 import { WooCommerceSyncQueue } from "@/components/dashboard/WooCommerceSyncQueue";
 import { TrazabilidadPanel } from "@/components/dashboard/TrazabilidadPanel";
+import { BrandDiscoveryPanel } from "@/components/dashboard/BrandDiscoveryPanel";
 import { Suspense, useState, useEffect } from "react";
 import { IAGenerator } from "@/components/dashboard/IAGenerator";
 import { PromptSettings } from "@/components/dashboard/PromptSettings";
@@ -40,7 +41,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { BookOpen, Layers } from "lucide-react";
+import { BookOpen, Layers, ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "@/lib/api/stats.functions";
 
@@ -65,6 +66,7 @@ type ViewType =
   | "dashboard"
   | "productos"
   | "trazabilidad"
+  | "brand-discovery"
   | "campañas"
   | "publicaciones"
   | "catalogos"
@@ -131,6 +133,7 @@ function Index() {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "productos", label: "Productos", icon: Package },
     { id: "trazabilidad", label: "Trazabilidad", icon: Layers },
+    { id: "brand-discovery", label: "Brand Discovery", icon: ClipboardList },
     { id: "campañas", label: "Campañas", icon: Megaphone },
     { id: "publicaciones", label: "Publicaciones", icon: Send },
     { id: "catalogos", label: "Catálogos", icon: BookOpen },
@@ -345,6 +348,20 @@ function Index() {
                 }
               >
                 <TrazabilidadPanel />
+              </Suspense>
+            </div>
+          )}
+
+          {view === "brand-discovery" && (
+            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+              <Suspense
+                fallback={
+                  <div className="flex justify-center p-12">
+                    <Loader2 className="animate-spin h-8 w-8 text-slate-300" />
+                  </div>
+                }
+              >
+                <BrandDiscoveryPanel />
               </Suspense>
             </div>
           )}
