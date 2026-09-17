@@ -21,6 +21,7 @@ import {
   setPublicacionEstado,
   getPublicacionComentarios,
   getMueblesParaSelector,
+  getCampanasParaSelector,
   CANALES,
   ESTADO_LABEL,
   type Publicacion,
@@ -82,6 +83,7 @@ type Borrador = {
   id?: string;
   titulo: string;
   muebleId: string;
+  campanaId: string;
   copy: string;
   canal: string;
   fechaProgramada: string;
@@ -92,6 +94,7 @@ type Borrador = {
 const BORRADOR_VACIO: Borrador = {
   titulo: "",
   muebleId: "",
+  campanaId: "",
   copy: "",
   canal: "",
   fechaProgramada: "",
@@ -121,6 +124,13 @@ export function PublicacionesManager() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: campanas = [] } = useQuery({
+    queryKey: ["campanas-selector"],
+    queryFn: getCampanasParaSelector,
+    enabled: editorAbierto,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: enlaces = [] } = useQuery({
     queryKey: ["publicaciones-links"],
     queryFn: () => getCatalogReviewLinks("publicaciones"),
@@ -144,6 +154,7 @@ export function PublicacionesManager() {
         copy: borrador.copy.trim() || null,
         canal: borrador.canal || null,
         fechaProgramada: borrador.fechaProgramada || null,
+        campanaId: borrador.campanaId || null,
         muebleId: borrador.muebleId || null,
         notas: borrador.notas.trim() || null,
         archivos: borrador.archivos,
@@ -230,6 +241,7 @@ export function PublicacionesManager() {
             id: publicacion.id,
             titulo: publicacion.titulo,
             muebleId: publicacion.mueble_id ?? "",
+            campanaId: publicacion.campana_id ?? "",
             copy: publicacion.copy ?? "",
             canal: publicacion.canal ?? "",
             fechaProgramada: publicacion.fecha_programada ?? "",
@@ -454,6 +466,23 @@ export function PublicacionesManager() {
                 Si eliges uno, la publicación aparece en su ficha y los archivos se guardan en la
                 carpeta de Drive de ese mueble.
               </p>
+            </div>
+
+            <div>
+              <Label htmlFor="campana">Campaña (opcional)</Label>
+              <select
+                id="campana"
+                value={borrador.campanaId}
+                onChange={(e) => setBorrador({ ...borrador, campanaId: e.target.value })}
+                className="w-full h-10 px-3 rounded-md border border-slate-200 dark:border-slate-700 bg-transparent text-sm"
+              >
+                <option value="">Ninguna</option>
+                {campanas.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

@@ -150,3 +150,14 @@ export async function getMueblesParaSelector() {
   if (error) throw new Error(error.message);
   return (data ?? []) as Array<{ id: string; nombre: string; categoria: string | null }>;
 }
+
+/** Lista ligera de campañas para el selector del editor de publicaciones. */
+export async function getCampanasParaSelector() {
+  const { data, error } = await supabase
+    .from("campanas")
+    .select("id, nombre")
+    .order("nombre");
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Array<{ id: string; nombre: string }>;
+}

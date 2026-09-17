@@ -1,19 +1,28 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCampaigns, upsertCampaign, deleteCampaign, Campaign } from "@/lib/api/campaigns.functions";
+import {
+  getCampaigns,
+  upsertCampaign,
+  deleteCampaign,
+  getCampanaMuebles,
+  setCampanaMuebles,
+  getMueblesLigeros,
+  Campaign,
+} from "@/lib/api/campaigns.functions";
 import { uploadToDrive } from "@/lib/api/inventory.functions";
 import { 
-  Plus, 
-  ExternalLink, 
-  MoreVertical, 
-  Trash2, 
-  Edit2, 
-  Calendar, 
+  Plus,
+  ExternalLink,
+  MoreVertical,
+  Trash2,
+  Edit2,
+  Calendar,
   Megaphone,
   Upload,
   Link as LinkIcon,
   X,
-  Loader2
+  Loader2,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,11 +49,51 @@ export function CampaignsManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Partial<Campaign> | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedMuebleIds, setSelectedMuebleIds] = useState<Set<string>>(new Set());
+  const [muebleBusqueda, setMuebleBusqueda] = useState("");
 
   const { data: campaigns = [], isLoading, error } = useQuery({
     queryKey: ['campaigns'],
     queryFn: () => getCampaigns(),
   });
+
+  const { data: todosMuebles = [] } = useQuery({
+    queryKey: ["muebles-ligeros"],
+    queryFn: () => getMueblesLigeros(),
+    enabled: isDialogOpen,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: mueblesCargados } = useQuery({
+    queryKey: ["campana-muebles", editingCampaign?.id],
+    queryFn: () => getCampanaMuebles({ data: { campanaId: editingCampaign!.id! } }),
+    enabled: isDialogOpen && Boolean(editingCampaign?.id),
+  });
+
+  React.useEffect(() => {
+    if (mueblesCargados) {
+      setSelectedMuebleIds(new Set(mueblesCargados));
+    }
+  }, [mueblesCargados]);
+
+  const mueblesFiltrados = useMemo(() => {
+    if (!muebleBusqueda.trim()) return todosMuebles;
+    const q = muebleBusqueda.toLowerCase();
+    return todosMuebles.filter(
+      (m) =>
+        m.nombre.toLowerCase().includes(q) ||
+        (m.categoria && m.categoria.toLowerCase().includes(q)),
+    );
+  }, [todosMuebles, muebleBusqueda]);
+
+  const toggleMueble = (id: string) => {
+    setSelectedMuebleIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const upsertMutation = useMutation({
     mutationFn: (data: any) => upsertCampaign({ data }),
@@ -130,13 +179,36 @@ export function CampaignsManager() {
     setEditingCampaign(prev => ({ ...prev, artes_oficiales: newFiles }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const mueblesMutation = useMutation({
+    mutationFn: (vars: { campanaId: string; muebleIds: string[] }) =>
+      setCampanaMuebles({ data: vars }),
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCampaign?.nombre) {
       toast.error("El nombre es obligatorio");
       return;
     }
-    upsertMutation.mutate(editingCampaign);
+    upsertMutation.mutate(editingCampaign, {
+      onSuccess: async (saved: Campaign) => {
+        try {
+          await mueblesMutation.mutateAsync({
+            campanaId: saved.id,
+            muebleIds: Array.from(selectedMuebleIds),
+          });
+        } catch {
+          toast.error("La campaña se guardó pero hubo error al vincular los muebles");
+        }
+      },
+    });
+  };
+
+  const openDialog = (campaign?: Campaign) => {
+    setEditingCampaign(campaign ?? {});
+    setSelectedMuebleIds(new Set());
+    setMuebleBusqueda("");
+    setIsDialogOpen(true);
   };
 
   if (isLoading) return <div className="flex justify-center p-12"><Loader2 className="animate-spin h-8 w-8 text-slate-300" /></div>;
@@ -171,7 +243,7 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
           <h2 className="text-2xl font-serif font-bold text-slate-900">Gestión de Campañas</h2>
           <p className="text-slate-500">Administra tus campañas estacionales y artes oficiales.</p>
         </div>
-        <Button onClick={() => { setEditingCampaign({}); setIsDialogOpen(true); }} className="bg-slate-900">
+        <Button onClick={() => openDialog()} className="bg-slate-900">
           <Plus className="h-4 w-4 mr-2" /> Nueva Campaña
         </Button>
       </div>
@@ -183,7 +255,7 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
           </div>
           <h3 className="text-lg font-medium text-slate-900">No hay campañas registradas</h3>
           <p className="text-slate-500 mt-1 max-w-xs mx-auto text-sm">Comienza creando tu primera campaña para organizar tus contenidos.</p>
-          <Button variant="outline" onClick={() => { setEditingCampaign({}); setIsDialogOpen(true); }} className="mt-6">
+          <Button variant="outline" onClick={() => openDialog()} className="mt-6">
             Crear ahora
           </Button>
         </div>
@@ -203,7 +275,7 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => { setEditingCampaign(campaign); setIsDialogOpen(true); }}>
+                      <DropdownMenuItem onClick={() => openDialog(campaign)}>
                         <Edit2 className="h-4 w-4 mr-2" /> Editar
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600" onClick={() => deleteMutation.mutate(campaign.id)}>
@@ -243,7 +315,7 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
                 </div>
               </CardContent>
               <CardFooter className="pt-2 flex gap-2">
-                <Button variant="outline" className="flex-1 text-xs h-9" onClick={() => { setEditingCampaign(campaign); setIsDialogOpen(true); }}>
+                <Button variant="outline" className="flex-1 text-xs h-9" onClick={() => openDialog(campaign)}>
                   Ver detalles
                 </Button>
                 {campaign.canva_link && (
@@ -321,6 +393,53 @@ GRANT ALL ON public.campanas TO authenticated, anon, service_role;`}
                 </div>
               </div>
               
+              <div className="grid gap-3">
+                <div className="flex items-center justify-between">
+                  <Label>Muebles en esta campaña</Label>
+                  {selectedMuebleIds.size > 0 && (
+                    <span className="text-xs text-violet-600 font-medium">
+                      {selectedMuebleIds.size} seleccionado{selectedMuebleIds.size !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Buscar mueble por nombre o categoría…"
+                    className="pl-9"
+                    value={muebleBusqueda}
+                    onChange={(e) => setMuebleBusqueda(e.target.value)}
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 divide-y divide-slate-100 dark:divide-slate-800">
+                  {mueblesFiltrados.length === 0 ? (
+                    <p className="p-3 text-center text-xs text-slate-400">
+                      {todosMuebles.length === 0 ? "Cargando muebles…" : "Sin resultados"}
+                    </p>
+                  ) : (
+                    mueblesFiltrados.map((m) => (
+                      <label
+                        key={m.id}
+                        className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedMuebleIds.has(m.id)}
+                          onChange={() => toggleMueble(m.id)}
+                          className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="truncate">{m.nombre}</span>
+                        {m.categoria && (
+                          <span className="ml-auto text-xs text-slate-400 shrink-0">
+                            {m.categoria}
+                          </span>
+                        )}
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+
               <div className="grid gap-3">
                 <Label>Artes Oficiales Aprobados</Label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

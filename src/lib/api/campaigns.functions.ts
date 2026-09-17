@@ -85,3 +85,47 @@ export const deleteCampaign = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { success: true };
   });
+
+export const getCampanaMuebles = createServerFn({ method: "POST" })
+  .middleware([requiereSesion])
+  .inputValidator((data: unknown) => z.object({ campanaId: z.string() }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: rows, error } = await supabase
+      .from("campana_muebles")
+      .select("mueble_id")
+      .eq("campana_id", data.campanaId);
+
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((r) => r.mueble_id) as string[];
+  });
+
+export const setCampanaMuebles = createServerFn({ method: "POST" })
+  .middleware([requiereEditor])
+  .inputValidator((data: unknown) =>
+    z.object({ campanaId: z.string(), muebleIds: z.array(z.string()) }).parse(data),
+  )
+  .handler(async ({ data }) => {
+    await supabase.from("campana_muebles").delete().eq("campana_id", data.campanaId);
+
+    if (data.muebleIds.length > 0) {
+      const rows = data.muebleIds.map((mId) => ({
+        campana_id: data.campanaId,
+        mueble_id: mId,
+      }));
+      const { error } = await supabase.from("campana_muebles").insert(rows);
+      if (error) throw new Error(error.message);
+    }
+    return { success: true };
+  });
+
+export const getMueblesLigeros = createServerFn({ method: "GET" })
+  .middleware([requiereSesion])
+  .handler(async () => {
+    const { data, error } = await supabase
+      .from("muebles")
+      .select("id, nombre, categoria")
+      .order("nombre");
+
+    if (error) throw new Error(error.message);
+    return (data ?? []) as Array<{ id: string; nombre: string; categoria: string | null }>;
+  });
